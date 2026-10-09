@@ -39,10 +39,12 @@ export const OwnerPortalPage: React.FC = () => {
 
   if (isTenantLoading || isAuthLoading) {
     return (
-      <div className="min-h-screen bg-background p-4 max-w-lg mx-auto space-y-4 pt-10">
-        <Skeleton className="h-16 w-full rounded-2xl" />
-        <Skeleton className="h-48 w-full rounded-2xl" />
-        <Skeleton className="h-48 w-full rounded-2xl" />
+      <div className="min-h-screen bg-black/95 flex justify-center">
+        <div className="w-full max-w-md min-h-screen bg-background border-x border-white/[0.08] p-4 space-y-4 pt-10">
+          <Skeleton className="h-14 w-full rounded-2xl" />
+          <Skeleton className="h-44 w-full rounded-2xl" />
+          <Skeleton className="h-44 w-full rounded-2xl" />
+        </div>
       </div>
     );
   }
@@ -50,7 +52,13 @@ export const OwnerPortalPage: React.FC = () => {
   if (!tenant) return null;
 
   if (!isAuthenticated) {
-    return <OwnerLoginPage tenant={tenant} />;
+    return (
+      <div className="min-h-screen bg-black/95 flex justify-center">
+        <div className="w-full max-w-md min-h-screen bg-background border-x border-white/[0.08]">
+          <OwnerLoginPage tenant={tenant} />
+        </div>
+      </div>
+    );
   }
 
   const resources = scheduleData?.resources || [];
@@ -58,58 +66,60 @@ export const OwnerPortalPage: React.FC = () => {
   const occupancies = scheduleData?.occupancies || [];
 
   return (
-    <div className="min-h-screen bg-background pb-24">
-      {/* Top Header */}
-      <OwnerHeader
-        tenant={tenant}
-        ownerEmail={ownerEmail}
-        onLogout={logout}
-      />
+    <div className="min-h-screen bg-black/95 flex justify-center antialiased">
+      <div className="w-full max-w-md min-h-screen bg-background border-x border-white/[0.08] flex flex-col relative pb-24 shadow-2xl">
+        {/* Top Header */}
+        <OwnerHeader
+          tenant={tenant}
+          ownerEmail={ownerEmail}
+          onLogout={logout}
+        />
 
-      {/* Main Content Area */}
-      <main className="max-w-xl mx-auto px-4 pt-4">
-        {activeTab === 'schedule' && (
-          <ScheduleView
-            tenant={tenant}
-            selectedDate={selectedDate}
-            onDateChange={setSelectedDate}
-            resources={resources}
-            bookings={bookings}
-            occupancies={occupancies}
-            onSelectBooking={setSelectedBooking}
-          />
-        )}
+        {/* Main Content Area */}
+        <main className="px-3.5 pt-3.5 flex-1 animate-in fade-in duration-200">
+          {activeTab === 'schedule' && (
+            <ScheduleView
+              tenant={tenant}
+              selectedDate={selectedDate}
+              onDateChange={setSelectedDate}
+              resources={resources}
+              bookings={bookings}
+              occupancies={occupancies}
+              onSelectBooking={setSelectedBooking}
+            />
+          )}
 
-        {activeTab === 'analytics' && <AnalyticsView tenant={tenant} />}
+          {activeTab === 'analytics' && <AnalyticsView tenant={tenant} />}
 
-        {activeTab === 'settings' && <SettingsView tenant={tenant} />}
-      </main>
+          {activeTab === 'settings' && <SettingsView tenant={tenant} />}
+        </main>
 
-      {/* Bottom Navigation */}
-      <OwnerBottomNav
-        currentTab={activeTab}
-        onTabChange={setActiveTab}
-        onQuickBlockClick={() => setIsManualBlockOpen(true)}
-      />
+        {/* Bottom Navigation */}
+        <OwnerBottomNav
+          currentTab={activeTab}
+          onTabChange={setActiveTab}
+          onQuickBlockClick={() => setIsManualBlockOpen(true)}
+        />
 
-      {/* Booking Details Drawer */}
-      <BookingDetailsDrawer
-        isOpen={Boolean(selectedBooking)}
-        onClose={() => setSelectedBooking(null)}
-        booking={selectedBooking}
-        tenant={tenant}
-        onUpdated={() => refetchSchedule()}
-      />
+        {/* Booking Details Drawer */}
+        <BookingDetailsDrawer
+          isOpen={Boolean(selectedBooking)}
+          onClose={() => setSelectedBooking(null)}
+          booking={selectedBooking}
+          tenant={tenant}
+          onUpdated={() => refetchSchedule()}
+        />
 
-      {/* Manual Bay Block Drawer */}
-      <ManualBlockDrawer
-        isOpen={isManualBlockOpen}
-        onClose={() => setIsManualBlockOpen(false)}
-        tenant={tenant}
-        resources={resources}
-        selectedDate={selectedDate}
-        onCreated={() => refetchSchedule()}
-      />
+        {/* Manual Bay Block Drawer */}
+        <ManualBlockDrawer
+          isOpen={isManualBlockOpen}
+          onClose={() => setIsManualBlockOpen(false)}
+          tenant={tenant}
+          resources={resources}
+          selectedDate={selectedDate}
+          onCreated={() => refetchSchedule()}
+        />
+      </div>
     </div>
   );
 };

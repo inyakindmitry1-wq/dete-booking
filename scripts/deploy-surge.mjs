@@ -1,5 +1,15 @@
 import { spawn } from 'node:child_process';
 import readline from 'node:readline';
+import fs from 'node:fs';
+import path from 'node:path';
+
+const distDir = path.resolve(process.cwd(), 'dist');
+if (fs.existsSync(path.join(distDir, 'index.html'))) {
+  fs.copyFileSync(path.join(distDir, 'index.html'), path.join(distDir, '200.html'));
+  fs.copyFileSync(path.join(distDir, 'index.html'), path.join(distDir, '404.html'));
+  fs.writeFileSync(path.join(distDir, '_redirects'), '/* /index.html 200\n');
+  console.log('✓ Prepared SPA routing files (200.html, 404.html, _redirects)');
+}
 
 const email = process.argv[2] || 'inyakindmitry1@gmail.com';
 const password = process.argv[3] || 'DeteBooking2026!';

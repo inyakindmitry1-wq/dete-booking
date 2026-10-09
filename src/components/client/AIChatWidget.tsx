@@ -105,12 +105,13 @@ export const AIChatWidget: React.FC<AIChatWidgetProps> = ({ tenant }) => {
     <>
       {/* Floating Action Button */}
       <button
+        id="ai-floating-trigger"
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-5 right-5 z-40 flex items-center gap-2 px-4 py-3 rounded-2xl bg-primary text-primary-foreground font-bold shadow-xl hover:scale-105 active:scale-95 transition-all"
+        className="fixed bottom-[calc(env(safe-area-inset-bottom,8px)+4.25rem)] right-4 z-40 flex items-center gap-2 px-3.5 py-2.5 rounded-2xl bg-primary text-primary-foreground font-bold shadow-2xl hover:scale-105 active:scale-95 transition-all border border-white/20 select-none text-xs"
         aria-label="Онлайн помощник"
       >
-        <Sparkles className="h-5 w-5" />
-        <span className="text-xs sm:text-sm">AI Консьерж</span>
+        <Sparkles className="h-4 w-4" />
+        <span className="font-bold">AI Помощник</span>
       </button>
 
       {/* Chat Drawer */}
