@@ -1,0 +1,125 @@
+{
+  "slug": "apex",
+  "name": "APEX Pitstop",
+  "tagline": "Быстрый автосервис и техническое обслуживание",
+  "description": "Честный автосервис полного цикла: диагностика, замена масел, тормозных систем, ремонт ходовой части и 3D сход-развал без очередей.",
+  "phone": "+7 (812) 555-44-33",
+  "address": "пр. Энергетиков, 14, бокс 2",
+  "city": "Санкт-Петербург",
+  "currency": "RUB",
+  "timezone": "Europe/Moscow",
+  "businessType": "service",
+  "isPreview": false,
+  "branding": {
+    "accentColor": "#DC2626",
+    "logoUrl": "https://images.unsplash.com/photo-1486006920555-c77dce18193b?auto=format&fit=crop&w=400&q=80",
+    "coverUrl": "https://images.unsplash.com/photo-1487754180451-c456f719a1fc?auto=format&fit=crop&w=1200&q=80",
+    "theme": "industrial-dark",
+    "favicon": "/favicon.svg",
+    "appleTouchIcon": "/apple-touch-icon.png"
+  },
+  "resources": [
+    {
+      "id": "33333333-3333-4333-8333-333333333301",
+      "name": "Подъемник 1 (Двухстоечный)",
+      "type": "hydraulic_lift",
+      "description": "Электрогидравлический подъемник г/п 4.0 т для слесарных работ и ТО",
+      "is_active": true,
+      "sort_order": 1
+    },
+    {
+      "id": "33333333-3333-4333-8333-333333333302",
+      "name": "Подъемник 2 (Сход-развал)",
+      "type": "hydraulic_lift",
+      "description": "Четырехстоечный подъемник со стендом Hunter 3D Hawkeye Elite",
+      "is_active": true,
+      "sort_order": 2
+    },
+    {
+      "id": "33333333-3333-4333-8333-333333333303",
+      "name": "Пост диагностики и автоэлектрики",
+      "type": "diagnostic_bay",
+      "description": "Стенд мотор-тестера и дилерские сканеры Launch / Autel",
+      "is_active": true,
+      "sort_order": 3
+    }
+  ],
+  "services": [
+    {
+      "id": "44444444-4444-4444-8444-444444444401",
+      "category": "Регулярное ТО",
+      "name": "Экспресс-замена моторного масла и фильтров",
+      "description": "Замена масла аппаратным или классическим методом, замена масляного и воздушного фильтра, осмотр течей.",
+      "duration_minutes": 45,
+      "buffer_minutes": 15,
+      "price": 2500,
+      "is_active": true,
+      "image_url": "https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&w=800&q=80",
+      "sort_order": 1
+    },
+    {
+      "id": "44444444-4444-4444-8444-444444444402",
+      "category": "Диагностика",
+      "name": "Компьютерная диагностика систем",
+      "description": "Считывание ошибок всех электронных блоков, проверка параметров датчиков в реальном времени, сброс сервисных интервалов.",
+      "duration_minutes": 40,
+      "buffer_minutes": 10,
+      "price": 2000,
+      "is_active": true,
+      "image_url": "https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?auto=format&fit=crop&w=800&q=80",
+      "sort_order": 2
+    },
+    {
+      "id": "44444444-4444-4444-8444-444444444403",
+      "category": "Тормозная система",
+      "name": "Замена передних/задних колодок и дисков",
+      "description": "Замена тормозных дисков и колодок, очистка и смазка направляющих суппортов, проверка тормозной жидкости.",
+      "duration_minutes": 90,
+      "buffer_minutes": 15,
+      "price": 5000,
+      "is_active": true,
+      "image_url": "https://images.unsplash.com/photo-1578844251758-2f71da64c96f?auto=format&fit=crop&w=800&q=80",
+      "sort_order": 3
+    },
+    {
+      "id": "44444444-4444-4444-8444-444444444404",
+      "category": "Подвеска",
+      "name": "Регулировка углов установки колес 3D (сход-развал)",
+      "description": "Высокоточная калибровка развала и схождения обеих осей на лазерном 3D-стенде с распечаткой до/после.",
+      "duration_minutes": 60,
+      "buffer_minutes": 15,
+      "price": 3500,
+      "is_active": true,
+      "image_url": "https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&w=800&q=80",
+      "sort_order": 4
+    }
+  ],
+  "serviceResources": [
+    {
+      "serviceId": "44444444-4444-4444-8444-444444444401",
+      "resourceId": "33333333-3333-4333-8333-333333333301"
+    },
+    {
+      "serviceId": "44444444-4444-4444-8444-444444444402",
+      "resourceId": "33333333-3333-4333-8333-333333333303"
+    },
+    {
+      "serviceId": "44444444-4444-4444-8444-444444444403",
+      "resourceId": "33333333-3333-4333-8333-333333333301"
+    },
+    {
+      "serviceId": "44444444-4444-4444-8444-444444444404",
+      "resourceId": "33333333-3333-4333-8333-333333333302"
+    }
+  ],
+  "workingHours": [
+    { "day_of_week": 0, "open_time": "09:00:00", "close_time": "18:00:00", "is_closed": false },
+    { "day_of_week": 1, "open_time": "08:30:00", "close_time": "20:00:00", "is_closed": false },
+    { "day_of_week": 2, "open_time": "08:30:00", "close_time": "20:00:00", "is_closed": false },
+    { "day_of_week": 3, "open_time": "08:30:00", "close_time": "20:00:00", "is_closed": false },
+    { "day_of_week": 4, "open_time": "08:30:00", "close_time": "20:00:00", "is_closed": false },
+    { "day_of_week": 5, "open_time": "08:30:00", "close_time": "20:00:00", "is_closed": false },
+    { "day_of_week": 6, "open_time": "08:30:00", "close_time": "19:00:00", "is_closed": false }
+  ],
+  "scheduleExceptions": []
+}
