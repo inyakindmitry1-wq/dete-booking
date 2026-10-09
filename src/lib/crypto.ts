@@ -20,17 +20,11 @@ export async function hashToken(token: string): Promise<string> {
   const encoder = new TextEncoder();
   const data = encoder.encode(token);
 
-  if (typeof crypto !== 'undefined' && crypto.subtle) {
-    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  if (typeof globalThis.crypto !== 'undefined' && globalThis.crypto.subtle) {
+    const hashBuffer = await globalThis.crypto.subtle.digest('SHA-256', data);
     const hashArray = Array.from(new Uint8Array(hashBuffer));
     return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
   }
 
-  // Node.js crypto fallback
-  try {
-    const nodeCrypto = await import('node:crypto');
-    return nodeCrypto.createHash('sha256').update(token).digest('hex');
-  } catch {
-    throw new Error('No crypto implementation available');
-  }
+  throw new Error('No Web Crypto API available');
 }
