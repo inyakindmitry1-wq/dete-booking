@@ -1,10 +1,10 @@
 import React from 'react';
-import { Clock, ChevronRight } from 'lucide-react';
+import { Clock, ArrowUpRight } from 'lucide-react';
 import { DbService } from '@/types/database';
 import { Button } from '@/components/ui/button';
 import { formatCurrency, formatDuration } from '@/lib/utils';
 
-interface ServiceCardProps {
+export interface ServiceCardProps {
   service: DbService;
   currency: string;
   onSelect: (service: DbService) => void;
@@ -26,17 +26,21 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({
           onSelect(service);
         }
       }}
-      className="group relative flex items-stretch gap-3.5 p-3 rounded-2xl border border-white/[0.08] bg-card/70 backdrop-blur-md hover:border-primary/40 hover:bg-card/90 transition-all duration-200 cursor-pointer active:scale-[0.99] select-none shadow-sm hover:shadow-md"
+      className="group relative flex items-stretch gap-3.5 p-3.5 rounded-2xl border border-white/[0.08] bg-[#12151c]/90 backdrop-blur-xl hover:border-primary/45 hover:bg-[#151923] transition-all duration-300 cursor-pointer active:scale-[0.99] select-none shadow-[0_8px_28px_rgba(0,0,0,0.35)]"
     >
+      {/* Subtle top specular border highlight */}
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent pointer-events-none" />
+
       {/* Service Image Thumbnail */}
-      <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-xl shrink-0 overflow-hidden bg-secondary/80 border border-white/[0.08]">
+      <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-xl shrink-0 overflow-hidden bg-black border border-white/[0.08] shadow-inner">
         <img
           src={service.image_url}
           alt={service.name}
-          className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
+          className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500"
           loading="lazy"
         />
-        <div className="absolute bottom-1.5 left-1.5 bg-black/75 backdrop-blur-md px-1.5 py-0.5 rounded-md text-[10px] font-semibold text-white/90 flex items-center gap-1 shadow">
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
+        <div className="absolute bottom-1.5 left-1.5 bg-black/80 backdrop-blur-md px-2 py-0.5 rounded-md text-[10px] font-bold text-white/90 border border-white/10 flex items-center gap-1 shadow">
           <Clock className="h-2.5 w-2.5 text-primary" />
           <span>{formatDuration(service.duration_minutes)}</span>
         </div>
@@ -48,19 +52,19 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({
           <span className="text-[10px] font-bold text-primary uppercase tracking-wider block">
             {service.category}
           </span>
-          <h3 className="text-sm sm:text-base font-bold text-foreground mt-0.5 leading-snug line-clamp-1 group-hover:text-primary transition-colors">
+          <h3 className="text-sm sm:text-base font-extrabold text-white mt-0.5 leading-snug line-clamp-1 group-hover:text-primary transition-colors">
             {service.name}
           </h3>
-          <p className="mt-1 text-xs text-muted-foreground line-clamp-2 leading-relaxed">
+          <p className="mt-1 text-xs text-zinc-400 line-clamp-2 leading-relaxed">
             {service.description}
           </p>
         </div>
 
-        {/* Bottom Row: Price & Action */}
+        {/* Bottom Row: Price & Action CTA */}
         <div className="mt-2 pt-2 border-t border-white/[0.06] flex items-center justify-between gap-2">
           <div className="flex items-baseline gap-1">
-            <span className="text-[10px] text-muted-foreground">от</span>
-            <span className="text-base sm:text-lg font-black text-foreground tracking-tight">
+            <span className="text-[10px] text-zinc-400 font-medium">от</span>
+            <span className="text-base sm:text-lg font-black text-white tracking-tight">
               {formatCurrency(service.price, currency)}
             </span>
           </div>
@@ -71,10 +75,10 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({
               e.stopPropagation();
               onSelect(service);
             }}
-            className="h-8 px-3 rounded-lg text-xs font-bold shadow-sm gap-1 active:scale-95"
+            className="h-9 px-3.5 rounded-xl text-xs font-bold shadow-md shadow-primary/20 gap-1.5 active:scale-95 transition-transform"
           >
             <span>Записаться</span>
-            <ChevronRight className="h-3.5 w-3.5" />
+            <ArrowUpRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
           </Button>
         </div>
       </div>
