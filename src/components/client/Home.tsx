@@ -157,9 +157,8 @@ export const Home: React.FC = () => {
           <main className="px-4 space-y-5 flex-1 animate-in fade-in duration-200">
             {/* 1. Hero Car Spotlight Card */}
             <div className="relative rounded-[28px] border border-white/[0.08] bg-[#0c0f15] overflow-hidden shadow-2xl">
-              {/* Electric Neon Accent Halo Ring */}
-              <div className="absolute top-2 inset-x-0 mx-auto h-32 w-64 rounded-full border-[6px] border-primary/50 blur-[2px] opacity-80 pointer-events-none" />
-              <div className="absolute top-4 inset-x-0 mx-auto h-28 w-56 rounded-full bg-primary/20 blur-xl pointer-events-none" />
+              {/* Subtle Ambient Vignette */}
+              <div className="absolute top-0 inset-x-0 h-24 bg-gradient-to-b from-white/[0.03] to-transparent pointer-events-none" />
 
               {/* Sports Car Frontal Render */}
               <div className="relative h-48 sm:h-52 w-full flex items-center justify-center overflow-hidden">
@@ -176,10 +175,10 @@ export const Home: React.FC = () => {
                   <button
                     type="button"
                     onClick={handleQuickBookHero}
-                    className="w-full h-12 px-5 rounded-full bg-black/60 backdrop-blur-xl border border-white/15 flex items-center justify-between text-white hover:bg-black/75 active:scale-[0.98] transition-all shadow-lg"
+                    className="w-full h-12 px-5 rounded-full bg-white/[0.08] hover:bg-white/[0.14] active:bg-white/[0.18] backdrop-blur-md border border-white/20 flex items-center justify-between text-white shadow-[0_4px_30px_rgba(0,0,0,0.5)] active:scale-[0.98] transition-all duration-200"
                   >
-                    <span className="text-sm font-bold tracking-tight">Записаться</span>
-                    <ArrowUpRight className="h-4 w-4 text-white" />
+                    <span className="text-sm font-semibold tracking-tight text-white drop-shadow-sm">Записаться</span>
+                    <ArrowUpRight className="h-4 w-4 text-white/90" />
                   </button>
                 </div>
               </div>

@@ -15,7 +15,7 @@ INSERT INTO tenants (
   'Москва',
   'RUB',
   'Europe/Moscow',
-  '#F59E0B',
+  '#FFFFFF',
   'https://images.unsplash.com/photo-1617814076367-b759c7d7e738?auto=format&fit=crop&w=400&q=80',
   'https://images.unsplash.com/photo-1601362840469-51e4d8d58785?auto=format&fit=crop&w=1200&q=80',
   'detailing',

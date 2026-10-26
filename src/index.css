@@ -16,9 +16,9 @@
     --popover: 222 47% 8%;
     --popover-foreground: 215 20.2% 65.1%;
 
-    /* Default accent color (Graphite luxury gold) */
-    --primary: 38 92% 50%;
-    --primary-foreground: 224 71% 4%;
+    /* Default accent color (Graphite luxury monochrome white) */
+    --primary: 0 0% 98%;
+    --primary-foreground: 0 0% 9%;
 
     --secondary: 222 47% 12%;
     --secondary-foreground: 210 40% 98%;
@@ -34,7 +34,7 @@
 
     --border: 217 33% 15%;
     --input: 217 33% 15%;
-    --ring: 38 92% 50%;
+    --ring: 0 0% 98%;
 
     --radius: 0.75rem;
 

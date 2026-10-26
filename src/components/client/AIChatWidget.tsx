@@ -103,23 +103,20 @@ export const AIChatWidget: React.FC<AIChatWidgetProps> = ({ tenant }) => {
 
   return (
     <>
-      {/* Floating Action Button */}
+      {/* Hidden Action Button (triggered cleanly by AI banner in home) */}
       <button
         id="ai-floating-trigger"
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-[calc(env(safe-area-inset-bottom,8px)+4.25rem)] right-4 z-40 flex items-center gap-2 px-3.5 py-2.5 rounded-2xl bg-primary text-primary-foreground font-bold shadow-2xl hover:scale-105 active:scale-95 transition-all border border-white/20 select-none text-xs"
+        className="hidden"
         aria-label="Онлайн помощник"
-      >
-        <Sparkles className="h-4 w-4" />
-        <span className="font-bold">AI Помощник</span>
-      </button>
+      />
 
       {/* Chat Drawer */}
       <Drawer open={isOpen} onOpenChange={setIsOpen}>
         <DrawerContent className="max-w-md mx-auto max-h-[85vh]">
           <DrawerHeader>
-            <DrawerTitle className="flex items-center gap-2">
-              <Bot className="h-5 w-5 text-primary" />
+            <DrawerTitle className="flex items-center gap-2 text-white">
+              <Bot className="h-5 w-5 text-white" />
               <span>AI-Консультант {tenant.name}</span>
             </DrawerTitle>
             <DrawerDescription>

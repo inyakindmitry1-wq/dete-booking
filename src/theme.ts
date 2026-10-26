@@ -5,7 +5,7 @@ export const appTheme = defineTheme({
   name: 'dete-dark',
   extends: neutralTheme,
   color: {
-    accent: '#F59E0B', // Default gold accent, overridden dynamically per tenant
+    accent: '#FFFFFF', // Monochrome white accent
     neutralStyle: 'cool',
     contrast: 'standard',
   },

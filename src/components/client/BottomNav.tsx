@@ -23,14 +23,14 @@ export const BottomNav: React.FC<BottomNavProps> = ({
 
   return (
     <div className="fixed bottom-4 inset-x-0 z-40 max-w-sm mx-auto px-4 pointer-events-none pb-[env(safe-area-inset-bottom,0px)]">
-      {/* Outer ambient glow halos */}
+      {/* Outer ambient soft shadow */}
       <div className="relative pointer-events-auto">
-        <div className="absolute -inset-1 rounded-full bg-primary/20 blur-md pointer-events-none opacity-40" />
+        <div className="absolute -inset-0.5 rounded-full bg-white/[0.04] blur-sm pointer-events-none" />
 
         {/* Floating pill navigation bar */}
         <nav
           aria-label="Основная навигация"
-          className="relative rounded-full backdrop-blur-2xl bg-[#0e1422]/90 border border-white/[0.12] shadow-[0_12px_40px_rgba(0,0,0,0.85)] p-1.5 flex items-center justify-between"
+          className="relative rounded-full backdrop-blur-2xl bg-[#121316]/95 border border-white/[0.12] shadow-[0_12px_40px_rgba(0,0,0,0.9)] p-1.5 flex items-center justify-between"
         >
           {tabs.map((tab) => {
             const Icon = tab.icon;
@@ -51,7 +51,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
                   <Icon className={cn("h-4 w-4 transition-transform", isActive ? "text-white" : "text-zinc-400")} />
                   <span className="tracking-tight">{tab.label}</span>
                   {tab.badge && (
-                    <span className="absolute -top-1 -right-1.5 h-2 w-2 rounded-full bg-primary ring-2 ring-[#0e1422] animate-pulse" />
+                    <span className="absolute -top-1 -right-1.5 h-2 w-2 rounded-full bg-white ring-2 ring-black animate-pulse" />
                   )}
                 </div>
               </button>
