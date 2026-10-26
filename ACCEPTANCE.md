@@ -41,7 +41,9 @@
    - `npm run tenant:validate` — PASSED для обоих демо-бизнесов (Graphite и Apex).
    - `npm run tenant:publish` — PASSED (сгенерированы `publish.sql` и `supabase/seed.sql`).
    - `npm run tenant:verify` — PASSED.
-5. **Vite Production Build & Service Worker**:
+5. **End-to-End Tests (Playwright Browser Automation)**:
+   - `npm run test:e2e` — 3/3 PASSED (Desktop Chromium, Pixel 5 Mobile Chrome, iPhone 12 Mobile Safari). Полный сквозной пользовательский сценарий: выбор услуги из каталога -> подбор доступного окна с буфером -> ввод контактов и автомобиля -> атомарное создание бронирования -> экран подтверждения с выгрузкой .ics и генерацией персонального криптографического токена -> вход владельца в мобильный кабинет `/owner/` -> мгновенное появление созданной записи в таймлайне боксов.
+6. **Vite Production Build & Service Worker**:
    - `npm run build` — PASSED (сгенерирован статический бандл `dist/` с `dist/sw.js` через Workbox `injectManifest`).
 
 ---
