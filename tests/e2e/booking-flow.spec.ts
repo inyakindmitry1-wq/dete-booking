@@ -14,7 +14,13 @@ test.describe('End-to-End Online Booking & Owner Flow', () => {
     await expect(bookButton).toBeVisible();
     await bookButton.click();
 
-    // 4. Booking drawer opens -> Choose slot
+    // 4. Booking drawer opens: if on Step 0 (Select Service), pick the desired service
+    const serviceItem = page.locator('button:has-text("Детейлинг-мойка")').first();
+    if (await serviceItem.isVisible({ timeout: 2000 }).catch(() => false)) {
+      await serviceItem.click();
+    }
+
+    // Now on Step 1: Choose slot
     const drawerTitle = page.locator('text=Выбор времени записи');
     await expect(drawerTitle).toBeVisible();
 

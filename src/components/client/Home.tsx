@@ -58,10 +58,8 @@ export const Home: React.FC = () => {
   }
 
   function handleQuickBookHero() {
-    if (services.length > 0) {
-      setActiveService(services[0]);
-      setIsDrawerOpen(true);
-    }
+    setActiveService(null);
+    setIsDrawerOpen(true);
   }
 
   if (isTenantLoading) {
@@ -357,6 +355,7 @@ export const Home: React.FC = () => {
           isOpen={isDrawerOpen}
           onClose={() => setIsDrawerOpen(false)}
           service={activeService}
+          services={services}
           tenant={tenant}
           onBookingComplete={(res) => {
             setIsDrawerOpen(false);

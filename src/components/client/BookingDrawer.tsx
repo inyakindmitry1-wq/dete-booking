@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { DbTenant, DbService, TimeSlot, CreateBookingResponse } from '@/types/database';
@@ -19,12 +19,13 @@ import { useSlots } from '@/hooks/useSlots';
 import { api } from '@/lib/api';
 import { generateAccessToken } from '@/lib/crypto';
 import { formatCurrency, formatDuration } from '@/lib/utils';
-import { ArrowLeft, CheckCircle2, Clock, AlertTriangle, Loader2 } from 'lucide-react';
+import { ArrowLeft, ArrowRight, CheckCircle2, Clock, AlertTriangle, Loader2 } from 'lucide-react';
 
 interface BookingDrawerProps {
   isOpen: boolean;
   onClose: () => void;
   service: DbService | null;
+  services?: DbService[];
   tenant: DbTenant;
   onBookingComplete: (booking: CreateBookingResponse) => void;
 }
@@ -33,10 +34,12 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({
   isOpen,
   onClose,
   service,
+  services = [],
   tenant,
   onBookingComplete,
 }) => {
-  const [step, setStep] = useState<1 | 2>(1);
+  const [selectedService, setSelectedService] = useState<DbService | null>(service);
+  const [step, setStep] = useState<0 | 1 | 2>(service ? 1 : 0);
   const [vehicleType, setVehicleType] = useState<VehicleCategory>('sedan');
   const [selectedDate, setSelectedDate] = useState<string>(format(new Date(), 'yyyy-MM-dd'));
   const [selectedSlot, setSelectedSlot] = useState<TimeSlot | null>(null);
@@ -52,20 +55,31 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // Fetch slots
+  // Sync service selection when drawer opens or service prop updates
+  useEffect(() => {
+    if (isOpen) {
+      if (service) {
+        setSelectedService(service);
+        setStep(1);
+      } else {
+        setSelectedService(null);
+        setStep(0);
+      }
+    }
+  }, [service, isOpen]);
+
+  // Fetch slots for current selected service
   const { data: slots, isLoading: isSlotsLoading } = useSlots(
     tenant,
-    service?.id || null,
+    selectedService?.id || null,
     selectedDate
   );
-
-  if (!service) return null;
 
   const canProceedToStep2 = selectedSlot && selectedSlot.is_available;
   const canSubmit = customerName.trim().length >= 2 && customerPhone.trim().length >= 10;
 
   async function handleSubmitBooking() {
-    if (!service || !selectedSlot || !canSubmit) return;
+    if (!selectedService || !selectedSlot || !canSubmit) return;
 
     setIsSubmitting(true);
     setErrorMessage(null);
@@ -81,7 +95,7 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({
       const response = await api.createBooking(
         {
           tenant_slug: tenant.slug,
-          service_id: service.id,
+          service_id: selectedService.id,
           start_time: selectedSlot.time,
           customer_name: customerName.trim(),
           customer_phone: customerPhone.trim(),
@@ -122,7 +136,7 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({
   }
 
   function handleResetAndClose() {
-    setStep(1);
+    setStep(service ? 1 : 0);
     setSelectedSlot(null);
     setErrorMessage(null);
     onClose();
@@ -132,30 +146,52 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({
     <Drawer open={isOpen} onOpenChange={(open) => !open && handleResetAndClose()}>
       <DrawerContent className="max-w-md mx-auto">
         <DrawerHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-2">
+            {step === 1 && services.length > 0 && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setSelectedSlot(null);
+                  setStep(0);
+                }}
+                className="h-8 px-2 -ml-2 text-zinc-400 hover:text-white"
+              >
+                <ArrowLeft className="h-4 w-4 mr-1" />
+                <span>К услугам</span>
+              </Button>
+            )}
             {step === 2 && (
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setStep(1)}
-                className="h-8 px-2 -ml-2 text-muted-foreground hover:text-foreground"
+                className="h-8 px-2 -ml-2 text-zinc-400 hover:text-white"
               >
                 <ArrowLeft className="h-4 w-4 mr-1" />
                 <span>Назад</span>
               </Button>
             )}
-            <div className="text-left flex-1">
+            <div className="text-left flex-1 min-w-0">
               <DrawerTitle>
-                {step === 1 ? 'Выбор времени записи' : 'Контактные данные'}
+                {step === 0
+                  ? 'Выберите услугу'
+                  : step === 1
+                  ? 'Выбор времени записи'
+                  : 'Контактные данные'}
               </DrawerTitle>
-              <DrawerDescription>
-                {service.name} • {formatCurrency(service.price, tenant.currency)}
+              <DrawerDescription className="truncate">
+                {step === 0
+                  ? `${tenant.name} • ${services.length} услуг в прайсе`
+                  : selectedService
+                  ? `${selectedService.name} • ${formatCurrency(selectedService.price, tenant.currency)}`
+                  : tenant.name}
               </DrawerDescription>
             </div>
           </div>
         </DrawerHeader>
 
-        <div className="space-y-5">
+        <div className="space-y-4 px-4 pb-2">
           {errorMessage && (
             <div className="p-3.5 rounded-xl border border-destructive/40 bg-destructive/10 text-destructive text-sm flex items-start gap-2.5">
               <AlertTriangle className="h-5 w-5 shrink-0 mt-0.5" />
@@ -163,8 +199,92 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({
             </div>
           )}
 
-          {step === 1 && (
+          {/* STEP 0: Select Service (when opened without pre-selected service) */}
+          {step === 0 && (
+            <div className="space-y-2.5 max-h-[62vh] overflow-y-auto pr-0.5 scrollbar-none">
+              <span className="text-xs font-bold text-zinc-400 uppercase tracking-wider block">
+                Доступные услуги ({services.length})
+              </span>
+              {services.map((svc) => (
+                <button
+                  key={svc.id}
+                  type="button"
+                  onClick={() => {
+                    setSelectedService(svc);
+                    setSelectedSlot(null);
+                    setStep(1);
+                  }}
+                  className="w-full group text-left p-3.5 rounded-2xl border border-white/[0.08] bg-[#141519] hover:bg-[#1b1c22] hover:border-white/30 active:scale-[0.99] transition-all flex items-center gap-3.5 select-none shadow-sm"
+                >
+                  <div className="relative h-16 w-16 rounded-xl overflow-hidden shrink-0 bg-black border border-white/10">
+                    <img
+                      src={svc.image_url}
+                      alt={svc.name}
+                      className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">
+                      {svc.category}
+                    </span>
+                    <h4 className="text-sm font-black text-white truncate group-hover:text-white">
+                      {svc.name}
+                    </h4>
+                    <div className="flex items-center gap-2 mt-1 text-xs">
+                      <span className="font-extrabold text-white">
+                        {formatCurrency(svc.price, tenant.currency)}
+                      </span>
+                      <span className="text-zinc-500">•</span>
+                      <span className="text-zinc-400 flex items-center gap-1 font-medium text-[11px]">
+                        <Clock className="h-3 w-3 text-zinc-400" />
+                        {formatDuration(svc.duration_minutes)}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="h-8 w-8 rounded-full border border-white/10 bg-white/5 flex items-center justify-center text-zinc-400 group-hover:text-white group-hover:bg-white/10 transition-colors shrink-0">
+                    <ArrowRight className="h-4 w-4" />
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* STEP 1: Choose Vehicle Type, Date and Available Time Slot */}
+          {step === 1 && selectedService && (
             <>
+              {/* Active Service Pill with "Изменить" action */}
+              <div className="flex items-center justify-between p-3 rounded-2xl bg-[#141519] border border-white/10 shadow-sm">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="h-11 w-11 rounded-xl overflow-hidden shrink-0 bg-black border border-white/10">
+                    <img
+                      src={selectedService.image_url}
+                      alt={selectedService.name}
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                  <div className="min-w-0">
+                    <span className="text-xs font-black text-white block truncate">
+                      {selectedService.name}
+                    </span>
+                    <span className="text-[11px] text-zinc-400 font-medium">
+                      {formatCurrency(selectedService.price, tenant.currency)} • {formatDuration(selectedService.duration_minutes)}
+                    </span>
+                  </div>
+                </div>
+                {services.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedSlot(null);
+                      setStep(0);
+                    }}
+                    className="text-xs font-bold text-zinc-300 hover:text-white px-2.5 py-1.5 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 active:scale-95 transition-all shrink-0 ml-2"
+                  >
+                    Изменить
+                  </button>
+                )}
+              </div>
+
               {/* Vehicle Type Selection */}
               <VehicleTypeSelector value={vehicleType} onChange={setVehicleType} />
 
@@ -196,7 +316,7 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({
                   <div className="text-right">
                     <span className="text-xs text-zinc-400 font-semibold flex items-center gap-1 justify-end">
                       <Clock className="h-3.5 w-3.5 text-zinc-300" />
-                      {formatDuration(service.duration_minutes)}
+                      {formatDuration(selectedService.duration_minutes)}
                     </span>
                   </div>
                 </div>
@@ -204,7 +324,8 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({
             </>
           )}
 
-          {step === 2 && (
+          {/* STEP 2: Customer Contact Form */}
+          {step === 2 && selectedService && (
             <div className="space-y-4">
               <div>
                 <Label htmlFor="cust-name" className="text-xs font-semibold mb-1.5 block">
@@ -280,7 +401,7 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({
                 <div className="p-3.5 rounded-2xl border border-white/10 bg-[#161619] space-y-1.5 text-xs shadow-md">
                   <div className="flex justify-between text-zinc-400">
                     <span>Услуга:</span>
-                    <span className="font-semibold text-white">{service.name}</span>
+                    <span className="font-semibold text-white">{selectedService.name}</span>
                   </div>
                   <div className="flex justify-between text-zinc-400">
                     <span>Дата и время:</span>
@@ -291,13 +412,13 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({
                   <div className="flex justify-between text-zinc-400">
                     <span>Длительность:</span>
                     <span className="font-semibold text-white">
-                      {formatDuration(service.duration_minutes)}
+                      {formatDuration(selectedService.duration_minutes)}
                     </span>
                   </div>
                   <div className="flex justify-between pt-2 border-t border-white/10 text-sm">
                     <span className="font-bold text-white">К оплате в студии:</span>
                     <span className="font-black text-white text-base">
-                      {formatCurrency(service.price, tenant.currency)}
+                      {formatCurrency(selectedService.price, tenant.currency)}
                     </span>
                   </div>
                 </div>
@@ -307,7 +428,7 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({
         </div>
 
         <DrawerFooter>
-          {step === 1 ? (
+          {step === 0 ? null : step === 1 ? (
             <Button
               disabled={!canProceedToStep2}
               onClick={() => setStep(2)}
