@@ -183,19 +183,19 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({
 
               {/* Selected Slot Summary */}
               {selectedSlot && (
-                <div className="p-3.5 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="h-5 w-5 text-primary" />
+                <div className="p-3.5 rounded-2xl bg-[#161619] border border-white/15 flex items-center justify-between shadow-lg">
+                  <div className="flex items-center gap-2.5">
+                    <CheckCircle2 className="h-5 w-5 text-white shrink-0" />
                     <div>
-                      <span className="text-xs text-muted-foreground block">Выбранное время</span>
-                      <span className="text-sm font-bold text-foreground">
+                      <span className="text-[11px] text-zinc-400 block font-medium">Выбранное время</span>
+                      <span className="text-sm font-bold text-white">
                         {format(new Date(selectedSlot.time), 'd MMMM (EEEE), HH:mm', { locale: ru })}
                       </span>
                     </div>
                   </div>
                   <div className="text-right">
-                    <span className="text-xs text-muted-foreground block flex items-center gap-1">
-                      <Clock className="h-3 w-3" />
+                    <span className="text-xs text-zinc-400 font-semibold flex items-center gap-1 justify-end">
+                      <Clock className="h-3.5 w-3.5 text-zinc-300" />
                       {formatDuration(service.duration_minutes)}
                     </span>
                   </div>
@@ -277,26 +277,26 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({
 
               {/* Booking Summary Box */}
               {selectedSlot && (
-                <div className="p-3.5 rounded-xl border border-border bg-secondary/50 space-y-1.5 text-xs">
-                  <div className="flex justify-between text-muted-foreground">
+                <div className="p-3.5 rounded-2xl border border-white/10 bg-[#161619] space-y-1.5 text-xs shadow-md">
+                  <div className="flex justify-between text-zinc-400">
                     <span>Услуга:</span>
-                    <span className="font-semibold text-foreground">{service.name}</span>
+                    <span className="font-semibold text-white">{service.name}</span>
                   </div>
-                  <div className="flex justify-between text-muted-foreground">
+                  <div className="flex justify-between text-zinc-400">
                     <span>Дата и время:</span>
-                    <span className="font-semibold text-foreground">
+                    <span className="font-semibold text-white">
                       {format(new Date(selectedSlot.time), 'd MMM yyyy, HH:mm', { locale: ru })}
                     </span>
                   </div>
-                  <div className="flex justify-between text-muted-foreground">
+                  <div className="flex justify-between text-zinc-400">
                     <span>Длительность:</span>
-                    <span className="font-semibold text-foreground">
+                    <span className="font-semibold text-white">
                       {formatDuration(service.duration_minutes)}
                     </span>
                   </div>
-                  <div className="flex justify-between pt-1.5 border-t border-border/80 text-sm">
-                    <span className="font-bold text-foreground">К оплате в студии:</span>
-                    <span className="font-extrabold text-primary">
+                  <div className="flex justify-between pt-2 border-t border-white/10 text-sm">
+                    <span className="font-bold text-white">К оплате в студии:</span>
+                    <span className="font-black text-white text-base">
                       {formatCurrency(service.price, tenant.currency)}
                     </span>
                   </div>

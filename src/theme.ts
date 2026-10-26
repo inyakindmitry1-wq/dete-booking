@@ -6,7 +6,7 @@ export const appTheme = defineTheme({
   extends: neutralTheme,
   color: {
     accent: '#FFFFFF', // Monochrome white accent
-    neutralStyle: 'cool',
+    neutralStyle: 'neutral',
     contrast: 'standard',
   },
 });
