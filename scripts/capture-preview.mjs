@@ -9,9 +9,9 @@ async function run() {
 
   const outDir = 'C:/Users/inyak/.gemini/antigravity/brain/0420e2c0-fae9-4704-a176-0c4d87b991a0';
 
-  // 1. Graphite Detailing Client Home
+  // 1. Sokol Team Detailing Client Home
   await page.goto('http://localhost:5173/s/graphite/', { waitUntil: 'networkidle' });
-  await page.waitForTimeout(1000);
+  await page.waitForTimeout(2000);
   await page.screenshot({ path: `${outDir}/preview_graphite.png` });
 
   // 2. Open Booking Drawer from Hero Button (Step 0: Choose Service)
@@ -21,10 +21,10 @@ async function run() {
   await page.screenshot({ path: `${outDir}/preview_booking_services.png` });
 
   // 2b. Pick first service to view Step 1 (Vehicle, Date & Slots)
-  const firstService = page.locator('button:has-text("Детейлинг-мойка")').first();
+  const firstService = page.locator('button:has-text("Детейлинг-комплекс")').first();
   if (await firstService.isVisible()) {
     await firstService.click();
-    await page.waitForTimeout(800);
+    await page.waitForTimeout(1000);
     await page.screenshot({ path: `${outDir}/preview_booking.png` });
   }
 

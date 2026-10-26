@@ -6,8 +6,8 @@ test.describe('End-to-End Online Booking & Owner Flow', () => {
     await page.goto('/s/graphite/');
 
     // 2. Verify branding and title
-    await expect(page).toHaveTitle(/GRAPHITE Detailing/);
-    await expect(page.locator('h1')).toContainText('GRAPHITE Detailing');
+    await expect(page).toHaveTitle(/Sokol Team Detailing/);
+    await expect(page.locator('h1')).toContainText('Sokol Team Detailing');
 
     // 3. Find and click first "Записаться" button
     const bookButton = page.locator('button:has-text("Записаться")').first();
@@ -15,7 +15,7 @@ test.describe('End-to-End Online Booking & Owner Flow', () => {
     await bookButton.click();
 
     // 4. Booking drawer opens: if on Step 0 (Select Service), pick the desired service
-    const serviceItem = page.locator('button:has-text("Детейлинг-мойка")').first();
+    const serviceItem = page.locator('button:has-text("Детейлинг-комплекс")').first();
     if (await serviceItem.isVisible({ timeout: 2000 }).catch(() => false)) {
       await serviceItem.click();
     }

@@ -227,10 +227,13 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({
                     <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">
                       {svc.category}
                     </span>
-                    <h4 className="text-sm font-black text-white truncate group-hover:text-white">
+                    <h4 className="text-sm font-black text-white group-hover:text-white">
                       {svc.name}
                     </h4>
-                    <div className="flex items-center gap-2 mt-1 text-xs">
+                    <p className="text-[11px] text-zinc-400 mt-1 line-clamp-2 whitespace-pre-line leading-relaxed">
+                      {svc.description}
+                    </p>
+                    <div className="flex items-center gap-2 mt-1.5 text-xs">
                       <span className="font-extrabold text-white">
                         {formatCurrency(svc.price, tenant.currency)}
                       </span>

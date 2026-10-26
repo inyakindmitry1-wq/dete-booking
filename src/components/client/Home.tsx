@@ -141,12 +141,20 @@ export const Home: React.FC = () => {
             className="flex items-center gap-2.5 text-left active:scale-95 transition-transform"
             aria-label="На главную"
           >
-            {/* Multi-layer styling brand mark icon */}
-            <div className="h-8 w-8 rounded-lg bg-zinc-900 border border-white/10 flex items-center justify-center text-white shadow-inner">
-              <Layers className="h-4 w-4" />
+            {/* Studio Brand Logo Mark */}
+            <div className="h-9 w-9 rounded-xl bg-black border border-white/15 overflow-hidden flex items-center justify-center shadow-inner shrink-0">
+              {tenant.logo_url ? (
+                <img
+                  src={tenant.logo_url}
+                  alt={tenant.name}
+                  className="h-full w-full object-contain p-1"
+                />
+              ) : (
+                <Layers className="h-4 w-4 text-white" />
+              )}
             </div>
             <span className="text-sm font-black uppercase tracking-wider text-white">
-              {tenant.name.split(' ')[0] || 'SGX'}
+              {tenant.name}
             </span>
           </button>
 

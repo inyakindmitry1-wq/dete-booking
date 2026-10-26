@@ -80,6 +80,16 @@ export function useTenant() {
       console.warn('Could not set accent color:', e);
     }
 
+    // Update favicon and apple-touch-icon links
+    const faviconLink = document.getElementById('favicon-link') as HTMLLinkElement | null;
+    if (faviconLink && tenant.logo_url) {
+      faviconLink.href = tenant.logo_url;
+    }
+    const appleTouchIcon = document.getElementById('apple-touch-icon') as HTMLLinkElement | null;
+    if (appleTouchIcon && tenant.logo_url) {
+      appleTouchIcon.href = tenant.logo_url;
+    }
+
     // Update Web App Manifest link dynamically
     const manifestLink = document.getElementById('manifest-link') as HTMLLinkElement | null;
     if (manifestLink) {
