@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   format,
   addDays,
@@ -36,7 +36,10 @@ interface SlotPickerProps {
   isLoading: boolean;
 }
 
-type TimePeriodFilter = 'all' | 'morning' | 'afternoon' | 'evening';
+// 2-letter Russian weekday abbreviations: ПН, ВТ, СР, ЧТ, ПТ, СБ, ВС
+const RU_WEEKDAYS = ['ВС', 'ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ'];
+
+type TimePeriodFilter = 'morning' | 'afternoon' | 'evening';
 
 export const SlotPicker: React.FC<SlotPickerProps> = ({
   selectedDate,
@@ -47,7 +50,7 @@ export const SlotPicker: React.FC<SlotPickerProps> = ({
   isLoading,
 }) => {
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
-  const [activePeriod, setActivePeriod] = useState<TimePeriodFilter>('all');
+  const [activePeriod, setActivePeriod] = useState<TimePeriodFilter>('morning');
   const [calendarMonth, setCalendarMonth] = useState<Date>(new Date(selectedDate));
 
   const today = useMemo(() => startOfToday(), []);
@@ -58,8 +61,9 @@ export const SlotPicker: React.FC<SlotPickerProps> = ({
     return Array.from({ length: 30 }, (_, i) => {
       const d = addDays(today, i);
       const dateStr = format(d, 'yyyy-MM-dd');
+      // ПН, ВТ, СР, ЧТ, ПТ, СБ, ВС for days
       const dayName =
-        i === 0 ? 'Сегодня' : i === 1 ? 'Завтра' : format(d, 'EE', { locale: ru });
+        i === 0 ? 'Сегодня' : i === 1 ? 'Завтра' : RU_WEEKDAYS[d.getDay()];
       const dayNumber = format(d, 'd MMM', { locale: ru });
       return { d, dateStr, dayName, dayNumber };
     });
@@ -73,6 +77,7 @@ export const SlotPicker: React.FC<SlotPickerProps> = ({
   }, [calendarMonth]);
 
   // Categorize slots by time of day
+  // Утро (до 12:00), День (12:00 – 17:00), Вечер (после 17:00)
   const { morningSlots, afternoonSlots, eveningSlots } = useMemo(() => {
     const morning: TimeSlot[] = [];
     const afternoon: TimeSlot[] = [];
@@ -92,13 +97,40 @@ export const SlotPicker: React.FC<SlotPickerProps> = ({
     return { morningSlots: morning, afternoonSlots: afternoon, eveningSlots: evening };
   }, [slots]);
 
-  // Filtered slots list based on active tab
+  // Auto-switch to a period with slots when slots load or date changes
+  useEffect(() => {
+    if (selectedSlotTime) {
+      const selectedSlot = slots.find((s) => s.time === selectedSlotTime);
+      if (selectedSlot) {
+        const hour = parseInt(selectedSlot.display_time.split(':')[0], 10);
+        if (hour < 12) {
+          setActivePeriod('morning');
+        } else if (hour < 17) {
+          setActivePeriod('afternoon');
+        } else {
+          setActivePeriod('evening');
+        }
+        return;
+      }
+    }
+
+    // Default to the first period that actually has slots
+    if (morningSlots.length > 0) {
+      setActivePeriod('morning');
+    } else if (afternoonSlots.length > 0) {
+      setActivePeriod('afternoon');
+    } else if (eveningSlots.length > 0) {
+      setActivePeriod('evening');
+    }
+  }, [selectedSlotTime, morningSlots.length, afternoonSlots.length, eveningSlots.length]);
+
+  // Filtered slots list based on active tab (Утро, День, Вечер only!)
   const displayedSlots = useMemo(() => {
     if (activePeriod === 'morning') return morningSlots;
     if (activePeriod === 'afternoon') return afternoonSlots;
     if (activePeriod === 'evening') return eveningSlots;
-    return slots;
-  }, [activePeriod, slots, morningSlots, afternoonSlots, eveningSlots]);
+    return [];
+  }, [activePeriod, morningSlots, afternoonSlots, eveningSlots]);
 
   const availableCount = useMemo(() => {
     return slots.filter((s) => s.is_available).length;
@@ -107,7 +139,7 @@ export const SlotPicker: React.FC<SlotPickerProps> = ({
   return (
     <div className="space-y-4">
       {/* ==================================================================== */}
-      {/* 1. Date Selection Section (30-day horizon + Month Calendar modal)      */}
+      {/* 1. Date Selection Section (30-day horizon with ПН, ВТ, СР, ЧТ...)     */}
       {/* ==================================================================== */}
       <div>
         <div className="flex items-center justify-between mb-2">
@@ -123,7 +155,7 @@ export const SlotPicker: React.FC<SlotPickerProps> = ({
             className="text-xs font-semibold text-zinc-300 hover:text-white flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-white/10 bg-[#161619] hover:bg-[#202025] active:scale-95 transition-all"
           >
             <CalendarDays className="h-3.5 w-3.5 text-zinc-400" />
-            <span>{isCalendarOpen ? 'Скрыть календарь' : 'Весь месяц (30 дней)'}</span>
+            <span>{isCalendarOpen ? 'Скрыть календарь' : 'Весь месяц'}</span>
           </button>
         </div>
 
@@ -155,15 +187,15 @@ export const SlotPicker: React.FC<SlotPickerProps> = ({
               </div>
             </div>
 
-            {/* Days of week */}
-            <div className="grid grid-cols-7 gap-1 text-center py-2 text-[11px] font-bold text-zinc-500 uppercase">
-              <span>Пн</span>
-              <span>Вт</span>
-              <span>Ср</span>
-              <span>Чт</span>
-              <span>Пт</span>
-              <span className="text-zinc-400">Сб</span>
-              <span className="text-zinc-400">Вс</span>
+            {/* Days of week (ПН, ВТ, СР, ЧТ, ПТ, СБ, ВС) */}
+            <div className="grid grid-cols-7 gap-1 text-center py-2 text-[11px] font-bold text-zinc-500">
+              <span>ПН</span>
+              <span>ВТ</span>
+              <span>СР</span>
+              <span>ЧТ</span>
+              <span>ПТ</span>
+              <span className="text-zinc-400">СБ</span>
+              <span className="text-zinc-400">ВС</span>
             </div>
 
             {/* Month Day Cells */}
@@ -238,7 +270,7 @@ export const SlotPicker: React.FC<SlotPickerProps> = ({
       </div>
 
       {/* ==================================================================== */}
-      {/* 2. Structured Time Slots Section (Period filters & Clean Grid)         */}
+      {/* 2. Structured Time Slots Section (Утро, День, Вечер - без "Все")       */}
       {/* ==================================================================== */}
       <div>
         <div className="flex items-center justify-between mb-2.5">
@@ -249,81 +281,65 @@ export const SlotPicker: React.FC<SlotPickerProps> = ({
 
           {slots.length > 0 && !isLoading && (
             <span className="text-[11px] text-zinc-400 font-medium">
-              Доступно окон: <strong className="text-white font-bold">{availableCount}</strong>
+              Свободно: <strong className="text-white font-bold">{availableCount}</strong>
             </span>
           )}
         </div>
 
-        {/* Period Filter Tabs */}
+        {/* Period Filter Tabs (ONLY Утро, День, Вечер) */}
         {slots.length > 0 && !isLoading && (
-          <div className="flex gap-1.5 p-1 rounded-xl bg-[#141417] border border-white/[0.08] mb-3">
+          <div className="grid grid-cols-3 gap-1.5 p-1 rounded-xl bg-[#141417] border border-white/[0.08] mb-3">
             <button
               type="button"
-              onClick={() => setActivePeriod('all')}
+              onClick={() => setActivePeriod('morning')}
               className={cn(
-                "flex-1 py-1.5 rounded-lg text-xs font-semibold transition-all select-none text-center",
-                activePeriod === 'all'
-                  ? "bg-white text-black shadow-sm font-bold"
-                  : "text-zinc-400 hover:text-white"
+                "py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 select-none",
+                activePeriod === 'morning'
+                  ? "bg-white text-black shadow-md font-black"
+                  : "text-zinc-400 hover:text-white hover:bg-white/5"
               )}
             >
-              Все ({slots.length})
+              <Sunrise className="h-3.5 w-3.5" />
+              <span>Утро</span>
+              <span className="text-[10px] opacity-75">({morningSlots.length})</span>
             </button>
 
-            {morningSlots.length > 0 && (
-              <button
-                type="button"
-                onClick={() => setActivePeriod('morning')}
-                className={cn(
-                  "flex-1 py-1.5 rounded-lg text-xs font-semibold transition-all select-none flex items-center justify-center gap-1",
-                  activePeriod === 'morning'
-                    ? "bg-white text-black shadow-sm font-bold"
-                    : "text-zinc-400 hover:text-white"
-                )}
-              >
-                <Sunrise className="h-3 w-3" />
-                <span>Утро</span>
-              </button>
-            )}
+            <button
+              type="button"
+              onClick={() => setActivePeriod('afternoon')}
+              className={cn(
+                "py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 select-none",
+                activePeriod === 'afternoon'
+                  ? "bg-white text-black shadow-md font-black"
+                  : "text-zinc-400 hover:text-white hover:bg-white/5"
+              )}
+            >
+              <Sun className="h-3.5 w-3.5" />
+              <span>День</span>
+              <span className="text-[10px] opacity-75">({afternoonSlots.length})</span>
+            </button>
 
-            {afternoonSlots.length > 0 && (
-              <button
-                type="button"
-                onClick={() => setActivePeriod('afternoon')}
-                className={cn(
-                  "flex-1 py-1.5 rounded-lg text-xs font-semibold transition-all select-none flex items-center justify-center gap-1",
-                  activePeriod === 'afternoon'
-                    ? "bg-white text-black shadow-sm font-bold"
-                    : "text-zinc-400 hover:text-white"
-                )}
-              >
-                <Sun className="h-3 w-3" />
-                <span>День</span>
-              </button>
-            )}
-
-            {eveningSlots.length > 0 && (
-              <button
-                type="button"
-                onClick={() => setActivePeriod('evening')}
-                className={cn(
-                  "flex-1 py-1.5 rounded-lg text-xs font-semibold transition-all select-none flex items-center justify-center gap-1",
-                  activePeriod === 'evening'
-                    ? "bg-white text-black shadow-sm font-bold"
-                    : "text-zinc-400 hover:text-white"
-                )}
-              >
-                <Moon className="h-3 w-3" />
-                <span>Вечер</span>
-              </button>
-            )}
+            <button
+              type="button"
+              onClick={() => setActivePeriod('evening')}
+              className={cn(
+                "py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 select-none",
+                activePeriod === 'evening'
+                  ? "bg-white text-black shadow-md font-black"
+                  : "text-zinc-400 hover:text-white hover:bg-white/5"
+              )}
+            >
+              <Moon className="h-3.5 w-3.5" />
+              <span>Вечер</span>
+              <span className="text-[10px] opacity-75">({eveningSlots.length})</span>
+            </button>
           </div>
         )}
 
         {/* Slot Grid / States */}
         {isLoading ? (
           <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-            {Array.from({ length: 8 }).map((_, i) => (
+            {Array.from({ length: 6 }).map((_, i) => (
               <Skeleton key={i} className="h-11 rounded-xl bg-zinc-900" />
             ))}
           </div>
@@ -332,15 +348,21 @@ export const SlotPicker: React.FC<SlotPickerProps> = ({
             <AlertCircle className="h-6 w-6 text-zinc-500" />
             <span className="font-semibold text-zinc-300">На эту дату нет свободных окон</span>
             <span className="text-[11px] text-zinc-500 max-w-xs">
-              Все посты заняты или студия закрыта. Пожалуйста, выберите соседнюю дату.
+              Все посты заняты или студия закрыта. Пожалуйста, выберите другую дату.
             </span>
           </div>
         ) : displayedSlots.length === 0 ? (
-          <div className="p-4 rounded-xl border border-white/[0.08] bg-[#141417] text-center text-xs text-zinc-400">
-            В выбранном интервале нет окон. Переключитесь на «Все».
+          <div className="p-5 rounded-xl border border-white/[0.08] bg-[#141417] text-center text-xs text-zinc-400">
+            В интервале «
+            {activePeriod === 'morning'
+              ? 'Утро'
+              : activePeriod === 'afternoon'
+              ? 'День'
+              : 'Вечер'}
+            » свободных окон нет. Переключитесь на другое время.
           </div>
         ) : (
-          <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 max-h-64 overflow-y-auto pr-1">
+          <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 max-h-60 overflow-y-auto pr-1">
             {displayedSlots.map((slot) => {
               const isSelected = selectedSlotTime === slot.time;
               return (
