@@ -25,6 +25,7 @@ import {
   ChevronLeft,
   ChevronRight,
   CalendarDays,
+  Sparkles,
 } from 'lucide-react';
 
 interface SlotPickerProps {
@@ -61,7 +62,6 @@ export const SlotPicker: React.FC<SlotPickerProps> = ({
     return Array.from({ length: 30 }, (_, i) => {
       const d = addDays(today, i);
       const dateStr = format(d, 'yyyy-MM-dd');
-      // ПН, ВТ, СР, ЧТ, ПТ, СБ, ВС for days
       const dayName =
         i === 0 ? 'Сегодня' : i === 1 ? 'Завтра' : RU_WEEKDAYS[d.getDay()];
       const dayNumber = format(d, 'd MMM', { locale: ru });
@@ -76,14 +76,19 @@ export const SlotPicker: React.FC<SlotPickerProps> = ({
     return eachDayOfInterval({ start: monthStart, end: monthEnd });
   }, [calendarMonth]);
 
-  // Categorize slots by time of day
+  // Filter ONLY truly available slots — occupied/unavailable slots simply disappear completely!
+  const availableSlotsOnly = useMemo(() => {
+    return slots.filter((s) => s.is_available);
+  }, [slots]);
+
+  // Categorize available slots by period of day
   // Утро (до 12:00), День (12:00 – 17:00), Вечер (после 17:00)
   const { morningSlots, afternoonSlots, eveningSlots } = useMemo(() => {
     const morning: TimeSlot[] = [];
     const afternoon: TimeSlot[] = [];
     const evening: TimeSlot[] = [];
 
-    slots.forEach((s) => {
+    availableSlotsOnly.forEach((s) => {
       const hour = parseInt(s.display_time.split(':')[0], 10);
       if (hour < 12) {
         morning.push(s);
@@ -95,12 +100,12 @@ export const SlotPicker: React.FC<SlotPickerProps> = ({
     });
 
     return { morningSlots: morning, afternoonSlots: afternoon, eveningSlots: evening };
-  }, [slots]);
+  }, [availableSlotsOnly]);
 
-  // Auto-switch to a period with slots when slots load or date changes
+  // Auto-switch to a period with available slots when slots load or date changes
   useEffect(() => {
     if (selectedSlotTime) {
-      const selectedSlot = slots.find((s) => s.time === selectedSlotTime);
+      const selectedSlot = availableSlotsOnly.find((s) => s.time === selectedSlotTime);
       if (selectedSlot) {
         const hour = parseInt(selectedSlot.display_time.split(':')[0], 10);
         if (hour < 12) {
@@ -114,7 +119,7 @@ export const SlotPicker: React.FC<SlotPickerProps> = ({
       }
     }
 
-    // Default to the first period that actually has slots
+    // Default to the first period that actually has free slots
     if (morningSlots.length > 0) {
       setActivePeriod('morning');
     } else if (afternoonSlots.length > 0) {
@@ -122,19 +127,15 @@ export const SlotPicker: React.FC<SlotPickerProps> = ({
     } else if (eveningSlots.length > 0) {
       setActivePeriod('evening');
     }
-  }, [selectedSlotTime, morningSlots.length, afternoonSlots.length, eveningSlots.length]);
+  }, [selectedSlotTime, morningSlots.length, afternoonSlots.length, eveningSlots.length, availableSlotsOnly]);
 
-  // Filtered slots list based on active tab (Утро, День, Вечер only!)
+  // Displayed slots: ONLY available slots for the selected period!
   const displayedSlots = useMemo(() => {
     if (activePeriod === 'morning') return morningSlots;
     if (activePeriod === 'afternoon') return afternoonSlots;
     if (activePeriod === 'evening') return eveningSlots;
     return [];
   }, [activePeriod, morningSlots, afternoonSlots, eveningSlots]);
-
-  const availableCount = useMemo(() => {
-    return slots.filter((s) => s.is_available).length;
-  }, [slots]);
 
   return (
     <div className="space-y-4">
@@ -220,7 +221,8 @@ export const SlotPicker: React.FC<SlotPickerProps> = ({
                       "h-9 rounded-xl text-xs font-semibold flex items-center justify-center transition-all select-none",
                       isDisabled && "opacity-20 text-zinc-600 cursor-not-allowed",
                       !isDisabled && !isSelected && "text-zinc-300 hover:text-white hover:bg-white/10",
-                      isSelected && "bg-white text-black font-extrabold shadow-md scale-105"
+                      isSelected &&
+                        "bg-white text-black font-extrabold shadow-[0_0_18px_rgba(255,255,255,0.4)] scale-105"
                     )}
                   >
                     {format(day, 'd')}
@@ -243,14 +245,14 @@ export const SlotPicker: React.FC<SlotPickerProps> = ({
                 className={cn(
                   "flex flex-col items-center justify-center min-w-[76px] py-2.5 px-3 rounded-2xl border text-center transition-all duration-200 shrink-0 active:scale-95 select-none",
                   isSelected
-                    ? "border-white bg-white text-black font-bold shadow-[0_4px_20px_rgba(255,255,255,0.25)] ring-1 ring-white"
+                    ? "border-white bg-white text-black font-bold shadow-[0_0_22px_rgba(255,255,255,0.35),0_4px_12px_rgba(0,0,0,0.4)] ring-1 ring-white"
                     : "border-white/[0.08] bg-[#161619] text-zinc-400 hover:border-white/20 hover:text-white hover:bg-[#1f1f23]"
                 )}
               >
                 <span
                   className={cn(
                     "text-[10px] uppercase font-bold tracking-tight",
-                    isSelected ? "text-zinc-700" : "text-zinc-500"
+                    isSelected ? "text-zinc-800" : "text-zinc-500"
                   )}
                 >
                   {d.dayName}
@@ -279,15 +281,15 @@ export const SlotPicker: React.FC<SlotPickerProps> = ({
             <span>Время визита</span>
           </label>
 
-          {slots.length > 0 && !isLoading && (
+          {availableSlotsOnly.length > 0 && !isLoading && (
             <span className="text-[11px] text-zinc-400 font-medium">
-              Свободно: <strong className="text-white font-bold">{availableCount}</strong>
+              Свободно: <strong className="text-white font-bold">{availableSlotsOnly.length}</strong>
             </span>
           )}
         </div>
 
         {/* Period Filter Tabs (ONLY Утро, День, Вечер) */}
-        {slots.length > 0 && !isLoading && (
+        {availableSlotsOnly.length > 0 && !isLoading && (
           <div className="grid grid-cols-3 gap-1.5 p-1 rounded-xl bg-[#141417] border border-white/[0.08] mb-3">
             <button
               type="button"
@@ -295,7 +297,7 @@ export const SlotPicker: React.FC<SlotPickerProps> = ({
               className={cn(
                 "py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 select-none",
                 activePeriod === 'morning'
-                  ? "bg-white text-black shadow-md font-black"
+                  ? "bg-white text-black shadow-[0_0_18px_rgba(255,255,255,0.3)] font-black"
                   : "text-zinc-400 hover:text-white hover:bg-white/5"
               )}
             >
@@ -310,7 +312,7 @@ export const SlotPicker: React.FC<SlotPickerProps> = ({
               className={cn(
                 "py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 select-none",
                 activePeriod === 'afternoon'
-                  ? "bg-white text-black shadow-md font-black"
+                  ? "bg-white text-black shadow-[0_0_18px_rgba(255,255,255,0.3)] font-black"
                   : "text-zinc-400 hover:text-white hover:bg-white/5"
               )}
             >
@@ -325,7 +327,7 @@ export const SlotPicker: React.FC<SlotPickerProps> = ({
               className={cn(
                 "py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 select-none",
                 activePeriod === 'evening'
-                  ? "bg-white text-black shadow-md font-black"
+                  ? "bg-white text-black shadow-[0_0_18px_rgba(255,255,255,0.3)] font-black"
                   : "text-zinc-400 hover:text-white hover:bg-white/5"
               )}
             >
@@ -343,7 +345,7 @@ export const SlotPicker: React.FC<SlotPickerProps> = ({
               <Skeleton key={i} className="h-11 rounded-xl bg-zinc-900" />
             ))}
           </div>
-        ) : slots.length === 0 ? (
+        ) : availableSlotsOnly.length === 0 ? (
           <div className="p-6 rounded-2xl border border-white/[0.08] bg-[#141417] text-center text-xs text-zinc-400 flex flex-col items-center gap-2">
             <AlertCircle className="h-6 w-6 text-zinc-500" />
             <span className="font-semibold text-zinc-300">На эту дату нет свободных окон</span>
@@ -352,14 +354,14 @@ export const SlotPicker: React.FC<SlotPickerProps> = ({
             </span>
           </div>
         ) : displayedSlots.length === 0 ? (
-          <div className="p-5 rounded-xl border border-white/[0.08] bg-[#141417] text-center text-xs text-zinc-400">
+          <div className="p-5 rounded-2xl border border-white/[0.08] bg-[#141417] text-center text-xs text-zinc-400">
             В интервале «
             {activePeriod === 'morning'
               ? 'Утро'
               : activePeriod === 'afternoon'
               ? 'День'
               : 'Вечер'}
-            » свободных окон нет. Переключитесь на другое время.
+            » свободных окон не осталось. Выберите другое время суток.
           </div>
         ) : (
           <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 max-h-60 overflow-y-auto pr-1">
@@ -369,18 +371,13 @@ export const SlotPicker: React.FC<SlotPickerProps> = ({
                 <button
                   key={slot.time}
                   type="button"
-                  disabled={!slot.is_available}
                   onClick={() => onSelectSlot(slot)}
                   className={cn(
                     "h-11 rounded-xl border text-sm font-bold transition-all flex items-center justify-center active:scale-95 select-none",
-                    !slot.is_available &&
-                      "opacity-25 bg-[#121214] border-white/5 text-zinc-600 cursor-not-allowed line-through",
-                    slot.is_available &&
-                      !isSelected &&
+                    !isSelected &&
                       "border-white/[0.08] bg-[#17171a] text-zinc-100 hover:border-white/30 hover:bg-[#202025] hover:text-white shadow-sm",
-                    slot.is_available &&
-                      isSelected &&
-                      "border-white bg-white text-black font-black shadow-[0_0_20px_rgba(255,255,255,0.35)] scale-[1.02]"
+                    isSelected &&
+                      "border-white bg-white text-black font-black shadow-[0_0_24px_rgba(255,255,255,0.4),0_2px_8px_rgba(0,0,0,0.5)] scale-[1.02]"
                   )}
                 >
                   {slot.display_time}

@@ -311,7 +311,7 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({
             <Button
               disabled={!canProceedToStep2}
               onClick={() => setStep(2)}
-              className="w-full h-12 rounded-xl text-base font-bold shadow-md"
+              className="w-full h-12 rounded-xl text-base font-black bg-white text-black hover:bg-zinc-100 shadow-[0_0_24px_rgba(255,255,255,0.32),0_4px_16px_rgba(0,0,0,0.6)] disabled:bg-zinc-800 disabled:text-zinc-500 disabled:shadow-none border border-white/20 active:scale-[0.99] transition-all"
             >
               Продолжить
             </Button>
@@ -319,7 +319,7 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({
             <Button
               disabled={!canSubmit || isSubmitting}
               onClick={handleSubmitBooking}
-              className="w-full h-12 rounded-xl text-base font-bold shadow-md"
+              className="w-full h-12 rounded-xl text-base font-black bg-white text-black hover:bg-zinc-100 shadow-[0_0_24px_rgba(255,255,255,0.32),0_4px_16px_rgba(0,0,0,0.6)] disabled:bg-zinc-800 disabled:text-zinc-500 disabled:shadow-none border border-white/20 active:scale-[0.99] transition-all"
             >
               {isSubmitting ? (
                 <>

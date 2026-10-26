@@ -132,7 +132,17 @@ export const Home: React.FC = () => {
         
         {/* Top App Header (Brand Logo + Profile Button) */}
         <header className="pt-[calc(env(safe-area-inset-top,8px)+6px)] px-5 pb-3 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
+          <button
+            type="button"
+            onClick={() => {
+              setActiveTab('home');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+              document.documentElement.scrollTo({ top: 0, behavior: 'smooth' });
+              document.body.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            className="flex items-center gap-2.5 text-left active:scale-95 transition-transform"
+            aria-label="На главную"
+          >
             {/* Multi-layer styling brand mark icon */}
             <div className="h-8 w-8 rounded-lg bg-zinc-900 border border-white/10 flex items-center justify-center text-white shadow-inner">
               <Layers className="h-4 w-4" />
@@ -140,7 +150,7 @@ export const Home: React.FC = () => {
             <span className="text-sm font-black uppercase tracking-wider text-white">
               {tenant.name.split(' ')[0] || 'SGX'}
             </span>
-          </div>
+          </button>
 
           <button
             type="button"

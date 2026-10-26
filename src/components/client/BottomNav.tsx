@@ -21,16 +21,29 @@ export const BottomNav: React.FC<BottomNavProps> = ({
     { id: 'ticket' as ClientTab, label: 'Моя запись', icon: CalendarDays, badge: hasActiveBooking },
   ];
 
+  const handleTabClick = (tabId: ClientTab) => {
+    if (activeTab === tabId) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      document.documentElement.scrollTo({ top: 0, behavior: 'smooth' });
+      document.body.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      onTabChange(tabId);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      document.documentElement.scrollTo({ top: 0, behavior: 'smooth' });
+      document.body.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
   return (
     <div className="fixed bottom-4 inset-x-0 z-40 max-w-sm mx-auto px-4 pointer-events-none pb-[env(safe-area-inset-bottom,0px)]">
       {/* Outer ambient soft shadow */}
       <div className="relative pointer-events-auto">
-        <div className="absolute -inset-0.5 rounded-full bg-white/[0.04] blur-sm pointer-events-none" />
+        <div className="absolute -inset-0.5 rounded-full bg-white/[0.04] blur-md pointer-events-none" />
 
-        {/* Floating pill navigation bar */}
+        {/* Floating pill navigation bar - translucent frosted glass matching top hero button */}
         <nav
           aria-label="Основная навигация"
-          className="relative rounded-full backdrop-blur-2xl bg-[#121316]/95 border border-white/[0.12] shadow-[0_12px_40px_rgba(0,0,0,0.9)] p-1.5 flex items-center justify-between"
+          className="relative rounded-full backdrop-blur-md bg-white/[0.08] hover:bg-white/[0.10] border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.6)] p-1.5 flex items-center justify-between transition-colors duration-300"
         >
           {tabs.map((tab) => {
             const Icon = tab.icon;
@@ -39,19 +52,22 @@ export const BottomNav: React.FC<BottomNavProps> = ({
               <button
                 key={tab.id}
                 type="button"
-                onClick={() => onTabChange(tab.id)}
+                onClick={() => handleTabClick(tab.id)}
                 className={cn(
-                  "relative flex items-center justify-center min-h-[44px] min-w-[90px] px-3 py-2 rounded-full transition-all duration-200 active:scale-95 select-none text-xs font-semibold",
+                  "relative flex items-center justify-center min-h-[44px] min-w-[94px] px-3 py-2 rounded-full transition-all duration-200 active:scale-95 select-none text-xs font-semibold",
                   isActive
-                    ? "bg-zinc-800/90 text-white shadow-inner border border-white/10"
-                    : "text-zinc-400 hover:text-white"
+                    ? "bg-white text-black font-extrabold shadow-[0_0_20px_rgba(255,255,255,0.35),0_2px_8px_rgba(0,0,0,0.4)] border border-white/40"
+                    : "text-zinc-300 hover:text-white hover:bg-white/[0.08]"
                 )}
               >
                 <div className="relative flex items-center gap-1.5">
-                  <Icon className={cn("h-4 w-4 transition-transform", isActive ? "text-white" : "text-zinc-400")} />
+                  <Icon className={cn("h-4 w-4 transition-transform", isActive ? "text-black" : "text-zinc-300")} />
                   <span className="tracking-tight">{tab.label}</span>
                   {tab.badge && (
-                    <span className="absolute -top-1 -right-1.5 h-2 w-2 rounded-full bg-white ring-2 ring-black animate-pulse" />
+                    <span className={cn(
+                      "absolute -top-1 -right-1.5 h-2 w-2 rounded-full animate-pulse",
+                      isActive ? "bg-black ring-2 ring-white" : "bg-white ring-2 ring-black"
+                    )} />
                   )}
                 </div>
               </button>
