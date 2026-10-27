@@ -29,6 +29,12 @@ console.log('✓ Pre-generated static route HTML files for instant 200 OK');
 
 console.log('📦 Pushing build to gh-pages branch...');
 try {
+  // Remove any stale .git inside dist so we create a clean, single fresh commit
+  const distGit = path.join(distDir, '.git');
+  if (fs.existsSync(distGit)) {
+    fs.rmSync(distGit, { recursive: true, force: true });
+  }
+
   // Use temporary git in dist to cleanly push to gh-pages branch
   execSync('git init', { cwd: distDir, stdio: 'ignore' });
   execSync('git config user.name "deploy-bot"', { cwd: distDir, stdio: 'ignore' });
