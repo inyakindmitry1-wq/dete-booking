@@ -253,7 +253,7 @@ BEGIN
 • Поверхностная уборка салона составами для химчистки
 • Уборка багажника и ниши запасного колеса
 • Использование консервирующего состава для интерьера
-• Пропитка стекол с обеих сторон', 120, 15, 6500, true, 'https://images.unsplash.com/photo-1607860108855-64acf2078ed9?auto=format&fit=crop&w=800&q=80', 1)
+• Пропитка стекол с обеих сторон', 120, 15, 5900, true, '/images/services/wash-premium.jpg', 1)
   ON CONFLICT (tenant_id, id) DO UPDATE SET
     category = EXCLUDED.category,
     name = EXCLUDED.name,
@@ -271,7 +271,7 @@ BEGIN
 • Уборка салона и багажника (пылесос, влажная уборка) + ниша запасного колеса
 • Использование консервирующего состава для интерьера
 • Пропитка стекол с обеих сторон
-• Чернение резины (мат/глянец)', 120, 15, 4900, true, 'https://images.unsplash.com/photo-1520340356584-f9917d1eea6f?auto=format&fit=crop&w=800&q=80', 2)
+• Чернение резины (мат/глянец)', 120, 15, 3900, true, '/images/services/wash-standard.jpg', 2)
   ON CONFLICT (tenant_id, id) DO UPDATE SET
     category = EXCLUDED.category,
     name = EXCLUDED.name,
@@ -283,7 +283,7 @@ BEGIN
     image_url = EXCLUDED.image_url,
     sort_order = EXCLUDED.sort_order;
   INSERT INTO services (id, tenant_id, category, name, description, duration_minutes, buffer_minutes, price, is_active, image_url, sort_order)
-  VALUES ('22222222-2222-4222-8222-222222222202', v_tenant_id, 'Кузов', 'Восстановительная полировка', 'Удаление до 95% царапин, паутины и голограмм. Возвращение заводского глянца и глубины цвета.', 360, 30, 22000, true, 'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?auto=format&fit=crop&w=800&q=80', 3)
+  VALUES ('22222222-2222-4222-8222-222222222202', v_tenant_id, 'Кузов', 'Восстановительная полировка', 'Удаление до 95% царапин, паутины и голограмм. Возвращение заводского глянца и глубины цвета.', 360, 30, 18000, true, '/images/services/polishing.jpg', 3)
   ON CONFLICT (tenant_id, id) DO UPDATE SET
     category = EXCLUDED.category,
     name = EXCLUDED.name,
@@ -295,7 +295,7 @@ BEGIN
     image_url = EXCLUDED.image_url,
     sort_order = EXCLUDED.sort_order;
   INSERT INTO services (id, tenant_id, category, name, description, duration_minutes, buffer_minutes, price, is_active, image_url, sort_order)
-  VALUES ('22222222-2222-4222-8222-222222222203', v_tenant_id, 'Кузов', 'Керамическая защита 9H (2 слоя)', 'Сверхгидрофобный эффект, защита от реагентов, птичьего помета и выгорания цвета на солнце. Стойкость до 2 лет.', 480, 60, 35000, true, 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=800&q=80', 4)
+  VALUES ('22222222-2222-4222-8222-222222222203', v_tenant_id, 'Кузов', 'Керамическая защита 9H (2 слоя)', 'Сверхгидрофобный эффект, защита от реагентов, птичьего помета и выгорания цвета на солнце. Стойкость до 2 лет.', 480, 60, 32000, true, '/images/services/ceramic.jpg', 4)
   ON CONFLICT (tenant_id, id) DO UPDATE SET
     category = EXCLUDED.category,
     name = EXCLUDED.name,
@@ -307,7 +307,7 @@ BEGIN
     image_url = EXCLUDED.image_url,
     sort_order = EXCLUDED.sort_order;
   INSERT INTO services (id, tenant_id, category, name, description, duration_minutes, buffer_minutes, price, is_active, image_url, sort_order)
-  VALUES ('22222222-2222-4222-8222-222222222204', v_tenant_id, 'Бронепленка', 'Антигравийный комплекс (PPF)', 'Полная оклейка ударной части (капот, бампер, оптика, крылья, зеркала) полиуретаном толщиной 200 микрон с самозатягивающимся слоем.', 1440, 120, 95000, true, 'https://images.unsplash.com/photo-1617814076367-b759c7d7e738?auto=format&fit=crop&w=800&q=80', 5)
+  VALUES ('22222222-2222-4222-8222-222222222204', v_tenant_id, 'Бронепленка', 'Антигравийный комплекс (PPF)', 'Полная оклейка ударной части (капот, бампер, оптика, крылья, зеркала) полиуретаном толщиной 200 микрон с самозатягивающимся слоем.', 1440, 120, 75000, true, '/images/services/ppf.jpg', 5)
   ON CONFLICT (tenant_id, id) DO UPDATE SET
     category = EXCLUDED.category,
     name = EXCLUDED.name,
@@ -319,7 +319,7 @@ BEGIN
     image_url = EXCLUDED.image_url,
     sort_order = EXCLUDED.sort_order;
   INSERT INTO services (id, tenant_id, category, name, description, duration_minutes, buffer_minutes, price, is_active, image_url, sort_order)
-  VALUES ('22222222-2222-4222-8222-222222222205', v_tenant_id, 'Интерьер', 'Глубокая химчистка салона', 'Торнадор, экстракторная чистка ковролина, обработка кожи крем-кондиционером с защитой от трещин и озонирование.', 240, 30, 16000, true, 'https://images.unsplash.com/photo-1583121274602-3e2820c69888?auto=format&fit=crop&w=800&q=80', 6)
+  VALUES ('22222222-2222-4222-8222-222222222205', v_tenant_id, 'Интерьер', 'Глубокая химчистка салона', 'Торнадор, экстракторная чистка ковролина, обработка кожи крем-кондиционером с защитой от трещин и озонирование.', 240, 30, 14000, true, '/images/services/interior.jpg', 6)
   ON CONFLICT (tenant_id, id) DO UPDATE SET
     category = EXCLUDED.category,
     name = EXCLUDED.name,
@@ -475,7 +475,7 @@ BEGIN
 • Поверхностная уборка салона составами для химчистки
 • Уборка багажника и ниши запасного колеса
 • Использование консервирующего состава для интерьера
-• Пропитка стекол с обеих сторон', 120, 15, 6500, true, 'https://images.unsplash.com/photo-1607860108855-64acf2078ed9?auto=format&fit=crop&w=800&q=80', 1)
+• Пропитка стекол с обеих сторон', 120, 15, 5900, true, '/images/services/wash-premium.jpg', 1)
   ON CONFLICT (tenant_id, id) DO UPDATE SET
     category = EXCLUDED.category,
     name = EXCLUDED.name,
@@ -493,7 +493,7 @@ BEGIN
 • Уборка салона и багажника (пылесос, влажная уборка) + ниша запасного колеса
 • Использование консервирующего состава для интерьера
 • Пропитка стекол с обеих сторон
-• Чернение резины (мат/глянец)', 120, 15, 4900, true, 'https://images.unsplash.com/photo-1520340356584-f9917d1eea6f?auto=format&fit=crop&w=800&q=80', 2)
+• Чернение резины (мат/глянец)', 120, 15, 3900, true, '/images/services/wash-standard.jpg', 2)
   ON CONFLICT (tenant_id, id) DO UPDATE SET
     category = EXCLUDED.category,
     name = EXCLUDED.name,
@@ -505,7 +505,7 @@ BEGIN
     image_url = EXCLUDED.image_url,
     sort_order = EXCLUDED.sort_order;
   INSERT INTO services (id, tenant_id, category, name, description, duration_minutes, buffer_minutes, price, is_active, image_url, sort_order)
-  VALUES ('22222222-2222-4222-8222-222222222202', v_tenant_id, 'Кузов', 'Восстановительная полировка', 'Удаление до 95% царапин, паутины и голограмм. Возвращение заводского глянца и глубины цвета.', 360, 30, 22000, true, 'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?auto=format&fit=crop&w=800&q=80', 3)
+  VALUES ('22222222-2222-4222-8222-222222222202', v_tenant_id, 'Кузов', 'Восстановительная полировка', 'Удаление до 95% царапин, паутины и голограмм. Возвращение заводского глянца и глубины цвета.', 360, 30, 18000, true, '/images/services/polishing.jpg', 3)
   ON CONFLICT (tenant_id, id) DO UPDATE SET
     category = EXCLUDED.category,
     name = EXCLUDED.name,
@@ -517,7 +517,7 @@ BEGIN
     image_url = EXCLUDED.image_url,
     sort_order = EXCLUDED.sort_order;
   INSERT INTO services (id, tenant_id, category, name, description, duration_minutes, buffer_minutes, price, is_active, image_url, sort_order)
-  VALUES ('22222222-2222-4222-8222-222222222203', v_tenant_id, 'Кузов', 'Керамическая защита 9H (2 слоя)', 'Сверхгидрофобный эффект, защита от реагентов, птичьего помета и выгорания цвета на солнце. Стойкость до 2 лет.', 480, 60, 35000, true, 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=800&q=80', 4)
+  VALUES ('22222222-2222-4222-8222-222222222203', v_tenant_id, 'Кузов', 'Керамическая защита 9H (2 слоя)', 'Сверхгидрофобный эффект, защита от реагентов, птичьего помета и выгорания цвета на солнце. Стойкость до 2 лет.', 480, 60, 32000, true, '/images/services/ceramic.jpg', 4)
   ON CONFLICT (tenant_id, id) DO UPDATE SET
     category = EXCLUDED.category,
     name = EXCLUDED.name,
@@ -529,7 +529,7 @@ BEGIN
     image_url = EXCLUDED.image_url,
     sort_order = EXCLUDED.sort_order;
   INSERT INTO services (id, tenant_id, category, name, description, duration_minutes, buffer_minutes, price, is_active, image_url, sort_order)
-  VALUES ('22222222-2222-4222-8222-222222222204', v_tenant_id, 'Бронепленка', 'Антигравийный комплекс (PPF)', 'Полная оклейка ударной части (капот, бампер, оптика, крылья, зеркала) полиуретаном толщиной 200 микрон с самозатягивающимся слоем.', 1440, 120, 95000, true, 'https://images.unsplash.com/photo-1617814076367-b759c7d7e738?auto=format&fit=crop&w=800&q=80', 5)
+  VALUES ('22222222-2222-4222-8222-222222222204', v_tenant_id, 'Бронепленка', 'Антигравийный комплекс (PPF)', 'Полная оклейка ударной части (капот, бампер, оптика, крылья, зеркала) полиуретаном толщиной 200 микрон с самозатягивающимся слоем.', 1440, 120, 75000, true, '/images/services/ppf.jpg', 5)
   ON CONFLICT (tenant_id, id) DO UPDATE SET
     category = EXCLUDED.category,
     name = EXCLUDED.name,
@@ -541,7 +541,7 @@ BEGIN
     image_url = EXCLUDED.image_url,
     sort_order = EXCLUDED.sort_order;
   INSERT INTO services (id, tenant_id, category, name, description, duration_minutes, buffer_minutes, price, is_active, image_url, sort_order)
-  VALUES ('22222222-2222-4222-8222-222222222205', v_tenant_id, 'Интерьер', 'Глубокая химчистка салона', 'Торнадор, экстракторная чистка ковролина, обработка кожи крем-кондиционером с защитой от трещин и озонирование.', 240, 30, 16000, true, 'https://images.unsplash.com/photo-1583121274602-3e2820c69888?auto=format&fit=crop&w=800&q=80', 6)
+  VALUES ('22222222-2222-4222-8222-222222222205', v_tenant_id, 'Интерьер', 'Глубокая химчистка салона', 'Торнадор, экстракторная чистка ковролина, обработка кожи крем-кондиционером с защитой от трещин и озонирование.', 240, 30, 14000, true, '/images/services/interior.jpg', 6)
   ON CONFLICT (tenant_id, id) DO UPDATE SET
     category = EXCLUDED.category,
     name = EXCLUDED.name,

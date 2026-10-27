@@ -34,6 +34,6 @@ describe('AI Concierge Tool Scoping & Authorization', () => {
 
     const match = services.find((s) => s.name.toLowerCase().includes('полировка'));
     expect(match).toBeDefined();
-    expect(match?.price).toBe(22000);
+    expect(match?.price).toBe(18000);
   });
 });

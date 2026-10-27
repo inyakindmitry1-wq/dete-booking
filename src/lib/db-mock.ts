@@ -130,7 +130,7 @@ function loadInitialState(): DatabaseState {
 
 class MockDatabase {
   private state: DatabaseState;
-  private storageKey = 'dete_pwa_mock_db_v5';
+  private storageKey = 'dete_pwa_mock_db_v6';
 
   constructor() {
     this.state = this.loadFromStorage() || loadInitialState();
@@ -145,6 +145,7 @@ class MockDatabase {
       window.localStorage.removeItem('dete_pwa_mock_db_v2');
       window.localStorage.removeItem('dete_pwa_mock_db_v3');
       window.localStorage.removeItem('dete_pwa_mock_db_v4');
+      window.localStorage.removeItem('dete_pwa_mock_db_v5');
 
       const saved = window.localStorage.getItem(this.storageKey);
       if (saved) {

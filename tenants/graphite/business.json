@@ -52,9 +52,9 @@
       "description": "• Трехфазная мойка с применением кварца\n• Чистка дисков от колодочной пыли\n• Чистка проёмов и дверных петель\n• Сушка кузова и проёмов турбосушкой\n• Поверхностная уборка салона составами для химчистки\n• Уборка багажника и ниши запасного колеса\n• Использование консервирующего состава для интерьера\n• Пропитка стекол с обеих сторон",
       "duration_minutes": 120,
       "buffer_minutes": 15,
-      "price": 6500,
+      "price": 5900,
       "is_active": true,
-      "image_url": "https://images.unsplash.com/photo-1607860108855-64acf2078ed9?auto=format&fit=crop&w=800&q=80",
+      "image_url": "/images/services/wash-premium.jpg",
       "sort_order": 1
     },
     {
@@ -64,9 +64,9 @@
       "description": "• Трехфазная мойка с применением кварца\n• Сушка кузова и проёмов турбосушкой\n• Мойка арок, дисков и шин\n• Уборка салона и багажника (пылесос, влажная уборка) + ниша запасного колеса\n• Использование консервирующего состава для интерьера\n• Пропитка стекол с обеих сторон\n• Чернение резины (мат/глянец)",
       "duration_minutes": 120,
       "buffer_minutes": 15,
-      "price": 4900,
+      "price": 3900,
       "is_active": true,
-      "image_url": "https://images.unsplash.com/photo-1520340356584-f9917d1eea6f?auto=format&fit=crop&w=800&q=80",
+      "image_url": "/images/services/wash-standard.jpg",
       "sort_order": 2
     },
     {
@@ -76,9 +76,9 @@
       "description": "Удаление до 95% царапин, паутины и голограмм. Возвращение заводского глянца и глубины цвета.",
       "duration_minutes": 360,
       "buffer_minutes": 30,
-      "price": 22000,
+      "price": 18000,
       "is_active": true,
-      "image_url": "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?auto=format&fit=crop&w=800&q=80",
+      "image_url": "/images/services/polishing.jpg",
       "sort_order": 3
     },
     {
@@ -88,9 +88,9 @@
       "description": "Сверхгидрофобный эффект, защита от реагентов, птичьего помета и выгорания цвета на солнце. Стойкость до 2 лет.",
       "duration_minutes": 480,
       "buffer_minutes": 60,
-      "price": 35000,
+      "price": 32000,
       "is_active": true,
-      "image_url": "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=800&q=80",
+      "image_url": "/images/services/ceramic.jpg",
       "sort_order": 4
     },
     {
@@ -100,9 +100,9 @@
       "description": "Полная оклейка ударной части (капот, бампер, оптика, крылья, зеркала) полиуретаном толщиной 200 микрон с самозатягивающимся слоем.",
       "duration_minutes": 1440,
       "buffer_minutes": 120,
-      "price": 95000,
+      "price": 75000,
       "is_active": true,
-      "image_url": "https://images.unsplash.com/photo-1617814076367-b759c7d7e738?auto=format&fit=crop&w=800&q=80",
+      "image_url": "/images/services/ppf.jpg",
       "sort_order": 5
     },
     {
@@ -112,9 +112,9 @@
       "description": "Торнадор, экстракторная чистка ковролина, обработка кожи крем-кондиционером с защитой от трещин и озонирование.",
       "duration_minutes": 240,
       "buffer_minutes": 30,
-      "price": 16000,
+      "price": 14000,
       "is_active": true,
-      "image_url": "https://images.unsplash.com/photo-1583121274602-3e2820c69888?auto=format&fit=crop&w=800&q=80",
+      "image_url": "/images/services/interior.jpg",
       "sort_order": 6
     }
   ],
