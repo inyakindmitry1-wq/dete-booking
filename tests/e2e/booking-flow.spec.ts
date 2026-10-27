@@ -9,6 +9,12 @@ test.describe('End-to-End Online Booking & Owner Flow', () => {
     await expect(page).toHaveTitle(/Sokol Team Detailing/);
     await expect(page.locator('h1')).toContainText('Sokol Team Detailing');
 
+    // If first-visit PWA onboarding is shown, click continue in browser
+    const continueBrowser = page.locator('button:has-text("Продолжить в браузере")');
+    if (await continueBrowser.isVisible({ timeout: 1500 }).catch(() => false)) {
+      await continueBrowser.click();
+    }
+
     // 3. Find and click first "Записаться" button
     const bookButton = page.locator('button:has-text("Записаться")').first();
     await expect(bookButton).toBeVisible();

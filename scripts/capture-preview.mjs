@@ -9,25 +9,21 @@ async function run() {
 
   const outDir = 'C:/Users/inyak/.gemini/antigravity/brain/0420e2c0-fae9-4704-a176-0c4d87b991a0';
 
-  // 1. Sokol Team Detailing Client Home (shows new hero car and PWA prompt after 2s)
+  // 1. Sokol Team Detailing First Visit Full-Screen Onboarding
   await page.goto('http://localhost:5173/s/sokol/', { waitUntil: 'networkidle' });
-  await page.waitForTimeout(2200);
+  await page.waitForTimeout(1000);
+  await page.screenshot({ path: `${outDir}/preview_pwa_onboarding.png` });
+
+  // 1b. Click "Продолжить в браузере" to enter Home Screen (and permanently remember)
+  const continueBrowser = page.locator('button:has-text("Продолжить в браузере")').first();
+  if (await continueBrowser.isVisible()) {
+    await continueBrowser.click();
+    await page.waitForTimeout(600);
+  }
+
+  // 1c. Home Screen
   await page.screenshot({ path: `${outDir}/preview_sokol.png` });
   await page.screenshot({ path: `${outDir}/preview_graphite.png` });
-
-  // 1b. Open Interactive PWA Install Guide Modal
-  const installGuideBtn = page.locator('button:has-text("Как установить?"), button:has-text("Приложение")').first();
-  if (await installGuideBtn.isVisible()) {
-    await installGuideBtn.click();
-    await page.waitForTimeout(600);
-    await page.screenshot({ path: `${outDir}/preview_pwa_guide.png` });
-    // Close modal
-    const closeGuide = page.locator('button:has-text("Понятно, добавлю!"), button[aria-label="Закрыть"]').first();
-    if (await closeGuide.isVisible()) {
-      await closeGuide.click();
-      await page.waitForTimeout(400);
-    }
-  }
 
   // 2. Open Booking Drawer from Hero Button (Step 0: Choose Service)
   const bookBtn = page.locator('button:has-text("Записаться")').first();

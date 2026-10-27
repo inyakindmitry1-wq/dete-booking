@@ -14,13 +14,12 @@ export function usePWAInstall(tenantSlug: string = 'sokol') {
   const [isStandalone, setIsStandalone] = useState(false);
   const [isIOS, setIsIOS] = useState(false);
   const [isAndroid, setIsAndroid] = useState(false);
-  const [showPrompt, setShowPrompt] = useState(false);
-  const [showGuide, setShowGuide] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    // 1. Detect Standalone PWA mode
+    // 1. Detect Standalone PWA mode (already installed & opened from home screen)
     const standaloneMode =
       window.matchMedia('(display-mode: standalone)').matches ||
       Boolean((navigator as any).standalone) ||
@@ -38,8 +37,15 @@ export function usePWAInstall(tenantSlug: string = 'sokol') {
     setIsIOS(iosDevice);
     setIsAndroid(androidDevice);
 
-    // If already running inside installed standalone PWA, don't show prompt
-    if (standaloneMode) return;
+    // If already in standalone mode, mark onboarding as completed permanently
+    if (standaloneMode) {
+      try {
+        localStorage.setItem(`pwa_onboarding_completed_${tenantSlug}`, 'true');
+      } catch {
+        // ignore
+      }
+      return;
+    }
 
     // 3. Listen for Chromium beforeinstallprompt
     const handleBeforeInstallPrompt = (e: Event) => {
@@ -51,28 +57,24 @@ export function usePWAInstall(tenantSlug: string = 'sokol') {
 
     const handleAppInstalled = () => {
       setIsStandalone(true);
-      setShowPrompt(false);
-      setShowGuide(false);
+      setShowOnboarding(false);
       setDeferredPrompt(null);
+      try {
+        localStorage.setItem(`pwa_onboarding_completed_${tenantSlug}`, 'true');
+      } catch {
+        // ignore
+      }
     };
 
     window.addEventListener('appinstalled', handleAppInstalled);
 
-    // 4. Check dismissal in localStorage
-    const storageKey = `pwa_prompt_dismissed_${tenantSlug}`;
-    const dismissedUntil = localStorage.getItem(storageKey);
-    const isDismissed = dismissedUntil && Number(dismissedUntil) > Date.now();
+    // 4. Check if user already saw onboarding or installed
+    const storageKey = `pwa_onboarding_completed_${tenantSlug}`;
+    const alreadyCompleted = localStorage.getItem(storageKey) === 'true';
 
-    if (!isDismissed) {
-      // Show prompt smoothly after 1.8 seconds on first visit
-      const timer = setTimeout(() => {
-        setShowPrompt(true);
-      }, 1800);
-      return () => {
-        clearTimeout(timer);
-        window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-        window.removeEventListener('appinstalled', handleAppInstalled);
-      };
+    // If not standalone and hasn't seen it yet, show full-screen onboarding
+    if (!alreadyCompleted) {
+      setShowOnboarding(true);
     }
 
     return () => {
@@ -81,41 +83,37 @@ export function usePWAInstall(tenantSlug: string = 'sokol') {
     };
   }, [tenantSlug]);
 
-  const dismissPrompt = useCallback((days = 7) => {
-    setShowPrompt(false);
+  const continueInBrowser = useCallback(() => {
+    setShowOnboarding(false);
     try {
-      const storageKey = `pwa_prompt_dismissed_${tenantSlug}`;
-      const expiresAt = Date.now() + days * 24 * 60 * 60 * 1000;
-      localStorage.setItem(storageKey, String(expiresAt));
+      localStorage.setItem(`pwa_onboarding_completed_${tenantSlug}`, 'true');
     } catch {
       // ignore
     }
   }, [tenantSlug]);
 
-  const triggerInstall = useCallback(async () => {
+  const triggerNativeInstall = useCallback(async () => {
     if (deferredPrompt) {
       try {
         await deferredPrompt.prompt();
         const choice = await deferredPrompt.userChoice;
         if (choice.outcome === 'accepted') {
           setDeferredPrompt(null);
-          setShowPrompt(false);
+          setShowOnboarding(false);
+          try {
+            localStorage.setItem(`pwa_onboarding_completed_${tenantSlug}`, 'true');
+          } catch {
+            // ignore
+          }
         }
       } catch {
-        setShowGuide(true);
+        // fallback
       }
-    } else {
-      // If iOS Safari or unsupported native trigger, open interactive guide
-      setShowGuide(true);
     }
-  }, [deferredPrompt]);
+  }, [deferredPrompt, tenantSlug]);
 
-  const openGuide = useCallback(() => {
-    setShowGuide(true);
-  }, []);
-
-  const closeGuide = useCallback(() => {
-    setShowGuide(false);
+  const openOnboardingManually = useCallback(() => {
+    setShowOnboarding(true);
   }, []);
 
   return {
@@ -123,11 +121,9 @@ export function usePWAInstall(tenantSlug: string = 'sokol') {
     isIOS,
     isAndroid,
     canNativeInstall: Boolean(deferredPrompt),
-    showPrompt,
-    showGuide,
-    triggerInstall,
-    dismissPrompt,
-    openGuide,
-    closeGuide,
+    showOnboarding,
+    continueInBrowser,
+    triggerNativeInstall,
+    openOnboardingManually,
   };
 }

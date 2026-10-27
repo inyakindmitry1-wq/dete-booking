@@ -167,7 +167,7 @@ export const Home: React.FC = () => {
             {!pwaInstall.isStandalone && (
               <button
                 type="button"
-                onClick={pwaInstall.openGuide}
+                onClick={pwaInstall.openOnboardingManually}
                 aria-label="Установить приложение"
                 title="Установить на рабочий стол"
                 className="h-9 px-3 rounded-full border border-white/15 bg-zinc-900/80 hover:bg-zinc-800 flex items-center gap-1.5 text-zinc-300 hover:text-white hover:border-white/30 active:scale-95 transition-all text-xs font-semibold"
@@ -401,19 +401,16 @@ export const Home: React.FC = () => {
           hasActiveBooking={hasRecentBooking}
         />
 
-        {/* PWA Install Floating Prompt & Step-by-Step Interactive Guide */}
+        {/* Full-screen PWA Install Onboarding on First Visit & Manual Reopen */}
         {tenant && !pwaInstall.isStandalone && (
           <PWAInstallPrompt
             tenant={tenant}
-            showPrompt={pwaInstall.showPrompt}
-            showGuide={pwaInstall.showGuide}
+            isOpen={pwaInstall.showOnboarding}
             isIOS={pwaInstall.isIOS}
             isAndroid={pwaInstall.isAndroid}
             canNativeInstall={pwaInstall.canNativeInstall}
-            onInstall={pwaInstall.triggerInstall}
-            onDismiss={pwaInstall.dismissPrompt}
-            onOpenGuide={pwaInstall.openGuide}
-            onCloseGuide={pwaInstall.closeGuide}
+            onNativeInstall={pwaInstall.triggerNativeInstall}
+            onContinueInBrowser={pwaInstall.continueInBrowser}
           />
         )}
       </div>
