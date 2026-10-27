@@ -196,7 +196,7 @@ INSERT INTO tenants (
   'Europe/Moscow',
   '#FFFFFF',
   '/icons/sokol-logo.png',
-  '/images/hero-car.png',
+  '/images/hero-car.jpg',
   'detailing',
   false
 ) ON CONFLICT (slug) DO UPDATE SET
@@ -418,7 +418,7 @@ INSERT INTO tenants (
   'Europe/Moscow',
   '#FFFFFF',
   '/icons/sokol-logo.png',
-  '/images/hero-car.png',
+  '/images/hero-car.jpg',
   'detailing',
   false
 ) ON CONFLICT (slug) DO UPDATE SET

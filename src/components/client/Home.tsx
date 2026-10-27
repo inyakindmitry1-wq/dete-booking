@@ -22,7 +22,11 @@ import {
   User,
   AlertCircle,
   Layers,
+  Smartphone,
+  Download,
 } from 'lucide-react';
+import { usePWAInstall } from '@/hooks/usePWAInstall';
+import { PWAInstallPrompt } from './PWAInstallPrompt';
 
 export const Home: React.FC = () => {
   const { tenant, isLoading: isTenantLoading, isError: isTenantError } = useTenant();
@@ -36,6 +40,7 @@ export const Home: React.FC = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [completedBooking, setCompletedBooking] = useState<CreateBookingResponse | null>(null);
   const [hasRecentBooking, setHasRecentBooking] = useState(false);
+  const pwaInstall = usePWAInstall(tenant?.slug);
 
   useEffect(() => {
     if (tenant) {
@@ -158,14 +163,29 @@ export const Home: React.FC = () => {
             </span>
           </button>
 
-          <button
-            type="button"
-            onClick={() => (window.location.href = `/s/${tenant.slug}/owner/`)}
-            aria-label="Вход для владельца"
-            className="h-9 w-9 rounded-full border border-white/15 bg-zinc-900/80 flex items-center justify-center text-zinc-300 hover:text-white hover:border-white/30 active:scale-95 transition-all"
-          >
-            <User className="h-4 w-4" />
-          </button>
+          <div className="flex items-center gap-2">
+            {!pwaInstall.isStandalone && (
+              <button
+                type="button"
+                onClick={pwaInstall.openGuide}
+                aria-label="Установить приложение"
+                title="Установить на рабочий стол"
+                className="h-9 px-3 rounded-full border border-white/15 bg-zinc-900/80 hover:bg-zinc-800 flex items-center gap-1.5 text-zinc-300 hover:text-white hover:border-white/30 active:scale-95 transition-all text-xs font-semibold"
+              >
+                <Smartphone className="h-3.5 w-3.5 text-primary" />
+                <span className="hidden xs:inline">Приложение</span>
+              </button>
+            )}
+
+            <button
+              type="button"
+              onClick={() => (window.location.href = `/s/${tenant.slug}/owner/`)}
+              aria-label="Вход для владельца"
+              className="h-9 w-9 rounded-full border border-white/15 bg-zinc-900/80 flex items-center justify-center text-zinc-300 hover:text-white hover:border-white/30 active:scale-95 transition-all"
+            >
+              <User className="h-4 w-4" />
+            </button>
+          </div>
         </header>
 
         {/* Tab 1: Home View (Flagship Screen from Reference) */}
@@ -380,6 +400,22 @@ export const Home: React.FC = () => {
           onTabChange={setActiveTab}
           hasActiveBooking={hasRecentBooking}
         />
+
+        {/* PWA Install Floating Prompt & Step-by-Step Interactive Guide */}
+        {tenant && !pwaInstall.isStandalone && (
+          <PWAInstallPrompt
+            tenant={tenant}
+            showPrompt={pwaInstall.showPrompt}
+            showGuide={pwaInstall.showGuide}
+            isIOS={pwaInstall.isIOS}
+            isAndroid={pwaInstall.isAndroid}
+            canNativeInstall={pwaInstall.canNativeInstall}
+            onInstall={pwaInstall.triggerInstall}
+            onDismiss={pwaInstall.dismissPrompt}
+            onOpenGuide={pwaInstall.openGuide}
+            onCloseGuide={pwaInstall.closeGuide}
+          />
+        )}
       </div>
     </div>
   );
