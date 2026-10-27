@@ -174,6 +174,7 @@ export interface CreateBookingRequest {
   customer_phone: string;
   car_model?: string;
   car_plate?: string;
+  vehicle_type?: 'sedan' | 'crossover' | 'suv';
   customer_notes?: string;
   idempotency_key: string;
 }

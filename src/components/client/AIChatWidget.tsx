@@ -13,6 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Sparkles, Send, Bot, User, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { api } from '@/lib/api';
+import { askStudioAssistant } from '@/lib/ai-assistant';
 
 interface AIChatWidgetProps {
   tenant: DbTenant;
@@ -50,29 +51,8 @@ export const AIChatWidget: React.FC<AIChatWidgetProps> = ({ tenant }) => {
     setIsTyping(true);
 
     try {
-      // Simulate/call Edge Function ai-chat
-      // With local tool resolution fallback
-      const lower = text.toLowerCase();
-      let reply = '';
-
-      if (lower.includes('цена') || lower.includes('стоимость') || lower.includes('сколько стоит')) {
-        const services = await api.getServices(tenant.id);
-        const match = services.find((s) => lower.includes(s.name.toLowerCase().split(' ')[0]));
-        if (match) {
-          reply = `Стоимость услуги "${match.name}" составляет от ${match.price.toLocaleString('ru-RU')} ₽, примерная длительность ${match.duration_minutes} мин.`;
-        } else {
-          reply = `У нас представлены ${services.length} услуг: от ${Math.min(...services.map((s) => s.price)).toLocaleString('ru-RU')} ₽ до ${Math.max(...services.map((s) => s.price)).toLocaleString('ru-RU')} ₽. Выберите интересующую услугу в каталоге выше!`;
-        }
-      } else if (lower.includes('где') || lower.includes('адрес') || lower.includes('как доехать')) {
-        reply = `Мы находимся по адресу: ${tenant.city}, ${tenant.address}. Телефон для связи: ${tenant.phone}.`;
-      } else if (lower.includes('окно') || lower.includes('свободн') || lower.includes('когда') || lower.includes('записат')) {
-        reply = `Чтобы выбрать точное свободное окно на подходящий пост, нажмите кнопку «Записаться» у нужной услуги в списке, и откроется расписание свободных мест в реальном времени!`;
-      } else {
-        reply = `Я готов ответить на ваши вопросы об услугах студии ${tenant.name}. Вы также можете нажать «Записаться» на любой карточке услуги, чтобы сразу забронировать удобное время.`;
-      }
-
-      // Small natural delay
-      await new Promise((resolve) => setTimeout(resolve, 600));
+      const services = await api.getServices(tenant.id);
+      const reply = await askStudioAssistant(text, tenant, services, messages);
 
       const assistantMsg: ChatMessage = {
         id: `ast-${Date.now()}`,

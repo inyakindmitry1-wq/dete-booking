@@ -7,6 +7,15 @@ async function run() {
   });
   const page = await context.newPage();
   await page.goto('http://localhost:5173/s/sokol/', { waitUntil: 'networkidle' });
+  await page.waitForTimeout(600);
+
+  // Skip onboarding if visible
+  const skipBtn = page.locator('button:has-text("Продолжить в браузере")').first();
+  if (await skipBtn.isVisible()) {
+    await skipBtn.click();
+    await page.waitForTimeout(400);
+  }
+
   const bookBtn = page.locator('button:has-text("Записаться")').first();
   await bookBtn.click();
   await page.waitForTimeout(800);

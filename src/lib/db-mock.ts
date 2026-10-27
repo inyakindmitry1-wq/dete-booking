@@ -1,4 +1,5 @@
 import { DbTenant, DbResource, DbService, DbServiceResource, DbWorkingHours, DbScheduleException, DbResourceOccupancy, DbCustomer, DbBooking, DbPayment, DbTenantMember, DbNotificationJob } from '@/types/database';
+import { getServicePriceForClass, VehicleCategory } from './pricing';
 import sokolJson from '../../tenants/sokol/business.json';
 import graphiteJson from '../../tenants/graphite/business.json';
 import apexJson from '../../tenants/apex/business.json';
@@ -130,7 +131,7 @@ function loadInitialState(): DatabaseState {
 
 class MockDatabase {
   private state: DatabaseState;
-  private storageKey = 'dete_pwa_mock_db_v6';
+  private storageKey = 'dete_pwa_mock_db_v7';
 
   constructor() {
     this.state = this.loadFromStorage() || loadInitialState();
@@ -146,6 +147,7 @@ class MockDatabase {
       window.localStorage.removeItem('dete_pwa_mock_db_v3');
       window.localStorage.removeItem('dete_pwa_mock_db_v4');
       window.localStorage.removeItem('dete_pwa_mock_db_v5');
+      window.localStorage.removeItem('dete_pwa_mock_db_v6');
 
       const saved = window.localStorage.getItem(this.storageKey);
       if (saved) {
@@ -261,6 +263,7 @@ class MockDatabase {
     customer_phone: string;
     car_model?: string;
     car_plate?: string;
+    vehicle_type?: string;
     customer_notes?: string;
     idempotency_key?: string;
     access_token_hash?: string;
@@ -337,6 +340,9 @@ class MockDatabase {
     }
 
     // 5. Create Booking
+    const vehicleType = (params.vehicle_type as VehicleCategory) || 'sedan';
+    const priceSnapshot = getServicePriceForClass(service.price, service.name, vehicleType);
+
     const bookingId = `book-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
     const newBooking: DbBooking = {
       id: bookingId,
@@ -349,7 +355,7 @@ class MockDatabase {
       duration_minutes: service.duration_minutes,
       status: 'confirmed',
       service_name_snapshot: service.name,
-      price_snapshot: service.price,
+      price_snapshot: priceSnapshot,
       idempotency_key: params.idempotency_key,
       access_token_hash: params.access_token_hash,
       customer_notes: params.customer_notes,
@@ -398,7 +404,7 @@ class MockDatabase {
       start_time: params.start_time,
       end_time: endIso,
       service_name: service.name,
-      price: service.price,
+      price: priceSnapshot,
       resource_name: chosenResource.name,
       status: 'confirmed' as const,
       is_duplicate: false,

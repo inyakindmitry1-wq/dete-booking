@@ -15,6 +15,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { SlotPicker } from './SlotPicker';
 import { VehicleTypeSelector, VehicleCategory } from './VehicleTypeSelector';
+import { getServicePriceForClass, VEHICLE_NAMES } from '@/lib/pricing';
 import { useSlots } from '@/hooks/useSlots';
 import { api } from '@/lib/api';
 import { generateAccessToken } from '@/lib/crypto';
@@ -78,6 +79,10 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({
   const canProceedToStep2 = selectedSlot && selectedSlot.is_available;
   const canSubmit = customerName.trim().length >= 2 && customerPhone.trim().length >= 10;
 
+  const activePrice = selectedService
+    ? getServicePriceForClass(selectedService.price, selectedService.name, vehicleType)
+    : 0;
+
   async function handleSubmitBooking() {
     if (!selectedService || !selectedSlot || !canSubmit) return;
 
@@ -101,6 +106,7 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({
           customer_phone: customerPhone.trim(),
           car_model: carModel.trim() || undefined,
           car_plate: carPlate.trim() || undefined,
+          vehicle_type: vehicleType,
           customer_notes: customerNotes.trim() || undefined,
           idempotency_key: idempotencyKey,
         },
@@ -270,7 +276,7 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({
                       {selectedService.name}
                     </span>
                     <span className="text-[11px] text-zinc-400 font-medium">
-                      {formatCurrency(selectedService.price, tenant.currency)} • {formatDuration(selectedService.duration_minutes)}
+                      {formatCurrency(activePrice, tenant.currency)} • {formatDuration(selectedService.duration_minutes)}
                     </span>
                   </div>
                 </div>
@@ -288,8 +294,13 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({
                 )}
               </div>
 
-              {/* Vehicle Type Selection */}
-              <VehicleTypeSelector value={vehicleType} onChange={setVehicleType} />
+              {/* Vehicle Type Selection with live dynamic pricing */}
+              <VehicleTypeSelector
+                value={vehicleType}
+                onChange={setVehicleType}
+                service={selectedService}
+                currency={tenant.currency}
+              />
 
               {/* Slot Picker */}
               <SlotPicker
@@ -407,6 +418,10 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({
                     <span className="font-semibold text-white">{selectedService.name}</span>
                   </div>
                   <div className="flex justify-between text-zinc-400">
+                    <span>Класс авто:</span>
+                    <span className="font-semibold text-emerald-400">{VEHICLE_NAMES[vehicleType]}</span>
+                  </div>
+                  <div className="flex justify-between text-zinc-400">
                     <span>Дата и время:</span>
                     <span className="font-semibold text-white">
                       {format(new Date(selectedSlot.time), 'd MMM yyyy, HH:mm', { locale: ru })}
@@ -421,7 +436,7 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({
                   <div className="flex justify-between pt-2 border-t border-white/10 text-sm">
                     <span className="font-bold text-white">К оплате в студии:</span>
                     <span className="font-black text-white text-base">
-                      {formatCurrency(selectedService.price, tenant.currency)}
+                      {formatCurrency(activePrice, tenant.currency)}
                     </span>
                   </div>
                 </div>
@@ -435,9 +450,11 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({
             <Button
               disabled={!canProceedToStep2}
               onClick={() => setStep(2)}
-              className="w-full h-12 rounded-xl text-base font-black bg-white text-black hover:bg-zinc-100 shadow-[0_0_24px_rgba(255,255,255,0.32),0_4px_16px_rgba(0,0,0,0.6)] disabled:bg-zinc-800 disabled:text-zinc-500 disabled:shadow-none border border-white/20 active:scale-[0.99] transition-all"
+              className="w-full h-12 rounded-xl text-base font-black bg-white text-black hover:bg-zinc-100 shadow-[0_0_24px_rgba(255,255,255,0.32),0_4px_16px_rgba(0,0,0,0.6)] disabled:bg-zinc-800 disabled:text-zinc-500 disabled:shadow-none border border-white/20 active:scale-[0.99] transition-all flex items-center justify-center gap-2"
             >
-              Продолжить
+              <span>Продолжить</span>
+              <span className="opacity-40">•</span>
+              <span>{formatCurrency(activePrice, tenant.currency)}</span>
             </Button>
           ) : (
             <Button
@@ -451,7 +468,7 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({
                   Оформляем запись...
                 </>
               ) : (
-                'Подтвердить запись'
+                `Подтвердить запись • ${formatCurrency(activePrice, tenant.currency)}`
               )}
             </Button>
           )}

@@ -55,6 +55,28 @@ export function useWebPush() {
       const permission = await Notification.requestPermission();
       if (permission === 'granted') {
         setStatus('granted');
+
+        // Immediately fire real native notification confirming active subscription
+        try {
+          if ('serviceWorker' in navigator) {
+            const reg = await navigator.serviceWorker.ready;
+            if (reg && reg.showNotification) {
+              await reg.showNotification('Sokol Team Detailing', {
+                body: 'Уведомления подключены! Мы напомним вам о визите и сообщим о готовности авто.',
+                icon: '/icons/sokol-logo.png',
+                badge: '/icons/sokol-logo.png',
+              });
+              return true;
+            }
+          }
+          new Notification('Sokol Team Detailing', {
+            body: 'Уведомления подключены! Мы напомним вам о визите и сообщим о готовности авто.',
+            icon: '/icons/sokol-logo.png',
+          });
+        } catch {
+          // Fallback if browser requires specific trigger
+        }
+
         return true;
       } else {
         setStatus('denied');

@@ -114,7 +114,7 @@
       "buffer_minutes": 30,
       "price": 14000,
       "is_active": true,
-      "image_url": "/images/services/interior.jpg",
+      "image_url": "/images/services/cleaning.jpg?v=3",
       "sort_order": 6
     }
   ],

@@ -319,7 +319,7 @@ BEGIN
     image_url = EXCLUDED.image_url,
     sort_order = EXCLUDED.sort_order;
   INSERT INTO services (id, tenant_id, category, name, description, duration_minutes, buffer_minutes, price, is_active, image_url, sort_order)
-  VALUES ('22222222-2222-4222-8222-222222222205', v_tenant_id, 'Интерьер', 'Глубокая химчистка салона', 'Торнадор, экстракторная чистка ковролина, обработка кожи крем-кондиционером с защитой от трещин и озонирование.', 240, 30, 14000, true, '/images/services/interior.jpg', 6)
+  VALUES ('22222222-2222-4222-8222-222222222205', v_tenant_id, 'Интерьер', 'Глубокая химчистка салона', 'Торнадор, экстракторная чистка ковролина, обработка кожи крем-кондиционером с защитой от трещин и озонирование.', 240, 30, 14000, true, '/images/services/cleaning.jpg?v=3', 6)
   ON CONFLICT (tenant_id, id) DO UPDATE SET
     category = EXCLUDED.category,
     name = EXCLUDED.name,
@@ -541,7 +541,7 @@ BEGIN
     image_url = EXCLUDED.image_url,
     sort_order = EXCLUDED.sort_order;
   INSERT INTO services (id, tenant_id, category, name, description, duration_minutes, buffer_minutes, price, is_active, image_url, sort_order)
-  VALUES ('22222222-2222-4222-8222-222222222205', v_tenant_id, 'Интерьер', 'Глубокая химчистка салона', 'Торнадор, экстракторная чистка ковролина, обработка кожи крем-кондиционером с защитой от трещин и озонирование.', 240, 30, 14000, true, '/images/services/interior.jpg', 6)
+  VALUES ('22222222-2222-4222-8222-222222222205', v_tenant_id, 'Интерьер', 'Глубокая химчистка салона', 'Торнадор, экстракторная чистка ковролина, обработка кожи крем-кондиционером с защитой от трещин и озонирование.', 240, 30, 14000, true, '/images/services/cleaning.jpg?v=3', 6)
   ON CONFLICT (tenant_id, id) DO UPDATE SET
     category = EXCLUDED.category,
     name = EXCLUDED.name,
