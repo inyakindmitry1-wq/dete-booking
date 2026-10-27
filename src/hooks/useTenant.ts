@@ -45,7 +45,7 @@ function hexToHsl(hex: string): string {
 
 export function useTenant() {
   const { slug } = useParams<{ slug: string }>();
-  const activeSlug = slug || import.meta.env.VITE_DEFAULT_TENANT || 'graphite';
+  const activeSlug = slug || import.meta.env.VITE_DEFAULT_TENANT || 'sokol';
 
   const query = useQuery<DbTenant | null>({
     queryKey: ['tenant', activeSlug],

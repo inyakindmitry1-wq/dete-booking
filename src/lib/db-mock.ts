@@ -1,4 +1,5 @@
 import { DbTenant, DbResource, DbService, DbServiceResource, DbWorkingHours, DbScheduleException, DbResourceOccupancy, DbCustomer, DbBooking, DbPayment, DbTenantMember, DbNotificationJob } from '@/types/database';
+import sokolJson from '../../tenants/sokol/business.json';
 import graphiteJson from '../../tenants/graphite/business.json';
 import apexJson from '../../tenants/apex/business.json';
 
@@ -31,7 +32,7 @@ function loadInitialState(): DatabaseState {
   const tenant_members: DbTenantMember[] = [];
   const notification_jobs: DbNotificationJob[] = [];
 
-  const rawConfigs = [graphiteJson, apexJson];
+  const rawConfigs = [sokolJson, graphiteJson, apexJson];
 
   for (const cfg of rawConfigs) {
     const tenantId = `tenant-${cfg.slug}`;
@@ -93,6 +94,12 @@ function loadInitialState(): DatabaseState {
 
   // Pre-seed owner membership for demo testing (e.g. owner_user_id)
   tenant_members.push({
+    tenant_id: 'tenant-sokol',
+    user_id: 'owner-sokol-user-id',
+    role: 'owner',
+    created_at: new Date().toISOString(),
+  });
+  tenant_members.push({
     tenant_id: 'tenant-graphite',
     user_id: 'owner-graphite-user-id',
     role: 'owner',
@@ -123,7 +130,7 @@ function loadInitialState(): DatabaseState {
 
 class MockDatabase {
   private state: DatabaseState;
-  private storageKey = 'dete_pwa_mock_db_v2';
+  private storageKey = 'dete_pwa_mock_db_v5';
 
   constructor() {
     this.state = this.loadFromStorage() || loadInitialState();
@@ -132,8 +139,28 @@ class MockDatabase {
   private loadFromStorage(): DatabaseState | null {
     if (typeof window === 'undefined' || !window.localStorage) return null;
     try {
+      // Clear legacy cache keys
+      window.localStorage.removeItem('detailing_mock_db_v1');
+      window.localStorage.removeItem('dete_pwa_mock_db_v1');
+      window.localStorage.removeItem('dete_pwa_mock_db_v2');
+      window.localStorage.removeItem('dete_pwa_mock_db_v3');
+      window.localStorage.removeItem('dete_pwa_mock_db_v4');
+
       const saved = window.localStorage.getItem(this.storageKey);
-      if (saved) return JSON.parse(saved);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        const fresh = loadInitialState();
+        // Always sync configuration definitions from business.json!
+        return {
+          ...parsed,
+          tenants: fresh.tenants,
+          services: fresh.services,
+          service_resources: fresh.service_resources,
+          resources: fresh.resources,
+          working_hours: fresh.working_hours,
+          tenant_members: fresh.tenant_members,
+        };
+      }
     } catch {
       // ignore
     }
@@ -160,6 +187,11 @@ class MockDatabase {
   }
 
   public getTenantBySlug(slug: string): DbTenant | undefined {
+    if (slug === 'sokol' || slug === 'sokol-team') {
+      const found = this.state.tenants.find((t) => t.slug === 'sokol');
+      if (found) return found;
+      return this.state.tenants.find((t) => t.slug === 'graphite');
+    }
     return this.state.tenants.find((t) => t.slug === slug);
   }
 

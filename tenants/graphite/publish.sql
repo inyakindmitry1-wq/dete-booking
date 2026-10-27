@@ -17,7 +17,7 @@ INSERT INTO tenants (
   'Europe/Moscow',
   '#FFFFFF',
   '/icons/sokol-logo.png',
-  'https://images.unsplash.com/photo-1601362840469-51e4d8d58785?auto=format&fit=crop&w=1200&q=80',
+  '/images/hero-car.png',
   'detailing',
   false
 ) ON CONFLICT (slug) DO UPDATE SET

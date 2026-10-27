@@ -10,9 +10,10 @@ async function run() {
   const outDir = 'C:/Users/inyak/.gemini/antigravity/brain/0420e2c0-fae9-4704-a176-0c4d87b991a0';
 
   // 1. Sokol Team Detailing Client Home
-  await page.goto('http://localhost:5173/s/graphite/', { waitUntil: 'networkidle' });
+  await page.goto('http://localhost:5173/s/sokol/', { waitUntil: 'networkidle' });
   await page.waitForTimeout(2000);
   await page.screenshot({ path: `${outDir}/preview_graphite.png` });
+  await page.screenshot({ path: `${outDir}/preview_sokol.png` });
 
   // 2. Open Booking Drawer from Hero Button (Step 0: Choose Service)
   const bookBtn = page.locator('button:has-text("Записаться")').first();

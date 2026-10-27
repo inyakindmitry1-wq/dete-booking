@@ -3,7 +3,7 @@ import { ClientPortalPage } from '@/pages/ClientPortalPage';
 import { ClientBookingStatusPage } from '@/pages/ClientBookingStatusPage';
 import { OwnerPortalPage } from '@/pages/OwnerPortalPage';
 
-const defaultTenant = import.meta.env.VITE_DEFAULT_TENANT || 'graphite';
+const defaultTenant = import.meta.env.VITE_DEFAULT_TENANT || 'sokol';
 
 export function App() {
   return (

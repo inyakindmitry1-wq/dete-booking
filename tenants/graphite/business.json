@@ -13,7 +13,7 @@
   "branding": {
     "accentColor": "#FFFFFF",
     "logoUrl": "/icons/sokol-logo.png",
-    "coverUrl": "https://images.unsplash.com/photo-1601362840469-51e4d8d58785?auto=format&fit=crop&w=1200&q=80",
+    "coverUrl": "/images/hero-car.png",
     "theme": "luxury-dark",
     "favicon": "/favicon.png",
     "appleTouchIcon": "/apple-touch-icon.png"
