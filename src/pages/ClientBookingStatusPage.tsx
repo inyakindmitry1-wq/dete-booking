@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useTenant } from '@/hooks/useTenant';
 import { api } from '@/lib/api';
@@ -29,6 +29,7 @@ import {
 export const ClientBookingStatusPage: React.FC = () => {
   const { bookingId } = useParams<{ bookingId: string }>();
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const token = searchParams.get('token') || '';
 
   const { tenant, isLoading: isTenantLoading } = useTenant();
@@ -70,7 +71,7 @@ export const ClientBookingStatusPage: React.FC = () => {
           <p className="text-xs text-muted-foreground mt-2 max-w-xs">
             Для просмотра и управления этой записью требуется персональный токен доступа.
           </p>
-          <Button className="mt-5 rounded-xl h-11 px-5" onClick={() => (window.location.href = `/s/${tenant.slug}/`)}>
+          <Button className="mt-5 rounded-xl h-11 px-5" onClick={() => navigate(`/s/${tenant.slug}/`)}>
             К услугам студии
           </Button>
         </div>
@@ -142,7 +143,7 @@ export const ClientBookingStatusPage: React.FC = () => {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => (window.location.href = `/s/${tenant.slug}/`)}
+            onClick={() => navigate(`/s/${tenant.slug}/`)}
             className="text-xs text-muted-foreground hover:text-foreground h-8 px-2 -ml-2"
           >
             <ArrowLeft className="h-4 w-4 mr-1" />

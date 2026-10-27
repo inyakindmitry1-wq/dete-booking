@@ -13,6 +13,8 @@ fs.writeFileSync(path.join(distDir, '.nojekyll'), '');
 
 // Pre-create directory index.html for all known tenant routes for zero-redirect 200 OK on GitHub Pages
 const staticRoutes = [
+  's/sokol',
+  's/sokol/owner',
   's/graphite',
   's/graphite/owner',
   's/apex',

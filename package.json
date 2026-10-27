@@ -16,7 +16,9 @@
     "tenant:validate": "tsx scripts/tenant-validate.ts",
     "tenant:publish": "tsx scripts/tenant-publish.ts",
     "tenant:verify": "tsx scripts/tenant-verify.ts",
-    "deploy": "node scripts/deploy-surge.mjs"
+    "deploy": "node scripts/deploy-gh-pages.mjs",
+    "deploy:gh-pages": "node scripts/deploy-gh-pages.mjs",
+    "deploy:surge": "node scripts/deploy-surge.mjs"
   },
   "dependencies": {
     "@astryxdesign/core": "^0.6.7",

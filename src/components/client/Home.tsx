@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTenant } from '@/hooks/useTenant';
 import { useServices } from '@/hooks/useServices';
 import { ServiceCard } from './ServiceCard';
@@ -41,6 +42,7 @@ export const Home: React.FC = () => {
   const [completedBooking, setCompletedBooking] = useState<CreateBookingResponse | null>(null);
   const [hasRecentBooking, setHasRecentBooking] = useState(false);
   const pwaInstall = usePWAInstall(tenant?.slug);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (tenant) {
@@ -179,7 +181,7 @@ export const Home: React.FC = () => {
 
             <button
               type="button"
-              onClick={() => (window.location.href = `/s/${tenant.slug}/owner/`)}
+              onClick={() => navigate(`/s/${tenant.slug}/owner/`)}
               aria-label="Вход для владельца"
               className="h-9 w-9 rounded-full border border-white/15 bg-zinc-900/80 flex items-center justify-center text-zinc-300 hover:text-white hover:border-white/30 active:scale-95 transition-all"
             >

@@ -23,3 +23,25 @@ export function formatDuration(minutes: number): string {
   }
   return `${hours} ч ${remaining} мин`;
 }
+
+export function assetUrl(url: string | undefined | null): string {
+  if (!url) return '';
+  if (
+    url.startsWith('http://') ||
+    url.startsWith('https://') ||
+    url.startsWith('data:') ||
+    url.startsWith('blob:')
+  ) {
+    return url;
+  }
+  const base = import.meta.env.BASE_URL || '/';
+  if (base === '/') return url;
+  const normalizedBase = base.endsWith('/') ? base : `${base}/`;
+  const cleanPath = url.startsWith('/') ? url.slice(1) : url;
+  const basePrefix = normalizedBase.replace(/^\//, '');
+  if (cleanPath.startsWith(basePrefix)) {
+    return `/${cleanPath}`;
+  }
+  return `${normalizedBase}${cleanPath}`;
+}
+

@@ -1,5 +1,6 @@
 import { DbTenant, DbResource, DbService, DbServiceResource, DbWorkingHours, DbScheduleException, DbResourceOccupancy, DbCustomer, DbBooking, DbPayment, DbTenantMember, DbNotificationJob } from '@/types/database';
 import { getServicePriceForClass, VehicleCategory } from './pricing';
+import { assetUrl } from './utils';
 import sokolJson from '../../tenants/sokol/business.json';
 import graphiteJson from '../../tenants/graphite/business.json';
 import apexJson from '../../tenants/apex/business.json';
@@ -48,8 +49,8 @@ function loadInitialState(): DatabaseState {
       currency: cfg.currency,
       timezone: cfg.timezone,
       accent_color: cfg.branding.accentColor,
-      logo_url: cfg.branding.logoUrl,
-      cover_url: cfg.branding.coverUrl,
+      logo_url: assetUrl(cfg.branding.logoUrl),
+      cover_url: assetUrl(cfg.branding.coverUrl),
       business_type: cfg.businessType as 'detailing' | 'service',
       tagline: cfg.tagline,
       description: cfg.description,
@@ -69,6 +70,7 @@ function loadInitialState(): DatabaseState {
     for (const s of cfg.services) {
       services.push({
         ...s,
+        image_url: assetUrl((s as any).imageUrl || s.image_url),
         tenant_id: tenantId,
       });
     }
@@ -131,7 +133,7 @@ function loadInitialState(): DatabaseState {
 
 class MockDatabase {
   private state: DatabaseState;
-  private storageKey = 'dete_pwa_mock_db_v7';
+  private storageKey = 'dete_pwa_mock_db_v8';
 
   constructor() {
     this.state = this.loadFromStorage() || loadInitialState();
