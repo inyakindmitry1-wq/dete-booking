@@ -24,6 +24,15 @@ for (const r of staticRoutes) {
   const targetDir = path.join(distDir, r);
   fs.mkdirSync(targetDir, { recursive: true });
   fs.copyFileSync(path.join(distDir, 'index.html'), path.join(targetDir, 'index.html'));
+
+  // Also copy icon and manifest assets so relative lookups from sub-routes always resolve 200 OK
+  const iconFiles = ['apple-touch-icon.png', 'favicon.png', 'pwa-192x192.png', 'pwa-512x512.png', 'manifest.webmanifest'];
+  for (const f of iconFiles) {
+    const srcFile = path.join(distDir, f);
+    if (fs.existsSync(srcFile)) {
+      fs.copyFileSync(srcFile, path.join(targetDir, f));
+    }
+  }
 }
 console.log('✓ Pre-generated static route HTML files for instant 200 OK');
 

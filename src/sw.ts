@@ -20,7 +20,7 @@ registerRoute(
     url.pathname.endsWith('.svg') ||
     url.pathname.endsWith('.webp'),
   new CacheFirst({
-    cacheName: 'tenant-media-v1',
+    cacheName: 'tenant-media-v2',
   })
 );
 

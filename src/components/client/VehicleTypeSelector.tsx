@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { cn, formatCurrency, assetUrl } from '@/lib/utils';
+import { cn, formatCurrency } from '@/lib/utils';
 import { Car, ShieldCheck } from 'lucide-react';
 import { DbService } from '@/types/database';
 import { VehicleCategory, getServicePriceForClass, VEHICLE_NAMES } from '@/lib/pricing';
+import { SEDAN_ICON, CROSSOVER_ICON, SUV_ICON } from '@/assets/car-icons';
 
 export type { VehicleCategory };
 
@@ -23,19 +24,19 @@ const VEHICLES: Array<{
     id: 'sedan',
     name: 'Седан',
     hint: 'Седан, купе',
-    iconSrc: '/icons/sedan.png',
+    iconSrc: SEDAN_ICON,
   },
   {
     id: 'crossover',
     name: 'Кроссовер',
     hint: 'Паркетник',
-    iconSrc: '/icons/crossover.png',
+    iconSrc: CROSSOVER_ICON,
   },
   {
     id: 'suv',
     name: 'Внедорожник',
     hint: 'Большой SUV',
-    iconSrc: '/icons/suv.png',
+    iconSrc: SUV_ICON,
   },
 ];
 
@@ -121,10 +122,9 @@ export const VehicleTypeSelector: React.FC<VehicleTypeSelectorProps> = ({
                   />
                 ) : (
                   <img
-                    src={assetUrl(v.iconSrc)}
+                    src={v.iconSrc}
                     alt={v.name}
                     loading="eager"
-                    onError={() => setImgErrors((prev) => ({ ...prev, [v.id]: true }))}
                     className={cn(
                       "h-6 w-auto max-w-[50px] object-contain filter invert transition-all duration-200",
                       isSelected
