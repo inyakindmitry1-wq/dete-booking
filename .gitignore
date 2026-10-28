@@ -34,3 +34,7 @@ playwright/.cache/
 coverage/
 dev-dist/
 *.tsbuildinfo
+/*.jpg
+/*.jpeg
+/*.png
+

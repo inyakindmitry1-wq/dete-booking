@@ -239,13 +239,13 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({
                     <p className="text-[11px] text-zinc-400 mt-1 line-clamp-2 whitespace-pre-line leading-relaxed">
                       {svc.description}
                     </p>
-                    <div className="flex items-center gap-2 mt-1.5 text-xs">
-                      <span className="font-extrabold text-white">
+                    <div className="flex items-center gap-2 mt-1.5 text-xs whitespace-nowrap">
+                      <span className="font-extrabold text-white whitespace-nowrap">
                         {formatCurrency(svc.price, tenant.currency)}
                       </span>
                       <span className="text-zinc-500">•</span>
-                      <span className="text-zinc-400 flex items-center gap-1 font-medium text-[11px]">
-                        <Clock className="h-3 w-3 text-zinc-400" />
+                      <span className="text-zinc-400 flex items-center gap-1 font-medium text-[11px] whitespace-nowrap">
+                        <Clock className="h-3 w-3 text-zinc-400 shrink-0" />
                         {formatDuration(svc.duration_minutes)}
                       </span>
                     </div>
@@ -275,7 +275,7 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({
                     <span className="text-xs font-black text-white block truncate">
                       {selectedService.name}
                     </span>
-                    <span className="text-[11px] text-zinc-400 font-medium">
+                    <span className="text-[11px] text-zinc-400 font-medium whitespace-nowrap">
                       {formatCurrency(activePrice, tenant.currency)} • {formatDuration(selectedService.duration_minutes)}
                     </span>
                   </div>
@@ -435,7 +435,7 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({
                   </div>
                   <div className="flex justify-between pt-2 border-t border-white/10 text-sm">
                     <span className="font-bold text-white">К оплате в студии:</span>
-                    <span className="font-black text-white text-base">
+                    <span className="font-black text-white text-base whitespace-nowrap">
                       {formatCurrency(activePrice, tenant.currency)}
                     </span>
                   </div>
@@ -454,7 +454,7 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({
             >
               <span>Продолжить</span>
               <span className="opacity-40">•</span>
-              <span>{formatCurrency(activePrice, tenant.currency)}</span>
+              <span className="whitespace-nowrap">{formatCurrency(activePrice, tenant.currency)}</span>
             </Button>
           ) : (
             <Button

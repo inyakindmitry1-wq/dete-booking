@@ -258,11 +258,11 @@ export const Home: React.FC = () => {
 
               {/* Card 3: Starting price */}
               <div className="col-span-2 rounded-2xl border border-white/[0.07] bg-[#121316] p-3.5 shadow-sm flex items-center justify-between">
-                <div className="flex items-center gap-2 text-white font-black text-base">
+                <div className="flex items-center gap-2 text-white font-black text-base whitespace-nowrap">
                   <Tag className="h-4 w-4 text-white shrink-0" />
-                  <span>от {formatCurrency(minPrice, tenant.currency)}</span>
+                  <span className="whitespace-nowrap">от {formatCurrency(minPrice, tenant.currency)}</span>
                 </div>
-                <span className="text-xs text-zinc-400 font-medium">
+                <span className="text-xs text-zinc-400 font-medium whitespace-nowrap">
                   за услугу
                 </span>
               </div>

@@ -1,9 +1,8 @@
-import React from 'react';
-import { cn } from '@/lib/utils';
+import React, { useState } from 'react';
+import { cn, formatCurrency, assetUrl } from '@/lib/utils';
 import { Car, ShieldCheck } from 'lucide-react';
 import { DbService } from '@/types/database';
 import { VehicleCategory, getServicePriceForClass, VEHICLE_NAMES } from '@/lib/pricing';
-import { formatCurrency } from '@/lib/utils';
 
 export type { VehicleCategory };
 
@@ -40,12 +39,41 @@ const VEHICLES: Array<{
   },
 ];
 
+function VehicleIconFallback({ category, className }: { category: VehicleCategory; className?: string }) {
+  if (category === 'sedan') {
+    return (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className={className}>
+        <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H7c-.6 0-1.1.2-1.5.6L3.5 10C2.6 10.3 2 11.1 2 12v4c0 .6.4 1 1 1h2" />
+        <circle cx="7" cy="17" r="2" />
+        <circle cx="17" cy="17" r="2" />
+      </svg>
+    );
+  }
+  if (category === 'crossover') {
+    return (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className={className}>
+        <path d="M19 17h2c.6 0 1-.4 1-1v-4c0-.9-.7-1.7-1.5-1.9l-3.2-.8c-.7-.2-1.5-.7-1.9-1.3L13.8 6.2c-.4-.5-1-.8-1.7-.8H7c-.7 0-1.3.4-1.7.9L3.2 9.8C2.5 10.2 2 11 2 11.8V16c0 .6.4 1 1 1h2" />
+        <circle cx="7" cy="17" r="2.2" />
+        <circle cx="17" cy="17" r="2.2" />
+      </svg>
+    );
+  }
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <path d="M19 17h2c.6 0 1-.4 1-1V9.5c0-.8-.6-1.5-1.4-1.6L16 7.2c-.6-.1-1.2-.5-1.5-1L13.2 4.5C12.8 4.2 12.3 4 11.8 4H5c-.8 0-1.5.6-1.7 1.4L2.2 10.5C2.1 10.9 2 11.3 2 11.7V16c0 .6.4 1 1 1h2" />
+      <circle cx="7" cy="17" r="2.3" />
+      <circle cx="17" cy="17" r="2.3" />
+    </svg>
+  );
+}
+
 export const VehicleTypeSelector: React.FC<VehicleTypeSelectorProps> = ({
   value,
   onChange,
   service,
   currency = 'RUB',
 }) => {
+  const [imgErrors, setImgErrors] = useState<Record<string, boolean>>({});
   const currentPrice = service
     ? getServicePriceForClass(service.price, service.name, value)
     : null;
@@ -81,16 +109,30 @@ export const VehicleTypeSelector: React.FC<VehicleTypeSelectorProps> = ({
             >
               {/* Silhouette Icon from user's reference */}
               <div className="h-7 w-full flex items-center justify-center mt-0.5">
-                <img
-                  src={v.iconSrc}
-                  alt={v.name}
-                  className={cn(
-                    "h-6 w-auto max-w-[50px] object-contain filter invert transition-all duration-200",
-                    isSelected
-                      ? "opacity-100 scale-105 drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]"
-                      : "opacity-45 group-hover:opacity-80"
-                  )}
-                />
+                {imgErrors[v.id] ? (
+                  <VehicleIconFallback
+                    category={v.id}
+                    className={cn(
+                      "h-6 w-auto max-w-[50px] transition-all duration-200",
+                      isSelected
+                        ? "text-white opacity-100 scale-105"
+                        : "text-zinc-400 opacity-60 group-hover:opacity-90"
+                    )}
+                  />
+                ) : (
+                  <img
+                    src={assetUrl(v.iconSrc)}
+                    alt={v.name}
+                    loading="eager"
+                    onError={() => setImgErrors((prev) => ({ ...prev, [v.id]: true }))}
+                    className={cn(
+                      "h-6 w-auto max-w-[50px] object-contain filter invert transition-all duration-200",
+                      isSelected
+                        ? "opacity-100 scale-105 drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]"
+                        : "opacity-55 group-hover:opacity-85"
+                    )}
+                  />
+                )}
               </div>
 
               {/* Title & Hint */}
@@ -108,7 +150,7 @@ export const VehicleTypeSelector: React.FC<VehicleTypeSelectorProps> = ({
                 {tierPrice !== null ? (
                   <span
                     className={cn(
-                      "text-[11px] font-black block mt-0.5 leading-tight",
+                      "text-[11px] font-black block mt-0.5 leading-tight whitespace-nowrap",
                       isSelected ? "text-emerald-400" : "text-zinc-400"
                     )}
                   >
@@ -147,8 +189,8 @@ export const VehicleTypeSelector: React.FC<VehicleTypeSelectorProps> = ({
             </div>
           </div>
 
-          <div className="text-right">
-            <span className="text-base sm:text-lg font-black text-white">
+          <div className="text-right shrink-0 whitespace-nowrap">
+            <span className="text-base sm:text-lg font-black text-white whitespace-nowrap">
               {formatCurrency(currentPrice, currency)}
             </span>
           </div>

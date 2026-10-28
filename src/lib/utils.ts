@@ -7,7 +7,10 @@ export function cn(...inputs: ClassValue[]) {
 
 export function formatCurrency(amount: number, currency: string = 'RUB'): string {
   if (currency === 'RUB') {
-    return `${new Intl.NumberFormat('ru-RU').format(amount)} ₽`;
+    const formatted = new Intl.NumberFormat('ru-RU').format(amount);
+    // Replace all standard and thin spaces with non-breaking spaces (\u00A0)
+    // so the ruble symbol and amount can never be broken apart onto separate lines!
+    return `${formatted.replace(/[\s\u2000-\u200B\u202F]/g, '\u00A0')}\u00A0₽`;
   }
   return new Intl.NumberFormat('ru-RU', { style: 'currency', currency }).format(amount);
 }

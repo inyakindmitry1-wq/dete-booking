@@ -57,14 +57,8 @@ test.describe('End-to-End Online Booking & Owner Flow', () => {
     await expect(page.locator('text=В календарь (.ics)')).toBeVisible();
     await expect(page.locator('text=Ваша персональная ссылка для проверки записи')).toBeVisible();
 
-    // 8. Open Owner Dashboard
+    // 8. Open Owner Dashboard (direct access without email/password)
     await page.goto('/s/graphite/owner/');
-
-    // Wait for login form and authenticate
-    await page.locator('#email').waitFor({ state: 'visible', timeout: 10000 });
-    await page.fill('#email', 'owner@graphite.ru');
-    await page.fill('#password', 'secret123');
-    await page.click('button:has-text("Войти в панель")');
 
     // 9. Verify schedule view contains the newly booked car / client
     await expect(page.locator('text=Кабинет')).toBeVisible({ timeout: 10000 });

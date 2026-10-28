@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useTenant } from '@/hooks/useTenant';
 import { useOwnerAuth } from '@/hooks/useOwnerAuth';
@@ -18,6 +19,7 @@ import { format } from 'date-fns';
 export const OwnerPortalPage: React.FC = () => {
   const { tenant, isLoading: isTenantLoading } = useTenant();
   const { isAuthenticated, isLoading: isAuthLoading, ownerEmail, logout } = useOwnerAuth(tenant?.id);
+  const navigate = useNavigate();
 
   const [activeTab, setActiveTab] = useState<OwnerTab>('schedule');
   const [selectedDate, setSelectedDate] = useState<string>(format(new Date(), 'yyyy-MM-dd'));
@@ -72,7 +74,10 @@ export const OwnerPortalPage: React.FC = () => {
         <OwnerHeader
           tenant={tenant}
           ownerEmail={ownerEmail}
-          onLogout={logout}
+          onLogout={() => {
+            logout();
+            navigate(`/s/${tenant.slug}/`);
+          }}
         />
 
         {/* Main Content Area */}

@@ -61,10 +61,10 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({
         </div>
 
         {/* Bottom Row: Price & Action CTA */}
-        <div className="mt-2 pt-2 border-t border-white/[0.06] flex items-center justify-between gap-2">
-          <div className="flex items-baseline gap-1">
-            <span className="text-[10px] text-zinc-400 font-medium">от</span>
-            <span className="text-base sm:text-lg font-black text-white tracking-tight">
+        <div className="mt-2.5 pt-2 border-t border-white/[0.06] flex items-center justify-between gap-1.5">
+          <div className="flex items-baseline gap-1 shrink-0 whitespace-nowrap">
+            <span className="text-[11px] text-zinc-400 font-medium whitespace-nowrap">от</span>
+            <span className="text-sm sm:text-base font-black text-white tracking-tight whitespace-nowrap inline-block">
               {formatCurrency(service.price, currency)}
             </span>
           </div>
@@ -75,10 +75,10 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({
               e.stopPropagation();
               onSelect(service);
             }}
-            className="h-9 px-3.5 rounded-xl text-xs font-bold shadow-md shadow-primary/20 gap-1.5 active:scale-95 transition-transform"
+            className="h-8 sm:h-8.5 px-3 rounded-xl text-xs font-bold shadow-md shadow-primary/20 gap-1 active:scale-95 transition-transform shrink-0 whitespace-nowrap"
           >
             <span>Записаться</span>
-            <ArrowUpRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+            <ArrowUpRight className="h-3 w-3 sm:h-3.5 sm:w-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform shrink-0" />
           </Button>
         </div>
       </div>

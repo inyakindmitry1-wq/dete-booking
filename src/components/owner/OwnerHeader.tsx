@@ -1,8 +1,9 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { DbTenant } from '@/types/database';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { LogOut, ExternalLink, Shield } from 'lucide-react';
+import { LogOut, ArrowLeft, Shield } from 'lucide-react';
 
 interface OwnerHeaderProps {
   tenant: DbTenant;
@@ -15,6 +16,8 @@ export const OwnerHeader: React.FC<OwnerHeaderProps> = ({
   ownerEmail,
   onLogout,
 }) => {
+  const navigate = useNavigate();
+
   return (
     <header className="sticky top-0 z-30 bg-card/95 backdrop-blur border-b border-border px-4 py-3">
       <div className="max-w-xl mx-auto flex items-center justify-between gap-2">
@@ -38,22 +41,23 @@ export const OwnerHeader: React.FC<OwnerHeaderProps> = ({
         </div>
 
         <div className="flex items-center gap-1.5">
-          <a
-            href={`/s/${tenant.slug}/`}
-            target="_blank"
-            rel="noopener noreferrer"
-            title="Открыть сайт для клиентов"
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => navigate(`/s/${tenant.slug}/`)}
+            title="Вернуться к онлайн-записи"
+            className="h-8 px-2.5 rounded-xl text-xs gap-1.5 text-zinc-300 hover:text-white hover:bg-white/10"
           >
-            <Button size="icon" variant="ghost" className="h-9 w-9 rounded-xl text-muted-foreground hover:text-foreground">
-              <ExternalLink className="h-4 w-4" />
-            </Button>
-          </a>
+            <ArrowLeft className="h-3.5 w-3.5" />
+            <span className="hidden xs:inline">К записи</span>
+          </Button>
+
           <Button
             size="icon"
             variant="ghost"
             onClick={onLogout}
             title="Выйти"
-            className="h-9 w-9 rounded-xl text-muted-foreground hover:text-destructive"
+            className="h-8 w-8 rounded-xl text-muted-foreground hover:text-destructive"
           >
             <LogOut className="h-4 w-4" />
           </Button>
