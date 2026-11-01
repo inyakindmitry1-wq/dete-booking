@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useTenant } from '@/hooks/useTenant';
+import { useServices } from '@/hooks/useServices';
 import { useOwnerAuth } from '@/hooks/useOwnerAuth';
 import { OwnerLoginPage } from './OwnerLoginPage';
 import { OwnerHeader } from '@/components/owner/OwnerHeader';
@@ -11,6 +12,7 @@ import { AnalyticsView } from '@/components/owner/AnalyticsView';
 import { SettingsView } from '@/components/owner/SettingsView';
 import { BookingDetailsDrawer } from '@/components/owner/BookingDetailsDrawer';
 import { ManualBlockDrawer } from '@/components/owner/ManualBlockDrawer';
+import { ManualBookingDrawer } from '@/components/owner/ManualBookingDrawer';
 import { api } from '@/lib/api';
 import { DbBooking } from '@/types/database';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -19,6 +21,7 @@ import { format } from 'date-fns';
 export const OwnerPortalPage: React.FC = () => {
   const { tenant, isLoading: isTenantLoading } = useTenant();
   const { isAuthenticated, isLoading: isAuthLoading, ownerEmail, logout } = useOwnerAuth(tenant?.id);
+  const { data: services = [] } = useServices(tenant?.id);
   const navigate = useNavigate();
 
   const [activeTab, setActiveTab] = useState<OwnerTab>('schedule');
@@ -27,6 +30,7 @@ export const OwnerPortalPage: React.FC = () => {
   // Modals & Drawers
   const [selectedBooking, setSelectedBooking] = useState<DbBooking | null>(null);
   const [isManualBlockOpen, setIsManualBlockOpen] = useState(false);
+  const [isManualBookingOpen, setIsManualBookingOpen] = useState(false);
 
   // Fetch schedule
   const {
@@ -41,11 +45,11 @@ export const OwnerPortalPage: React.FC = () => {
 
   if (isTenantLoading || isAuthLoading) {
     return (
-      <div className="min-h-screen bg-black/95 flex justify-center">
-        <div className="w-full max-w-md min-h-screen bg-background border-x border-white/[0.08] p-4 space-y-4 pt-10">
-          <Skeleton className="h-14 w-full rounded-2xl" />
-          <Skeleton className="h-44 w-full rounded-2xl" />
-          <Skeleton className="h-44 w-full rounded-2xl" />
+      <div className="min-h-screen bg-black flex justify-center">
+        <div className="w-full max-w-md min-h-screen bg-black border-x border-white/[0.08] p-4 space-y-4 pt-10">
+          <Skeleton className="h-14 w-full rounded-2xl bg-[#131722]" />
+          <Skeleton className="h-44 w-full rounded-2xl bg-[#131722]" />
+          <Skeleton className="h-44 w-full rounded-2xl bg-[#131722]" />
         </div>
       </div>
     );
@@ -55,8 +59,8 @@ export const OwnerPortalPage: React.FC = () => {
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-black/95 flex justify-center">
-        <div className="w-full max-w-md min-h-screen bg-background border-x border-white/[0.08]">
+      <div className="min-h-screen bg-black flex justify-center">
+        <div className="w-full max-w-md min-h-screen bg-black border-x border-white/[0.08]">
           <OwnerLoginPage tenant={tenant} />
         </div>
       </div>
@@ -68,8 +72,8 @@ export const OwnerPortalPage: React.FC = () => {
   const occupancies = scheduleData?.occupancies || [];
 
   return (
-    <div className="min-h-screen bg-black/95 flex justify-center antialiased">
-      <div className="w-full max-w-md min-h-screen bg-background border-x border-white/[0.08] flex flex-col relative pb-24 shadow-2xl">
+    <div className="min-h-screen bg-black flex justify-center antialiased">
+      <div className="w-full max-w-md min-h-screen bg-black border-x border-white/[0.08] flex flex-col relative pb-24 shadow-2xl">
         {/* Top Header */}
         <OwnerHeader
           tenant={tenant}
@@ -91,6 +95,9 @@ export const OwnerPortalPage: React.FC = () => {
               bookings={bookings}
               occupancies={occupancies}
               onSelectBooking={setSelectedBooking}
+              onOpenManualBooking={() => setIsManualBookingOpen(true)}
+              onOpenManualBlock={() => setIsManualBlockOpen(true)}
+              onOpenSettingsTab={(subTab) => setActiveTab('settings')}
             />
           )}
 
@@ -121,6 +128,17 @@ export const OwnerPortalPage: React.FC = () => {
           onClose={() => setIsManualBlockOpen(false)}
           tenant={tenant}
           resources={resources}
+          selectedDate={selectedDate}
+          onCreated={() => refetchSchedule()}
+        />
+
+        {/* Manual Booking Creation Drawer */}
+        <ManualBookingDrawer
+          isOpen={isManualBookingOpen}
+          onClose={() => setIsManualBookingOpen(false)}
+          tenant={tenant}
+          resources={resources}
+          services={services}
           selectedDate={selectedDate}
           onCreated={() => refetchSchedule()}
         />

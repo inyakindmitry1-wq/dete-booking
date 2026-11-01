@@ -26,8 +26,8 @@ test.describe('End-to-End Online Booking & Owner Flow', () => {
       await serviceItem.click();
     }
 
-    // Now on Step 1: Choose slot
-    const drawerTitle = page.locator('text=Выбор времени записи');
+    // Now on Step 2 (Photo 1): "Дата и время"
+    const drawerTitle = page.locator('text=/Дата и время|Выбор времени записи/');
     await expect(drawerTitle).toBeVisible();
 
     // Select an available slot button
@@ -35,33 +35,33 @@ test.describe('End-to-End Online Booking & Owner Flow', () => {
     await expect(slotButton).toBeVisible();
     await slotButton.click();
 
-    // Click "Продолжить" to step 2
+    // Click "Продолжить" to Step 3 (Photo 2)
     const continueButton = page.locator('button:has-text("Продолжить")');
     await expect(continueButton).toBeEnabled();
     await continueButton.click();
 
-    // 5. Fill customer form
-    await expect(page.locator('text=Контактные данные')).toBeVisible();
+    // 5. Fill customer form (Photo 2: "Ваш автомобиль")
+    await expect(page.locator('text=/Ваш автомобиль|Контактные данные/')).toBeVisible();
 
     await page.fill('#cust-name', 'Алексей Тестовый');
     await page.fill('#cust-phone', '+7 (999) 777-88-99');
     await page.fill('#cust-car', 'Audi RS6');
 
-    // 6. Submit booking
-    const submitButton = page.locator('button:has-text("Подтвердить запись")');
+    // 6. Submit booking (Photo 2: "Оформить запись")
+    const submitButton = page.locator('button:has-text("Оформить запись"), button:has-text("Подтвердить запись")').first();
     await expect(submitButton).toBeEnabled();
     await submitButton.click();
 
-    // 7. Verify confirmation screen
-    await expect(page.locator('text=Запись подтверждена!')).toBeVisible({ timeout: 10000 });
-    await expect(page.locator('text=В календарь (.ics)')).toBeVisible();
-    await expect(page.locator('text=Ваша персональная ссылка для проверки записи')).toBeVisible();
+    // 7. Verify confirmation screen (Photo 3: "Моя запись" & "Подтверждена")
+    await expect(page.locator('text=Моя запись').first()).toBeVisible({ timeout: 10000 });
+    await expect(page.locator('text=Подтверждена').first()).toBeVisible();
+    await expect(page.locator('text=В календарь').first()).toBeVisible();
 
     // 8. Open Owner Dashboard (direct access without email/password)
     await page.goto('/s/graphite/owner/');
 
     // 9. Verify schedule view contains the newly booked car / client
-    await expect(page.locator('text=Кабинет')).toBeVisible({ timeout: 10000 });
+    await expect(page.locator('text=/Расписание|Кабинет/').first()).toBeVisible({ timeout: 10000 });
     await expect(page.locator('text=Алексей Тестовый')).toBeVisible({ timeout: 10000 });
     await expect(page.locator('text=Audi RS6')).toBeVisible({ timeout: 10000 });
   });

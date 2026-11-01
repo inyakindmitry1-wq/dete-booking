@@ -1,11 +1,23 @@
-import React from 'react';
-import { format, addDays } from 'date-fns';
+import React, { useState, useRef, useMemo } from 'react';
+import { format, addDays, startOfWeek, endOfWeek, eachDayOfInterval, isSameDay } from 'date-fns';
 import { ru } from 'date-fns/locale';
-import { DbResource, DbBooking, DbResourceOccupancy, DbTenant } from '@/types/database';
-import { Card } from '@/components/ui/card';
+import { DbResource, DbBooking, DbResourceOccupancy, DbTenant, DbService } from '@/types/database';
+import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { cn, formatCurrency } from '@/lib/utils';
-import { Calendar, Clock, Car, User, Phone, Lock, ChevronRight } from 'lucide-react';
+import {
+  ChevronLeft,
+  ChevronRight,
+  Plus,
+  Lock,
+  Clock,
+  Car,
+  Phone,
+  Calendar,
+  AlertCircle,
+  Sliders,
+  MapPin,
+} from 'lucide-react';
 
 interface ScheduleViewProps {
   tenant: DbTenant;
@@ -15,6 +27,9 @@ interface ScheduleViewProps {
   bookings: DbBooking[];
   occupancies: DbResourceOccupancy[];
   onSelectBooking: (booking: DbBooking) => void;
+  onOpenManualBooking?: () => void;
+  onOpenManualBlock?: () => void;
+  onOpenSettingsTab?: (tab: 'hours' | 'contacts' | 'services') => void;
 }
 
 export const ScheduleView: React.FC<ScheduleViewProps> = ({
@@ -25,177 +40,448 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
   bookings,
   occupancies,
   onSelectBooking,
+  onOpenManualBooking,
+  onOpenManualBlock,
+  onOpenSettingsTab,
 }) => {
-  // 5 days selector strip
-  const days = Array.from({ length: 7 }, (_, i) => {
-    const d = addDays(new Date(), i);
-    const dateStr = format(d, 'yyyy-MM-dd');
-    const dayLabel = i === 0 ? 'Сегодня' : i === 1 ? 'Завтра' : format(d, 'EEEEEE', { locale: ru });
-    const dayDate = format(d, 'd MMM', { locale: ru });
-    return { dateStr, dayLabel, dayDate };
-  });
+  const [isWeekView, setIsWeekView] = useState(false);
+  const hiddenDateRef = useRef<HTMLInputElement>(null);
+
+  const selectedDateObj = useMemo(() => new Date(selectedDate), [selectedDate]);
+
+  // Navigate date
+  const handlePrev = () => {
+    const delta = isWeekView ? -7 : -1;
+    const nextD = addDays(selectedDateObj, delta);
+    onDateChange(format(nextD, 'yyyy-MM-dd'));
+  };
+
+  const handleNext = () => {
+    const delta = isWeekView ? 7 : 1;
+    const nextD = addDays(selectedDateObj, delta);
+    onDateChange(format(nextD, 'yyyy-MM-dd'));
+  };
+
+  const handleOpenDatePicker = () => {
+    if (hiddenDateRef.current) {
+      if ('showPicker' in HTMLInputElement.prototype) {
+        try {
+          hiddenDateRef.current.showPicker();
+          return;
+        } catch {
+          // ignore
+        }
+      }
+      hiddenDateRef.current.focus();
+      hiddenDateRef.current.click();
+    }
+  };
+
+  // Week days for week view (Monday to Sunday)
+  const weekDays = useMemo(() => {
+    const start = startOfWeek(selectedDateObj, { weekStartsOn: 1 });
+    const end = endOfWeek(selectedDateObj, { weekStartsOn: 1 });
+    return eachDayOfInterval({ start, end });
+  }, [selectedDateObj]);
+
+  // Calculate KPI stats (Arrivals, Completed, Received)
+  const stats = useMemo(() => {
+    const arrivals = bookings.filter((b) => b.status !== 'cancelled').length;
+    const completed = bookings.filter((b) => b.status === 'completed').length;
+    // Calculate received: sum of completed bookings or payments
+    const received = bookings
+      .filter((b) => b.status === 'completed')
+      .reduce((sum, b) => sum + (b.price_snapshot || 0), 0);
+
+    return { arrivals, completed, received };
+  }, [bookings]);
 
   return (
-    <div className="space-y-4">
-      {/* Date selector strip */}
-      <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none -mx-1 px-1">
-        {days.map((d) => {
-          const isSelected = d.dateStr === selectedDate;
-          return (
+    <div className="space-y-4 pb-12">
+      {/* ==================================================================== */}
+      {/* 1. DATE TOOLBAR (Matching Reference: Prev, Date, Next, Day/Week)     */}
+      {/* ==================================================================== */}
+      <div className="flex items-center justify-between gap-2 pt-1">
+        <div className="flex items-center gap-1.5 flex-1 min-w-0">
+          <Button
+            size="icon"
+            variant="ghost"
+            onClick={handlePrev}
+            aria-label="Предыдущий день"
+            className="h-10 w-10 rounded-xl bg-[#131722] border border-white/10 text-zinc-300 hover:text-white shrink-0"
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </Button>
+
+          <div className="relative flex-1 min-w-0">
             <button
-              key={d.dateStr}
               type="button"
-              onClick={() => onDateChange(d.dateStr)}
-              className={cn(
-                "flex flex-col items-center justify-center min-w-[70px] py-2 px-2 rounded-xl border text-center transition-all shrink-0 active:scale-95",
-                isSelected
-                  ? "border-primary bg-primary/10 text-primary font-bold shadow-sm"
-                  : "border-border bg-secondary/50 text-muted-foreground hover:border-border/80 hover:text-foreground"
-              )}
+              onClick={handleOpenDatePicker}
+              className="w-full h-10 px-3 rounded-xl bg-[#131722] border border-white/10 text-xs font-semibold text-white flex items-center justify-center gap-1.5 hover:bg-[#1c2233] transition-colors truncate"
             >
-              <span className="text-[10px] uppercase capitalize">{d.dayLabel}</span>
-              <span className="text-xs font-semibold mt-0.5 text-foreground">{d.dayDate}</span>
+              <Calendar className="h-3.5 w-3.5 text-blue-400 shrink-0" />
+              <span className="truncate capitalize">
+                {isWeekView
+                  ? `Неделя ${format(weekDays[0], 'd MMM', { locale: ru })} – ${format(weekDays[6], 'd MMM', { locale: ru })}`
+                  : format(selectedDateObj, 'd MMMM yyyy', { locale: ru })}
+              </span>
             </button>
-          );
-        })}
+            <input
+              ref={hiddenDateRef}
+              type="date"
+              value={selectedDate}
+              onChange={(e) => {
+                if (e.target.value) {
+                  onDateChange(e.target.value);
+                }
+              }}
+              className="absolute inset-0 opacity-0 pointer-events-none w-full h-full"
+              tabIndex={-1}
+            />
+          </div>
+
+          <Button
+            size="icon"
+            variant="ghost"
+            onClick={handleNext}
+            aria-label="Следующий день"
+            className="h-10 w-10 rounded-xl bg-[#131722] border border-white/10 text-zinc-300 hover:text-white shrink-0"
+          >
+            <ChevronRight className="h-5 w-5" />
+          </Button>
+        </div>
+
+        {/* View Toggle: "День" / "Неделя" */}
+        <div className="flex items-center p-1 rounded-xl bg-[#131722] border border-white/10 shrink-0">
+          <button
+            type="button"
+            onClick={() => setIsWeekView(false)}
+            className={cn(
+              "px-3 py-1.5 rounded-lg text-xs font-semibold transition-all select-none",
+              !isWeekView
+                ? "bg-[#2563eb] text-white shadow-sm font-bold"
+                : "text-zinc-400 hover:text-white"
+            )}
+          >
+            День
+          </button>
+          <button
+            type="button"
+            onClick={() => setIsWeekView(true)}
+            className={cn(
+              "px-3 py-1.5 rounded-lg text-xs font-semibold transition-all select-none",
+              isWeekView
+                ? "bg-[#2563eb] text-white shadow-sm font-bold"
+                : "text-zinc-400 hover:text-white"
+            )}
+          >
+            Неделя
+          </button>
+        </div>
       </div>
 
-      {/* Summary line */}
-      <div className="flex items-center justify-between text-xs text-muted-foreground px-1">
-        <span>Постов в работе: {resources.length}</span>
-        <span>Всего записей на день: {bookings.length}</span>
+      {/* ==================================================================== */}
+      {/* 2. STATS KPI ROW (Matching Reference: Заезды | Выполнено | Получено) */}
+      {/* ==================================================================== */}
+      <div className="grid grid-cols-3 gap-2.5">
+        <div className="p-3.5 rounded-2xl bg-[#0e121a] border border-white/10 space-y-1">
+          <span className="text-xs text-zinc-400 font-medium block">
+            Заезды
+          </span>
+          <span className="text-xl font-bold text-white block">
+            {stats.arrivals}
+          </span>
+        </div>
+
+        <div className="p-3.5 rounded-2xl bg-[#0e121a] border border-white/10 space-y-1">
+          <span className="text-xs text-zinc-400 font-medium block">
+            Выполнено
+          </span>
+          <span className="text-xl font-bold text-emerald-400 block">
+            {stats.completed}
+          </span>
+        </div>
+
+        <div className="p-3.5 rounded-2xl bg-[#0e121a] border border-white/10 space-y-1">
+          <span className="text-xs text-zinc-400 font-medium block">
+            Получено
+          </span>
+          <span className="text-xl font-bold text-white block truncate">
+            {formatCurrency(stats.received, tenant.currency)}
+          </span>
+        </div>
       </div>
 
-      {/* Bay Lanes */}
-      <div className="space-y-4">
-        {resources.map((res) => {
-          const bayBookings = bookings.filter((b) => b.resource_id === res.id);
-          const bayBlocks = occupancies.filter(
-            (o) =>
-              o.resource_id === res.id &&
-              o.occupancy_type === 'manual_block' &&
-              o.start_time.startsWith(selectedDate)
-          );
+      {/* ==================================================================== */}
+      {/* 3. QUICK ACTION TOOLBAR (Add booking, Lock Bay, Settings buttons)     */}
+      {/* ==================================================================== */}
+      <div className="flex flex-wrap items-center gap-2 pt-1">
+        {onOpenManualBooking && (
+          <Button
+            size="sm"
+            onClick={onOpenManualBooking}
+            className="h-10 px-3.5 rounded-xl text-xs font-bold bg-[#2563eb] hover:bg-blue-500 text-white shadow-sm gap-1.5"
+          >
+            <Plus className="h-4 w-4" />
+            <span>Добавить запись</span>
+          </Button>
+        )}
 
-          return (
-            <div key={res.id} className="space-y-2">
-              <div className="flex items-center justify-between px-1">
-                <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
-                  <span className="h-2 w-2 rounded-full bg-primary" />
-                  {res.name}
-                </span>
-                <span className="text-[11px] text-muted-foreground">
-                  {bayBookings.length + bayBlocks.length} событий
-                </span>
-              </div>
+        {onOpenManualBlock && (
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={onOpenManualBlock}
+            className="h-10 px-3 rounded-xl text-xs font-semibold bg-[#131722] hover:bg-[#1c2233] text-zinc-300 hover:text-white border border-white/10 gap-1.5"
+          >
+            <Lock className="h-3.5 w-3.5 text-zinc-400" />
+            <span>Заблокировать бокс</span>
+          </Button>
+        )}
 
-              {bayBookings.length === 0 && bayBlocks.length === 0 ? (
-                <div className="p-4 rounded-xl border border-dashed border-border bg-secondary/20 text-center text-xs text-muted-foreground">
-                  Пост свободен на выбранную дату
+        {onOpenSettingsTab && (
+          <div className="flex items-center gap-1.5 ml-auto">
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => onOpenSettingsTab('hours')}
+              className="h-10 px-2.5 rounded-xl text-xs font-medium text-zinc-400 hover:text-white bg-[#131722] hover:bg-[#1c2233] border border-white/10"
+              title="Часы работы"
+            >
+              <Clock className="h-3.5 w-3.5" />
+            </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => onOpenSettingsTab('contacts')}
+              className="h-10 px-2.5 rounded-xl text-xs font-medium text-zinc-400 hover:text-white bg-[#131722] hover:bg-[#1c2233] border border-white/10"
+              title="Контакты"
+            >
+              <MapPin className="h-3.5 w-3.5" />
+            </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => onOpenSettingsTab('services')}
+              className="h-10 px-2.5 rounded-xl text-xs font-medium text-zinc-400 hover:text-white bg-[#131722] hover:bg-[#1c2233] border border-white/10"
+              title="Услуги"
+            >
+              <Sliders className="h-3.5 w-3.5" />
+            </Button>
+          </div>
+        )}
+      </div>
+
+      {/* ==================================================================== */}
+      {/* 4. BAY SCHEDULE & BOOKINGS (Day View or Week View)                    */}
+      {/* ==================================================================== */}
+      {!isWeekView ? (
+        // DAY VIEW: ORGANIZED BY BAYS
+        <div className="space-y-4 pt-2">
+          {resources.map((res) => {
+            const bayBookings = bookings.filter((b) => b.resource_id === res.id);
+            const bayBlocks = occupancies.filter(
+              (o) =>
+                o.resource_id === res.id &&
+                o.occupancy_type === 'manual_block' &&
+                o.start_time.startsWith(selectedDate)
+            );
+
+            return (
+              <div key={res.id} className="space-y-2">
+                {/* Bay Header */}
+                <div className="flex items-center justify-between px-1">
+                  <span className="text-xs font-bold text-white flex items-center gap-2">
+                    <span className="h-2 w-2 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.6)]" />
+                    <span>{res.name}</span>
+                  </span>
+                  <span className="text-[11px] text-zinc-400">
+                    {bayBookings.length} {bayBookings.length === 1 ? 'запись' : 'записей'}
+                  </span>
                 </div>
-              ) : (
-                <div className="grid gap-2">
-                  {/* Manual Blocks */}
-                  {bayBlocks.map((block) => (
-                    <div
-                      key={block.id}
-                      className="p-3 rounded-xl border border-amber-500/30 bg-amber-500/10 text-xs flex items-center justify-between"
-                    >
-                      <div className="flex items-center gap-2">
-                        <Lock className="h-4 w-4 text-amber-400" />
+
+                {bayBookings.length === 0 && bayBlocks.length === 0 ? (
+                  <div className="p-3.5 rounded-2xl border border-white/10 bg-[#0e121a]/60 text-center text-xs text-zinc-500">
+                    Пост свободен на выбранную дату
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {/* Manual Blocks */}
+                    {bayBlocks.map((block) => (
+                      <div
+                        key={block.id}
+                        className="p-3.5 rounded-2xl border border-dashed border-red-500/30 bg-red-500/5 flex items-center gap-3 text-xs text-red-300"
+                      >
+                        <Lock className="h-4 w-4 shrink-0 text-red-400" />
                         <div>
-                          <span className="font-bold text-amber-300 block">
-                            Блокировка поста: {block.note || 'Технический перерыв'}
+                          <span className="font-bold block">
+                            Блокировка поста ({format(new Date(block.start_time), 'HH:mm')} – {format(new Date(block.end_time), 'HH:mm')})
                           </span>
-                          <span className="text-[11px] text-muted-foreground">
-                            {format(new Date(block.start_time), 'HH:mm')} — {format(new Date(block.end_time), 'HH:mm')}
+                          <span className="text-[11px] text-red-400/80">
+                            {block.note || 'Технический перерыв'}
                           </span>
                         </div>
                       </div>
-                      <Badge variant="warning" className="text-[10px]">
-                        Заблокирован
-                      </Badge>
-                    </div>
-                  ))}
+                    ))}
 
-                  {/* Customer Bookings */}
-                  {bayBookings.map((b) => {
-                    const statusVariant =
-                      b.status === 'confirmed'
-                        ? 'default'
-                        : b.status === 'checked_in'
-                        ? 'warning'
-                        : b.status === 'completed'
-                        ? 'success'
-                        : 'destructive';
+                    {/* Bookings */}
+                    {bayBookings.map((b) => {
+                      const startTime = format(new Date(b.start_time), 'HH:mm');
+                      const endTime = format(new Date(b.end_time), 'HH:mm');
 
-                    const statusLabel =
-                      b.status === 'confirmed'
-                        ? 'Ожидает'
-                        : b.status === 'checked_in'
-                        ? 'В работе'
-                        : b.status === 'completed'
-                        ? 'Выполнен'
-                        : 'Отменен';
+                      const statusColor =
+                        b.status === 'confirmed'
+                          ? 'bg-blue-500/15 text-blue-400 border-blue-500/30'
+                          : b.status === 'checked_in'
+                          ? 'bg-amber-500/15 text-amber-400 border-amber-500/30'
+                          : b.status === 'completed'
+                          ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30'
+                          : 'bg-zinc-700/30 text-zinc-400 border-zinc-600/30';
 
-                    return (
-                      <Card
-                        key={b.id}
-                        onClick={() => onSelectBooking(b)}
-                        className="p-3.5 border border-border bg-card hover:border-primary/50 cursor-pointer transition-all active:scale-[0.99] space-y-2"
-                      >
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm font-extrabold text-foreground flex items-center gap-1 font-mono">
-                              <Clock className="h-3.5 w-3.5 text-primary" />
-                              {format(new Date(b.start_time), 'HH:mm')} — {format(new Date(b.end_time), 'HH:mm')}
+                      const statusText =
+                        b.status === 'confirmed'
+                          ? 'Подтверждена'
+                          : b.status === 'checked_in'
+                          ? 'В работе'
+                          : b.status === 'completed'
+                          ? 'Выполнен'
+                          : 'Отменена';
+
+                      return (
+                        <button
+                          key={b.id}
+                          type="button"
+                          onClick={() => onSelectBooking(b)}
+                          className="w-full text-left p-4 rounded-2xl border border-white/10 bg-[#0e121a] hover:bg-[#141a26] hover:border-white/20 transition-all select-none space-y-2.5 active:scale-[0.99] shadow-sm"
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-bold text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded-lg border border-blue-500/20">
+                              {startTime} — {endTime}
                             </span>
-                            <Badge variant={statusVariant} className="text-[10px] px-1.5 py-0">
-                              {statusLabel}
+                            <Badge variant="outline" className={cn("text-[10px] font-semibold", statusColor)}>
+                              {statusText}
                             </Badge>
                           </div>
-                          <span className="text-xs font-bold text-foreground">
-                            {formatCurrency(b.price_snapshot, tenant.currency)}
-                          </span>
-                        </div>
 
-                        <div className="text-xs">
-                          <span className="font-bold text-foreground block">
-                            {b.service_name_snapshot}
-                          </span>
-                          <div className="flex items-center gap-3 mt-1 text-muted-foreground">
-                            <span className="flex items-center gap-1">
-                              <User className="h-3 w-3" />
-                              {b.customer?.name || 'Клиент'}
-                            </span>
-                            {b.customer?.phone && (
-                              <span className="flex items-center gap-1">
-                                <Phone className="h-3 w-3" />
-                                {b.customer.phone}
+                          <div className="space-y-1">
+                            <h4 className="text-sm font-bold text-white tracking-tight">
+                              {b.service_name_snapshot}
+                            </h4>
+                            <div className="flex items-center justify-between text-xs text-zinc-400 pt-0.5">
+                              <span>
+                                {b.car_model || 'Автомобиль не указан'}
+                                {b.car_plate ? ` (${b.car_plate})` : ''}
                               </span>
-                            )}
-                          </div>
-                          {b.car_model && (
-                            <div className="flex items-center gap-1 mt-0.5 text-muted-foreground text-[11px]">
-                              <Car className="h-3 w-3 text-primary" />
-                              <span>{b.car_model} {b.car_plate ? `(${b.car_plate})` : ''}</span>
+                              <span className="font-bold text-white">
+                                {formatCurrency(b.price_snapshot, tenant.currency)}
+                              </span>
                             </div>
-                          )}
-                        </div>
+                          </div>
 
-                        <div className="flex items-center justify-end text-[11px] text-primary pt-1 border-t border-border/40">
-                          <span>Управление заказом</span>
-                          <ChevronRight className="h-3 w-3 ml-0.5" />
-                        </div>
-                      </Card>
-                    );
-                  })}
-                </div>
+                          <div className="flex items-center justify-between pt-1 border-t border-white/[0.06] text-xs text-zinc-400">
+                            <span>{b.customer?.name || 'Клиент'}</span>
+                            <span className="text-zinc-500">{b.customer?.phone}</span>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+
+          {bookings.length === 0 && (
+            <div className="py-8 text-center space-y-3">
+              <div className="inline-flex items-center justify-center h-12 w-12 rounded-full bg-[#131722] border border-white/10 text-zinc-400">
+                <AlertCircle className="h-6 w-6 text-zinc-500" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-sm font-bold text-white">
+                  Записей пока нет
+                </h3>
+                <p className="text-xs text-zinc-400 max-w-xs mx-auto">
+                  Новые записи клиентов появятся здесь. Можно добавить запись вручную.
+                </p>
+              </div>
+              {onOpenManualBooking && (
+                <Button
+                  size="sm"
+                  onClick={onOpenManualBooking}
+                  className="rounded-xl h-10 px-4 text-xs font-bold bg-[#2563eb] text-white"
+                >
+                  + Добавить запись
+                </Button>
               )}
             </div>
-          );
-        })}
-      </div>
+          )}
+        </div>
+      ) : (
+        // WEEK VIEW: 7 DAYS OVERVIEW
+        <div className="space-y-3 pt-2">
+          {weekDays.map((day) => {
+            const dayStr = format(day, 'yyyy-MM-dd');
+            const isToday = isSameDay(day, new Date());
+            const isCurrentSelected = dayStr === selectedDate;
+            const dayBookings = bookings.filter((b) => b.start_time.startsWith(dayStr));
+
+            return (
+              <div
+                key={dayStr}
+                className={cn(
+                  "p-3.5 rounded-2xl border transition-all space-y-2",
+                  isCurrentSelected
+                    ? "bg-[#141a26] border-blue-500/40 shadow-sm"
+                    : "bg-[#0e121a] border-white/10"
+                )}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-bold text-white capitalize">
+                      {format(day, 'EEEE, d MMM', { locale: ru })}
+                    </span>
+                    {isToday && (
+                      <Badge className="bg-blue-500 text-white text-[10px] px-1.5 py-0">
+                        Сегодня
+                      </Badge>
+                    )}
+                  </div>
+                  <span className="text-xs text-zinc-400 font-medium">
+                    {dayBookings.length} {dayBookings.length === 1 ? 'запись' : 'записей'}
+                  </span>
+                </div>
+
+                {dayBookings.length === 0 ? (
+                  <p className="text-xs text-zinc-500 italic">Нет записей</p>
+                ) : (
+                  <div className="space-y-1.5 pt-1">
+                    {dayBookings.map((b) => (
+                      <button
+                        key={b.id}
+                        type="button"
+                        onClick={() => onSelectBooking(b)}
+                        className="w-full p-2.5 rounded-xl bg-black/40 border border-white/10 hover:border-white/20 text-left flex items-center justify-between text-xs transition-colors"
+                      >
+                        <div className="min-w-0 pr-2">
+                          <span className="font-bold text-white block truncate">
+                            {format(new Date(b.start_time), 'HH:mm')} • {b.service_name_snapshot}
+                          </span>
+                          <span className="text-[11px] text-zinc-400 truncate block">
+                            {b.customer?.name} • {b.car_model || 'Авто'}
+                          </span>
+                        </div>
+                        <span className="font-bold text-white shrink-0">
+                          {formatCurrency(b.price_snapshot, tenant.currency)}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };

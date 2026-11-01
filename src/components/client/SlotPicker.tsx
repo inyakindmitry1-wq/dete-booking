@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import {
   format,
   addDays,
@@ -25,7 +25,6 @@ import {
   ChevronLeft,
   ChevronRight,
   CalendarDays,
-  Sparkles,
 } from 'lucide-react';
 
 interface SlotPickerProps {
@@ -37,10 +36,10 @@ interface SlotPickerProps {
   isLoading: boolean;
 }
 
-// 2-letter Russian weekday abbreviations: ПН, ВТ, СР, ЧТ, ПТ, СБ, ВС
-const RU_WEEKDAYS = ['ВС', 'ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ'];
+// 2-letter Russian weekday abbreviations capitalized: Пт, Сб, Вс, Пн, Вт, Ср, Чт
+const RU_WEEKDAYS_SHORT = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
 
-type TimePeriodFilter = 'morning' | 'afternoon' | 'evening';
+type TimePeriodFilter = 'all' | 'morning' | 'afternoon' | 'evening';
 
 export const SlotPicker: React.FC<SlotPickerProps> = ({
   selectedDate,
@@ -50,24 +49,29 @@ export const SlotPicker: React.FC<SlotPickerProps> = ({
   slots = [],
   isLoading,
 }) => {
+  const [activePeriod, setActivePeriod] = useState<TimePeriodFilter>('all');
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
-  const [activePeriod, setActivePeriod] = useState<TimePeriodFilter>('morning');
   const [calendarMonth, setCalendarMonth] = useState<Date>(new Date(selectedDate));
+  const hiddenDateInputRef = useRef<HTMLInputElement>(null);
 
   const today = useMemo(() => startOfToday(), []);
   const maxDate = useMemo(() => addDays(today, 30), [today]);
 
-  // Generate 30 days horizon for the horizontal swipe strip
-  const daysHorizon = useMemo(() => {
-    return Array.from({ length: 30 }, (_, i) => {
-      const d = addDays(today, i);
+  // Generate 7 days strip starting from today (or centered/sliding if selected date is further)
+  const sevenDays = useMemo(() => {
+    const selDateObj = new Date(selectedDate);
+    const diffDays = Math.max(0, Math.floor((selDateObj.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)));
+    // If selected date is within next 7 days, show days 0..6. Otherwise slide so selected date is visible.
+    const startOffset = diffDays < 7 ? 0 : Math.min(diffDays - 3, 23);
+
+    return Array.from({ length: 7 }, (_, i) => {
+      const d = addDays(today, startOffset + i);
       const dateStr = format(d, 'yyyy-MM-dd');
-      const dayName =
-        i === 0 ? 'Сегодня' : i === 1 ? 'Завтра' : RU_WEEKDAYS[d.getDay()];
-      const dayNumber = format(d, 'd MMM', { locale: ru });
-      return { d, dateStr, dayName, dayNumber };
+      const weekdayStr = RU_WEEKDAYS_SHORT[d.getDay()];
+      const dayNumber = format(d, 'd');
+      return { d, dateStr, weekdayStr, dayNumber };
     });
-  }, [today]);
+  }, [today, selectedDate]);
 
   // Days for the full interactive Month Calendar view
   const monthDays = useMemo(() => {
@@ -76,13 +80,12 @@ export const SlotPicker: React.FC<SlotPickerProps> = ({
     return eachDayOfInterval({ start: monthStart, end: monthEnd });
   }, [calendarMonth]);
 
-  // Filter ONLY truly available slots — occupied/unavailable slots simply disappear completely!
+  // Filter ONLY truly available slots
   const availableSlotsOnly = useMemo(() => {
     return slots.filter((s) => s.is_available);
   }, [slots]);
 
   // Categorize available slots by period of day
-  // Утро (до 12:00), День (12:00 – 17:00), Вечер (после 17:00)
   const { morningSlots, afternoonSlots, eveningSlots } = useMemo(() => {
     const morning: TimeSlot[] = [];
     const afternoon: TimeSlot[] = [];
@@ -102,68 +105,121 @@ export const SlotPicker: React.FC<SlotPickerProps> = ({
     return { morningSlots: morning, afternoonSlots: afternoon, eveningSlots: evening };
   }, [availableSlotsOnly]);
 
-  // Auto-switch to a period with available slots when slots load or date changes
-  useEffect(() => {
-    if (selectedSlotTime) {
-      const selectedSlot = availableSlotsOnly.find((s) => s.time === selectedSlotTime);
-      if (selectedSlot) {
-        const hour = parseInt(selectedSlot.display_time.split(':')[0], 10);
-        if (hour < 12) {
-          setActivePeriod('morning');
-        } else if (hour < 17) {
-          setActivePeriod('afternoon');
-        } else {
-          setActivePeriod('evening');
-        }
-        return;
-      }
-    }
-
-    // Default to the first period that actually has free slots
-    if (morningSlots.length > 0) {
-      setActivePeriod('morning');
-    } else if (afternoonSlots.length > 0) {
-      setActivePeriod('afternoon');
-    } else if (eveningSlots.length > 0) {
-      setActivePeriod('evening');
-    }
-  }, [selectedSlotTime, morningSlots.length, afternoonSlots.length, eveningSlots.length, availableSlotsOnly]);
-
-  // Displayed slots: ONLY available slots for the selected period!
   const displayedSlots = useMemo(() => {
     if (activePeriod === 'morning') return morningSlots;
     if (activePeriod === 'afternoon') return afternoonSlots;
     if (activePeriod === 'evening') return eveningSlots;
-    return [];
-  }, [activePeriod, morningSlots, afternoonSlots, eveningSlots]);
+    return availableSlotsOnly;
+  }, [activePeriod, morningSlots, afternoonSlots, eveningSlots, availableSlotsOnly]);
+
+  // Format full date label like "25 сент. 2026г."
+  const formattedFullDate = useMemo(() => {
+    try {
+      const d = new Date(selectedDate);
+      return format(d, "d MMM yyyy'г.'", { locale: ru });
+    } catch {
+      return selectedDate;
+    }
+  }, [selectedDate]);
+
+  const handleOpenNativePicker = () => {
+    if (hiddenDateInputRef.current) {
+      if ('showPicker' in HTMLInputElement.prototype) {
+        try {
+          hiddenDateInputRef.current.showPicker();
+          return;
+        } catch {
+          // fallback
+        }
+      }
+      hiddenDateInputRef.current.focus();
+      hiddenDateInputRef.current.click();
+    } else {
+      setIsCalendarOpen(!isCalendarOpen);
+    }
+  };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3.5">
       {/* ==================================================================== */}
-      {/* 1. Date Selection Section (30-day horizon with ПН, ВТ, СР, ЧТ...)     */}
+      {/* 1. Exactly 7 Day Cards Row (Matching Photo 1)                       */}
       {/* ==================================================================== */}
       <div>
-        <div className="flex items-center justify-between mb-2">
-          <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider flex items-center gap-1.5">
-            <CalendarIcon className="h-3.5 w-3.5 text-white" />
-            <span>Выберите дату</span>
-          </label>
+        <div className="grid grid-cols-7 gap-1.5 sm:gap-2">
+          {sevenDays.map((item) => {
+            const isSelected = item.dateStr === selectedDate;
+            return (
+              <button
+                key={item.dateStr}
+                type="button"
+                onClick={() => onSelectDate(item.dateStr)}
+                className={cn(
+                  "flex flex-col items-center justify-center py-2.5 rounded-2xl transition-all duration-150 select-none active:scale-95",
+                  isSelected
+                    ? "bg-[#2563eb] text-white shadow-[0_4px_16px_rgba(37,99,235,0.45)] ring-1 ring-blue-400/40"
+                    : "bg-[#131722]/80 border border-white/10 text-white hover:bg-[#1c2233] hover:border-white/20"
+                )}
+              >
+                <span
+                  className={cn(
+                    "text-xs font-medium tracking-tight mb-0.5",
+                    isSelected ? "text-white" : "text-zinc-400"
+                  )}
+                >
+                  {item.weekdayStr}
+                </span>
+                <span
+                  className={cn(
+                    "text-lg font-bold leading-tight",
+                    isSelected ? "text-white" : "text-white"
+                  )}
+                >
+                  {item.dayNumber}
+                </span>
+              </button>
+            );
+          })}
+        </div>
 
-          {/* Toggle Full Month Calendar Button */}
+        {/* Action: "Другая дата" (Left aligned) and Native Date Input */}
+        <div className="flex items-center justify-between mt-2 px-0.5">
+          <div className="relative">
+            <button
+              type="button"
+              onClick={handleOpenNativePicker}
+              className="text-xs text-zinc-400 hover:text-white transition-colors cursor-pointer flex items-center gap-1 font-medium select-none"
+            >
+              <span>Другая дата</span>
+            </button>
+            <input
+              ref={hiddenDateInputRef}
+              type="date"
+              value={selectedDate}
+              min={format(today, 'yyyy-MM-dd')}
+              max={format(maxDate, 'yyyy-MM-dd')}
+              onChange={(e) => {
+                if (e.target.value) {
+                  onSelectDate(e.target.value);
+                }
+              }}
+              className="absolute -top-1 left-0 opacity-0 pointer-events-none w-0 h-0"
+              tabIndex={-1}
+            />
+          </div>
+
           <button
             type="button"
             onClick={() => setIsCalendarOpen(!isCalendarOpen)}
-            className="text-xs font-semibold text-zinc-300 hover:text-white flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-white/10 bg-[#161619] hover:bg-[#202025] active:scale-95 transition-all"
+            className="text-[11px] text-zinc-500 hover:text-zinc-300 flex items-center gap-1 transition-colors"
           >
-            <CalendarDays className="h-3.5 w-3.5 text-zinc-400" />
-            <span>{isCalendarOpen ? 'Скрыть календарь' : 'Весь месяц'}</span>
+            <CalendarDays className="h-3 w-3" />
+            <span>{isCalendarOpen ? 'Скрыть календарь' : 'Календарь'}</span>
           </button>
         </div>
 
-        {/* Option A: Full Month Calendar Dropdown / Grid */}
+        {/* Optional Month Calendar Popover / Dropdown */}
         {isCalendarOpen && (
-          <div className="p-3.5 rounded-2xl border border-white/15 bg-[#121215] mb-3 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
-            {/* Calendar Month Navigation Header */}
+          <div className="p-3.5 rounded-2xl border border-white/15 bg-[#121622] my-3 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
             <div className="flex items-center justify-between pb-3 border-b border-white/10">
               <span className="text-sm font-extrabold text-white capitalize">
                 {format(calendarMonth, 'LLLL yyyy', { locale: ru })}
@@ -188,18 +244,16 @@ export const SlotPicker: React.FC<SlotPickerProps> = ({
               </div>
             </div>
 
-            {/* Days of week (ПН, ВТ, СР, ЧТ, ПТ, СБ, ВС) */}
             <div className="grid grid-cols-7 gap-1 text-center py-2 text-[11px] font-bold text-zinc-500">
-              <span>ПН</span>
-              <span>ВТ</span>
-              <span>СР</span>
-              <span>ЧТ</span>
-              <span>ПТ</span>
-              <span className="text-zinc-400">СБ</span>
-              <span className="text-zinc-400">ВС</span>
+              <span>Пн</span>
+              <span>Вт</span>
+              <span>Ср</span>
+              <span>Чт</span>
+              <span>Пт</span>
+              <span className="text-zinc-400">Сб</span>
+              <span className="text-zinc-400">Вс</span>
             </div>
 
-            {/* Month Day Cells */}
             <div className="grid grid-cols-7 gap-1">
               {monthDays.map((day) => {
                 const dayStr = format(day, 'yyyy-MM-dd');
@@ -221,8 +275,7 @@ export const SlotPicker: React.FC<SlotPickerProps> = ({
                       "h-9 rounded-xl text-xs font-semibold flex items-center justify-center transition-all select-none",
                       isDisabled && "opacity-20 text-zinc-600 cursor-not-allowed",
                       !isDisabled && !isSelected && "text-zinc-300 hover:text-white hover:bg-white/10",
-                      isSelected &&
-                        "bg-white text-black font-extrabold shadow-[0_0_18px_rgba(255,255,255,0.4)] scale-105"
+                      isSelected && "bg-[#2563eb] text-white font-extrabold shadow-[0_0_14px_rgba(37,99,235,0.5)]"
                     )}
                   >
                     {format(day, 'd')}
@@ -233,138 +286,93 @@ export const SlotPicker: React.FC<SlotPickerProps> = ({
           </div>
         )}
 
-        {/* Option B: 30-Day Horizontal Swipe Strip */}
-        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none -mx-1 px-1">
-          {daysHorizon.map((d) => {
-            const isSelected = d.dateStr === selectedDate;
-            return (
-              <button
-                key={d.dateStr}
-                type="button"
-                onClick={() => onSelectDate(d.dateStr)}
-                className={cn(
-                  "flex flex-col items-center justify-center min-w-[76px] py-2.5 px-3 rounded-2xl border text-center transition-all duration-200 shrink-0 active:scale-95 select-none",
-                  isSelected
-                    ? "border-white bg-white text-black font-bold shadow-[0_0_22px_rgba(255,255,255,0.35),0_4px_12px_rgba(0,0,0,0.4)] ring-1 ring-white"
-                    : "border-white/[0.08] bg-[#161619] text-zinc-400 hover:border-white/20 hover:text-white hover:bg-[#1f1f23]"
-                )}
-              >
-                <span
-                  className={cn(
-                    "text-[10px] uppercase font-bold tracking-tight",
-                    isSelected ? "text-zinc-800" : "text-zinc-500"
-                  )}
-                >
-                  {d.dayName}
-                </span>
-                <span
-                  className={cn(
-                    "text-xs font-black mt-0.5",
-                    isSelected ? "text-black" : "text-zinc-200"
-                  )}
-                >
-                  {d.dayNumber}
-                </span>
-              </button>
-            );
-          })}
+        {/* Centered Selected Date Summary Header (Matching Photo 1: "25 сент. 2026г.") */}
+        <div className="text-center pt-3 pb-1 border-t border-white/[0.06] mt-3">
+          <span className="text-sm text-zinc-300 font-medium">
+            {formattedFullDate}
+          </span>
         </div>
       </div>
 
       {/* ==================================================================== */}
-      {/* 2. Structured Time Slots Section (Утро, День, Вечер - без "Все")       */}
+      {/* 2. Time Slots Section (Matching Sleek Reference Style)               */}
       {/* ==================================================================== */}
       <div>
-        <div className="flex items-center justify-between mb-2.5">
-          <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider flex items-center gap-1.5">
-            <Clock className="h-3.5 w-3.5 text-white" />
-            <span>Время визита</span>
-          </label>
-
-          {availableSlotsOnly.length > 0 && !isLoading && (
-            <span className="text-[11px] text-zinc-400 font-medium">
-              Свободно: <strong className="text-white font-bold">{availableSlotsOnly.length}</strong>
-            </span>
-          )}
-        </div>
-
-        {/* Period Filter Tabs (ONLY Утро, День, Вечер) */}
-        {availableSlotsOnly.length > 0 && !isLoading && (
-          <div className="grid grid-cols-3 gap-1.5 p-1 rounded-xl bg-[#141417] border border-white/[0.08] mb-3">
+        {/* Period Filter Tabs (Optional filter if multiple periods exist) */}
+        {availableSlotsOnly.length > 8 && !isLoading && (
+          <div className="grid grid-cols-4 gap-1 p-1 rounded-xl bg-[#131722] border border-white/10 mb-3">
+            <button
+              type="button"
+              onClick={() => setActivePeriod('all')}
+              className={cn(
+                "py-1.5 rounded-lg text-xs font-semibold transition-all text-center select-none",
+                activePeriod === 'all'
+                  ? "bg-[#2563eb] text-white shadow-sm font-bold"
+                  : "text-zinc-400 hover:text-white"
+              )}
+            >
+              Все ({availableSlotsOnly.length})
+            </button>
             <button
               type="button"
               onClick={() => setActivePeriod('morning')}
               className={cn(
-                "py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 select-none",
+                "py-1.5 rounded-lg text-xs font-semibold transition-all text-center select-none",
                 activePeriod === 'morning'
-                  ? "bg-white text-black shadow-[0_0_18px_rgba(255,255,255,0.3)] font-black"
-                  : "text-zinc-400 hover:text-white hover:bg-white/5"
+                  ? "bg-[#2563eb] text-white shadow-sm font-bold"
+                  : "text-zinc-400 hover:text-white"
               )}
             >
-              <Sunrise className="h-3.5 w-3.5" />
-              <span>Утро</span>
-              <span className="text-[10px] opacity-75">({morningSlots.length})</span>
+              Утро ({morningSlots.length})
             </button>
-
             <button
               type="button"
               onClick={() => setActivePeriod('afternoon')}
               className={cn(
-                "py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 select-none",
+                "py-1.5 rounded-lg text-xs font-semibold transition-all text-center select-none",
                 activePeriod === 'afternoon'
-                  ? "bg-white text-black shadow-[0_0_18px_rgba(255,255,255,0.3)] font-black"
-                  : "text-zinc-400 hover:text-white hover:bg-white/5"
+                  ? "bg-[#2563eb] text-white shadow-sm font-bold"
+                  : "text-zinc-400 hover:text-white"
               )}
             >
-              <Sun className="h-3.5 w-3.5" />
-              <span>День</span>
-              <span className="text-[10px] opacity-75">({afternoonSlots.length})</span>
+              День ({afternoonSlots.length})
             </button>
-
             <button
               type="button"
               onClick={() => setActivePeriod('evening')}
               className={cn(
-                "py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 select-none",
+                "py-1.5 rounded-lg text-xs font-semibold transition-all text-center select-none",
                 activePeriod === 'evening'
-                  ? "bg-white text-black shadow-[0_0_18px_rgba(255,255,255,0.3)] font-black"
-                  : "text-zinc-400 hover:text-white hover:bg-white/5"
+                  ? "bg-[#2563eb] text-white shadow-sm font-bold"
+                  : "text-zinc-400 hover:text-white"
               )}
             >
-              <Moon className="h-3.5 w-3.5" />
-              <span>Вечер</span>
-              <span className="text-[10px] opacity-75">({eveningSlots.length})</span>
+              Вечер ({eveningSlots.length})
             </button>
           </div>
         )}
 
-        {/* Slot Grid / States */}
+        {/* Slot Grid */}
         {isLoading ? (
           <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
             {Array.from({ length: 6 }).map((_, i) => (
-              <Skeleton key={i} className="h-11 rounded-xl bg-zinc-900" />
+              <Skeleton key={i} className="h-11 rounded-xl bg-[#131722]" />
             ))}
           </div>
         ) : availableSlotsOnly.length === 0 ? (
-          <div className="p-6 rounded-2xl border border-white/[0.08] bg-[#141417] text-center text-xs text-zinc-400 flex flex-col items-center gap-2">
-            <AlertCircle className="h-6 w-6 text-zinc-500" />
+          <div className="p-5 rounded-2xl border border-white/10 bg-[#131722]/70 text-center text-xs text-zinc-400 flex flex-col items-center gap-2">
+            <AlertCircle className="h-5 w-5 text-zinc-500" />
             <span className="font-semibold text-zinc-300">На эту дату нет свободных окон</span>
             <span className="text-[11px] text-zinc-500 max-w-xs">
-              Все посты заняты или студия закрыта. Пожалуйста, выберите другую дату.
+              Все боксы заняты или студия закрыта. Пожалуйста, выберите другую дату.
             </span>
           </div>
         ) : displayedSlots.length === 0 ? (
-          <div className="p-5 rounded-2xl border border-white/[0.08] bg-[#141417] text-center text-xs text-zinc-400">
-            В интервале «
-            {activePeriod === 'morning'
-              ? 'Утро'
-              : activePeriod === 'afternoon'
-              ? 'День'
-              : 'Вечер'}
-            » свободных окон не осталось. Выберите другое время суток.
+          <div className="p-4 rounded-2xl border border-white/10 bg-[#131722]/70 text-center text-xs text-zinc-400">
+            В выбранном интервале свободных окон нет. Выберите другое время.
           </div>
         ) : (
-          <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 max-h-60 overflow-y-auto pr-1">
+          <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 max-h-56 overflow-y-auto pr-1 scrollbar-none">
             {displayedSlots.map((slot) => {
               const isSelected = selectedSlotTime === slot.time;
               return (
@@ -375,9 +383,9 @@ export const SlotPicker: React.FC<SlotPickerProps> = ({
                   className={cn(
                     "h-11 rounded-xl border text-sm font-bold transition-all flex items-center justify-center active:scale-95 select-none",
                     !isSelected &&
-                      "border-white/[0.08] bg-[#17171a] text-zinc-100 hover:border-white/30 hover:bg-[#202025] hover:text-white shadow-sm",
+                      "border-white/10 bg-[#131722] text-zinc-200 hover:border-white/30 hover:bg-[#1c2233] hover:text-white",
                     isSelected &&
-                      "border-white bg-white text-black font-black shadow-[0_0_24px_rgba(255,255,255,0.4),0_2px_8px_rgba(0,0,0,0.5)] scale-[1.02]"
+                      "border-blue-400 bg-[#2563eb] text-white font-extrabold shadow-[0_0_16px_rgba(37,99,235,0.45)] scale-[1.02]"
                   )}
                 >
                   {slot.display_time}

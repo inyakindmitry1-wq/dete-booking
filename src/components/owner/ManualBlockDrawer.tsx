@@ -3,17 +3,12 @@ import { DbTenant, DbResource } from '@/types/database';
 import {
   Drawer,
   DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerDescription,
-  DrawerFooter,
 } from '@/components/ui/drawer';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { api } from '@/lib/api';
-import { format } from 'date-fns';
-import { Lock, AlertTriangle, Loader2 } from 'lucide-react';
+import { Lock, AlertTriangle, Loader2, X } from 'lucide-react';
 
 interface ManualBlockDrawerProps {
   isOpen: boolean;
@@ -75,90 +70,109 @@ export const ManualBlockDrawer: React.FC<ManualBlockDrawerProps> = ({
 
   return (
     <Drawer open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DrawerContent className="max-w-md mx-auto">
-        <DrawerHeader>
-          <DrawerTitle className="flex items-center gap-2">
-            <Lock className="h-5 w-5 text-amber-400" />
-            <span>Блокировка рабочего поста</span>
-          </DrawerTitle>
-          <DrawerDescription>
-            Закрыть интервал для техобслуживания, обеда или живой очереди
-          </DrawerDescription>
-        </DrawerHeader>
+      <DrawerContent className="max-w-md mx-auto bg-[#0b0e14] border-t border-white/10 text-white rounded-t-[28px] focus:outline-none">
+        <div className="mx-auto mt-3 h-1 w-10 rounded-full bg-white/20 shrink-0" />
 
-        <div className="space-y-4 px-1">
+        <div className="px-5 pt-3 pb-6 space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-xl font-bold tracking-tight text-white leading-tight">
+                Заблокировать бокс
+              </h2>
+              <span className="text-xs text-zinc-400 block mt-0.5">
+                Ограничение онлайн-записи на выбранный промежуток времени
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={onClose}
+              className="p-1.5 rounded-full text-zinc-400 hover:text-white hover:bg-white/10 transition-colors"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+
           {errorMessage && (
-            <div className="p-3 rounded-xl border border-destructive/40 bg-destructive/10 text-destructive text-xs flex items-center gap-2">
-              <AlertTriangle className="h-4 w-4 shrink-0" />
+            <div className="p-3 rounded-2xl border border-destructive/40 bg-destructive/10 text-destructive text-xs flex items-start gap-2">
+              <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
               <span>{errorMessage}</span>
             </div>
           )}
 
-          <div>
-            <Label className="text-xs mb-1.5 block">Выберите пост</Label>
-            <div className="grid grid-cols-1 gap-2">
-              {resources.map((r) => {
-                const isSelected = selectedResourceId === r.id;
-                return (
-                  <button
-                    key={r.id}
-                    type="button"
-                    onClick={() => setSelectedResourceId(r.id)}
-                    className={`p-3 rounded-xl border text-left text-xs font-semibold flex items-center justify-between transition-all ${
-                      isSelected
-                        ? 'border-primary bg-primary/10 text-primary'
-                        : 'border-border bg-secondary/40 text-muted-foreground'
-                    }`}
-                  >
-                    <span>{r.name}</span>
-                    <span className="text-[10px] text-muted-foreground capitalize">{r.type}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-3.5">
             <div>
-              <Label className="text-xs mb-1 block">Начало</Label>
+              <Label className="text-xs text-zinc-400 font-medium mb-1.5 block">
+                Выберите пост (бокс)
+              </Label>
+              <select
+                value={selectedResourceId}
+                onChange={(e) => setSelectedResourceId(e.target.value)}
+                className="w-full h-12 rounded-xl bg-[#131722] border border-white/10 text-white px-3 text-sm focus:outline-none focus:border-blue-500"
+              >
+                {resources.map((r) => (
+                  <option key={r.id} value={r.id} className="bg-zinc-900 text-white">
+                    {r.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2.5">
+              <div>
+                <Label className="text-xs text-zinc-400 font-medium mb-1.5 block">
+                  Начало блокировки
+                </Label>
+                <Input
+                  type="time"
+                  value={startTime}
+                  onChange={(e) => setStartTime(e.target.value)}
+                  className="h-12 rounded-xl bg-[#131722] border-white/10 text-white"
+                />
+              </div>
+
+              <div>
+                <Label className="text-xs text-zinc-400 font-medium mb-1.5 block">
+                  Конец блокировки
+                </Label>
+                <Input
+                  type="time"
+                  value={endTime}
+                  onChange={(e) => setEndTime(e.target.value)}
+                  className="h-12 rounded-xl bg-[#131722] border-white/10 text-white"
+                />
+              </div>
+            </div>
+
+            <div>
+              <Label className="text-xs text-zinc-400 font-medium mb-1.5 block">
+                Причина (для внутреннего учета)
+              </Label>
               <Input
-                type="time"
-                value={startTime}
-                onChange={(e) => setStartTime(e.target.value)}
-                className="h-11 font-mono"
+                placeholder="Например: Техническое обслуживание или обед"
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                className="h-12 rounded-xl bg-[#131722] border-white/10 text-white"
               />
             </div>
-            <div>
-              <Label className="text-xs mb-1 block">Окончание</Label>
-              <Input
-                type="time"
-                value={endTime}
-                onChange={(e) => setEndTime(e.target.value)}
-                className="h-11 font-mono"
-              />
-            </div>
-          </div>
 
-          <div>
-            <Label className="text-xs mb-1 block">Причина / Примечание</Label>
-            <Input
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-              placeholder="Ремонт подъемника / Обед"
-              className="h-11"
-            />
+            <div className="pt-2">
+              <Button
+                disabled={isLoading || !selectedResourceId}
+                onClick={handleSubmit}
+                className="w-full h-13 rounded-2xl bg-[#2563eb] hover:bg-blue-500 text-white font-bold text-base shadow-[0_4px_20px_rgba(37,99,235,0.4)] active:scale-[0.99] transition-all"
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="h-5 w-5 animate-spin mr-2" />
+                    <span>Блокируем пост...</span>
+                  </>
+                ) : (
+                  <span>Заблокировать</span>
+                )}
+              </Button>
+            </div>
           </div>
         </div>
-
-        <DrawerFooter>
-          <Button
-            disabled={isLoading || !selectedResourceId}
-            onClick={handleSubmit}
-            className="w-full h-12 rounded-xl font-bold bg-amber-500 hover:bg-amber-600 text-black shadow-md"
-          >
-            {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Заблокировать пост'}
-          </Button>
-        </DrawerFooter>
       </DrawerContent>
     </Drawer>
   );
