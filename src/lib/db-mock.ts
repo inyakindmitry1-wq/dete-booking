@@ -4,6 +4,7 @@ import { assetUrl } from './utils';
 import sokolJson from '../../tenants/sokol/business.json';
 import graphiteJson from '../../tenants/graphite/business.json';
 import apexJson from '../../tenants/apex/business.json';
+import syndicateJson from '../../tenants/syndicate/business.json';
 
 interface DatabaseState {
   tenants: DbTenant[];
@@ -34,7 +35,7 @@ function loadInitialState(): DatabaseState {
   const tenant_members: DbTenantMember[] = [];
   const notification_jobs: DbNotificationJob[] = [];
 
-  const rawConfigs = [sokolJson, graphiteJson, apexJson];
+  const rawConfigs = [sokolJson, graphiteJson, apexJson, syndicateJson];
 
   for (const cfg of rawConfigs) {
     const tenantId = `tenant-${cfg.slug}`;
@@ -111,6 +112,12 @@ function loadInitialState(): DatabaseState {
   tenant_members.push({
     tenant_id: 'tenant-apex',
     user_id: 'owner-apex-user-id',
+    role: 'owner',
+    created_at: new Date().toISOString(),
+  });
+  tenant_members.push({
+    tenant_id: 'tenant-syndicate',
+    user_id: 'owner-syndicate-user-id',
     role: 'owner',
     created_at: new Date().toISOString(),
   });
