@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Theme } from '@astryxdesign/core';
 import { appTheme } from './theme';
 import { App } from './App';
+import { DemoStoreProvider } from './context/DemoStoreContext';
 import './index.css';
 
 const queryClient = new QueryClient({
@@ -21,7 +22,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <QueryClientProvider client={queryClient}>
       <Theme theme={appTheme} mode="dark">
         <BrowserRouter basename={import.meta.env.BASE_URL}>
-          <App />
+          <DemoStoreProvider>
+            <App />
+          </DemoStoreProvider>
         </BrowserRouter>
       </Theme>
     </QueryClientProvider>

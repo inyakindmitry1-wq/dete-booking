@@ -1,0 +1,143 @@
+import { StudioPreset } from '../types';
+
+export const brooklandsPreset: StudioPreset = {
+  slug: 'brooklands',
+  name: 'BROOKLANDS Detailing',
+  shortName: 'Brooklands',
+  tagline: 'Ателье премиального детейлинга и стайлинга автомобилей в Москве',
+  description:
+    'Детейлинг-ателье BROOKLANDS на Звенигородском шоссе. Топовое европейское оборудование, индивидуальные боксы с климат-контролем и премиальные материалы от лучших мировых брендов.',
+  logoUrl: '/icons/apex-logo.png',
+  coverUrl: '/images/hero-car.jpg',
+  accentColor: '#10b981',
+  branch: {
+    address: 'Звенигородское шоссе, 28, стр. 1',
+    city: 'Москва',
+    phone: '+7 (495) 120-00-28',
+    secondaryPhone: '+7 (916) 777-28-28',
+    workingHoursText: 'Ежедневно с 09:00 до 22:00',
+    coordinates: {
+      lat: 55.7684,
+      lng: 37.5458,
+    },
+    yandexRating: '4.9',
+    reviewsCount: 184,
+    badge: 'Хорошее место 2026 • Рейтинг 4.9',
+  },
+  services: [
+    {
+      id: 'brooklands-svc-wash',
+      category: 'Мойка и уход',
+      name: 'BROOKLANDS Signature 3-фазная мойка',
+      description:
+        'Премиальный ритуал мойки с диэлектрической очисткой подкапотного пространства, обработкой колесных арок, очисткой выхлопных насадок и деликатной сушкой.',
+      durationMinutes: 100,
+      bufferMinutes: 20,
+      priceType: 'from',
+      prices: {
+        class_1_sedan: 4500,
+        class_2_suv: 5400,
+        class_3_xl: 6300,
+      },
+      imageUrl: '/images/services/wash-premium.jpg',
+      sortOrder: 1,
+      isPopular: true,
+    },
+    {
+      id: 'brooklands-svc-polish',
+      category: 'Полировка кузова',
+      name: 'Ювелирная восстановительная полировка кузова',
+      description:
+        'Многоступенчатая полировка немецкими полировальными системами Rupes и Koch Chemie. Максимальное сохранение толщины заводского лака и кристальный глянец.',
+      durationMinutes: 420,
+      bufferMinutes: 40,
+      priceType: 'fixed',
+      prices: {
+        class_1_sedan: 35000,
+        class_2_suv: 42000,
+        class_3_xl: 49000,
+      },
+      imageUrl: '/images/services/polishing.jpg',
+      sortOrder: 2,
+      isPopular: true,
+    },
+    {
+      id: 'brooklands-svc-ceramic',
+      category: 'Защитные покрытия',
+      name: 'Керамический бронекомплекс Ceramic Pro 9H',
+      description:
+        'Нанесение 4 слоев 9H и слоя гидрофобного Top Coat. Экстремальная глубина цвета, защита от царапин, ультрафиолета и реагентов.',
+      durationMinutes: 360,
+      bufferMinutes: 40,
+      priceType: 'from',
+      prices: {
+        class_1_sedan: 65000,
+        class_2_suv: 78000,
+        class_3_xl: 91000,
+      },
+      imageUrl: '/images/services/ceramic.jpg',
+      sortOrder: 3,
+    },
+    {
+      id: 'brooklands-svc-ppf',
+      category: 'Бронирование PPF',
+      name: 'Комплексная оклейка полиуретаном SunTek Ultra',
+      description:
+        'Премиальная защита всего кузова оптически прозрачной полиуретановой пленкой SunTek Ultra с пожизненной гарантией от пожелтения.',
+      durationMinutes: 2880,
+      bufferMinutes: 60,
+      priceType: 'from',
+      prices: {
+        class_1_sedan: 280000,
+        class_2_suv: 335000,
+        class_3_xl: 390000,
+      },
+      imageUrl: '/images/services/ppf.jpg',
+      sortOrder: 4,
+      isPopular: true,
+    },
+    {
+      id: 'brooklands-svc-dryclean',
+      category: 'Интерьер',
+      name: 'Спа-детейлинг интерьера автомобиля',
+      description:
+        'Полная разборная химчистка салона с обработкой парогенератором, чисткой системы вентиляции, озонированием и защитной пропиткой кожи Colourlock.',
+      durationMinutes: 360,
+      bufferMinutes: 30,
+      priceType: 'fixed',
+      prices: {
+        class_1_sedan: 26000,
+        class_2_suv: 31000,
+        class_3_xl: 36500,
+      },
+      imageUrl: '/images/services/himchistka.jpg',
+      sortOrder: 5,
+    },
+    {
+      id: 'brooklands-svc-inspection',
+      category: 'Консультация',
+      name: 'Диагностика ЛКП и персональный план ухода',
+      description:
+        'Детальный аудит состояния кузова мастером-технологом Brooklands. Замер толщины ЛКП, проверка скрытых дефектов и чашечка авторского кофе.',
+      durationMinutes: 30,
+      bufferMinutes: 0,
+      priceType: 'inspection',
+      prices: {
+        class_1_sedan: 0,
+        class_2_suv: 0,
+        class_3_xl: 0,
+      },
+      imageUrl: '/images/services/cleaning.jpg',
+      sortOrder: 6,
+    },
+  ],
+  upsellOffer: {
+    id: 'brooklands-upsell-wheels',
+    title: 'Керамическое покрытие колесных дисков',
+    description: 'Защитите диски от въевшейся тормозной пыли и реагентов со скидкой 35%.',
+    originalPrice: 12000,
+    discountPrice: 7800,
+    durationMinutes: 60,
+    imageUrl: '/images/services/polishing.jpg',
+  },
+};

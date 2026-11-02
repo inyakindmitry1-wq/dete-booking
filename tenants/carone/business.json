@@ -1,0 +1,173 @@
+{
+  "slug": "carone",
+  "name": "Carone Detailing",
+  "tagline": "Профессиональный детейлинг, бронирование кузова и автомойка в Самаре",
+  "description": "Детейлинг-студия Carone в Самаре на ул. Энтузиастов. Обладатель награды «Хорошее место 2026» Яндекс Карт с рейтингом 5.0. Деликатная мойка кузова, восстановительная полировка, оклейка полиуретаном и химчистка салона.",
+  "phone": "+7 (964) 977-42-73",
+  "address": "ул. Энтузиастов, 11",
+  "city": "Самара",
+  "currency": "RUB",
+  "timezone": "Europe/Samara",
+  "businessType": "detailing",
+  "isPreview": false,
+  "branding": {
+    "accentColor": "#38bdf8",
+    "logoUrl": "/logos/carone.png",
+    "coverUrl": "/images/carone/hero.jpg",
+    "theme": "luxury-dark",
+    "favicon": "/logos/carone.png",
+    "appleTouchIcon": "/logos/carone.png"
+  },
+  "resources": [
+    {
+      "id": "77777777-7777-4777-8777-777777777701",
+      "name": "Моечный бокс 1 (Carone Wash)",
+      "type": "wash_bay",
+      "description": "Пост деликатной бесконтактной и ручной мойки с турбосушкой",
+      "is_active": true,
+      "sort_order": 1
+    },
+    {
+      "id": "77777777-7777-4777-8777-777777777702",
+      "name": "Детейлинг бокс 2 (Carone Detail)",
+      "type": "detailing_bay",
+      "description": "Зона полировки, химчистки и нанесения защитных керамических покрытий",
+      "is_active": true,
+      "sort_order": 2
+    },
+    {
+      "id": "77777777-7777-4777-8777-777777777703",
+      "name": "PPF бокс 3 (Carone Film Lab)",
+      "type": "detailing_bay",
+      "description": "Обеспыленная чистая зона для оклейки авто антигравийной пленкой",
+      "is_active": true,
+      "sort_order": 3
+    }
+  ],
+  "services": [
+    {
+      "id": "88888888-8888-4888-8888-888888888801",
+      "category": "Мойка и уход",
+      "name": "Комплексная детейлинг-мойка кузова",
+      "description": "Бесконтактная фаза, деликатная ручная мойка крупнопористой губкой с pH-нейтральным шампунем, очистка колесных дисков, нано-консервация воском и турбосушка.",
+      "duration_minutes": 75,
+      "buffer_minutes": 15,
+      "price": 2200,
+      "is_active": true,
+      "image_url": "/images/carone/bay-1.jpg",
+      "sort_order": 1
+    },
+    {
+      "id": "88888888-8888-4888-8888-888888888802",
+      "category": "Полировка кузова",
+      "name": "Детейлинг-полировка ЛКП кузова",
+      "description": "Восстановительная абразивная и финишная полировка пастами премиум-класса. Устранение паутинки, голограмм и помутнений лака до зеркального глянца.",
+      "duration_minutes": 300,
+      "buffer_minutes": 30,
+      "price": 18000,
+      "is_active": true,
+      "image_url": "/images/carone/bay-2.jpg",
+      "sort_order": 2
+    },
+    {
+      "id": "88888888-8888-4888-8888-888888888803",
+      "category": "Интерьер",
+      "name": "Глубокая химчистка салона с сушкой",
+      "description": "Тщательная экстракторная очистка сидений, ковров, потолка, дверных карт и багажника. Обработка воздуховодов и консервация пластика и кожи.",
+      "duration_minutes": 360,
+      "buffer_minutes": 30,
+      "price": 15000,
+      "is_active": true,
+      "image_url": "/images/services/himchistka.jpg",
+      "sort_order": 3
+    },
+    {
+      "id": "88888888-8888-4888-8888-888888888804",
+      "category": "Защитные покрытия",
+      "name": "Керамическое покрытие кузова (2 слоя)",
+      "description": "Нанесение нанокерамического состава. Создает устойчивый гидрофобный щит, защищает от химических реагентов и придает сочный карамельный блеск.",
+      "duration_minutes": 240,
+      "buffer_minutes": 30,
+      "price": 22000,
+      "is_active": true,
+      "image_url": "/images/services/ceramic.jpg",
+      "sort_order": 4
+    },
+    {
+      "id": "88888888-8888-4888-8888-888888888805",
+      "category": "Оклейка пленкой",
+      "name": "Бронирование кузова антигравийной пленкой (PPF)",
+      "description": "Защита лакокрасочного покрытия высокопрочным полиуретаном с функцией самозатягивания царапин. 100% защита от дорожного гравия и сколов.",
+      "duration_minutes": 2880,
+      "buffer_minutes": 60,
+      "price": 160000,
+      "is_active": true,
+      "image_url": "/images/services/ppf.jpg",
+      "sort_order": 5
+    },
+    {
+      "id": "88888888-8888-4888-8888-888888888806",
+      "category": "Стекла",
+      "name": "Водоотталкивающее покрытие «Антидождь»",
+      "description": "Гидрофобная обработка лобового и двух передних боковых стекол. Обеспечивает отличную видимость в дождь и снижает износ щеток стеклоочистителя.",
+      "duration_minutes": 45,
+      "buffer_minutes": 15,
+      "price": 3500,
+      "is_active": true,
+      "image_url": "/images/services/wash-premium.jpg",
+      "sort_order": 6
+    },
+    {
+      "id": "88888888-8888-4888-8888-888888888807",
+      "category": "Консультация",
+      "name": "Осмотр и диагностика ЛКП (консультация)",
+      "description": "Бесплатный профессиональный осмотр состояния кузова мастером Carone. Замер толщины лака, оценка повреждений и индивидуальный расчет стоимости.",
+      "duration_minutes": 30,
+      "buffer_minutes": 0,
+      "price": 0,
+      "is_active": true,
+      "image_url": "/images/services/cleaning.jpg",
+      "sort_order": 7
+    }
+  ],
+  "serviceResources": [
+    {
+      "serviceId": "88888888-8888-4888-8888-888888888801",
+      "resourceId": "77777777-7777-4777-8777-777777777701"
+    },
+    {
+      "serviceId": "88888888-8888-4888-8888-888888888802",
+      "resourceId": "77777777-7777-4777-8777-777777777702"
+    },
+    {
+      "serviceId": "88888888-8888-4888-8888-888888888803",
+      "resourceId": "77777777-7777-4777-8777-777777777702"
+    },
+    {
+      "serviceId": "88888888-8888-4888-8888-888888888804",
+      "resourceId": "77777777-7777-4777-8777-777777777702"
+    },
+    {
+      "serviceId": "88888888-8888-4888-8888-888888888805",
+      "resourceId": "77777777-7777-4777-8777-777777777703"
+    },
+    {
+      "serviceId": "88888888-8888-4888-8888-888888888806",
+      "resourceId": "77777777-7777-4777-8777-777777777701"
+    },
+    {
+      "serviceId": "88888888-8888-4888-8888-888888888807",
+      "resourceId": "77777777-7777-4777-8777-777777777702"
+    }
+  ],
+  "workingHours": [
+    { "day_of_week": 0, "open_time": "09:00:00", "close_time": "20:00:00", "is_closed": true },
+    { "day_of_week": 1, "open_time": "09:00:00", "close_time": "20:00:00", "is_closed": false },
+    { "day_of_week": 2, "open_time": "09:00:00", "close_time": "20:00:00", "is_closed": false },
+    { "day_of_week": 3, "open_time": "09:00:00", "close_time": "20:00:00", "is_closed": false },
+    { "day_of_week": 4, "open_time": "09:00:00", "close_time": "20:00:00", "is_closed": false },
+    { "day_of_week": 5, "open_time": "09:00:00", "close_time": "20:00:00", "is_closed": false },
+    { "day_of_week": 6, "open_time": "09:00:00", "close_time": "20:00:00", "is_closed": true }
+  ],
+  "scheduleExceptions": []
+}

@@ -21,6 +21,10 @@ const staticRoutes = [
   's/apex/owner',
   's/syndicate',
   's/syndicate/owner',
+  's/carone',
+  's/carone/owner',
+  's/brooklands',
+  's/brooklands/owner',
 ];
 for (const r of staticRoutes) {
   const targetDir = path.join(distDir, r);

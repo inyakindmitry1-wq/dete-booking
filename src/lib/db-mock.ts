@@ -5,6 +5,7 @@ import sokolJson from '../../tenants/sokol/business.json';
 import graphiteJson from '../../tenants/graphite/business.json';
 import apexJson from '../../tenants/apex/business.json';
 import syndicateJson from '../../tenants/syndicate/business.json';
+import caroneJson from '../../tenants/carone/business.json';
 
 interface DatabaseState {
   tenants: DbTenant[];
@@ -35,7 +36,7 @@ function loadInitialState(): DatabaseState {
   const tenant_members: DbTenantMember[] = [];
   const notification_jobs: DbNotificationJob[] = [];
 
-  const rawConfigs = [sokolJson, graphiteJson, apexJson, syndicateJson];
+  const rawConfigs = [sokolJson, graphiteJson, apexJson, syndicateJson, caroneJson];
 
   for (const cfg of rawConfigs) {
     const tenantId = `tenant-${cfg.slug}`;
@@ -118,6 +119,12 @@ function loadInitialState(): DatabaseState {
   tenant_members.push({
     tenant_id: 'tenant-syndicate',
     user_id: 'owner-syndicate-user-id',
+    role: 'owner',
+    created_at: new Date().toISOString(),
+  });
+  tenant_members.push({
+    tenant_id: 'tenant-carone',
+    user_id: 'owner-carone-user-id',
     role: 'owner',
     created_at: new Date().toISOString(),
   });

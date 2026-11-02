@@ -1,0 +1,143 @@
+import { StudioPreset } from '../types';
+
+export const syndicatePreset: StudioPreset = {
+  slug: 'syndicate',
+  name: 'Syndicate Detailing',
+  shortName: 'Syndicate',
+  tagline: 'Премиальный детейлинг, бронирование кузова и защита ЛКП в Самаре',
+  description:
+    'Детейлинг-студия Syndicate в Самаре. Обладатель официальной награды «Хорошее место 2026» Яндекс Карт с рейтингом 4.9. Комплексная трехфазная мойка, восстановительная полировка ЛКП, антигравийная пленка (PPF), керамика KRYTEX и профессиональный уход за интерьером.',
+  logoUrl: '/icons/syndicate-logo.png',
+  coverUrl: '/images/hero-car.jpg',
+  accentColor: '#fbbf24',
+  branch: {
+    address: 'ул. Льва Толстого, 97А, корп. 1',
+    city: 'Самара',
+    phone: '+7 (987) 955-31-77',
+    secondaryPhone: '+7 (846) 205-31-77',
+    workingHoursText: 'Ежедневно с 09:00 до 21:00',
+    coordinates: {
+      lat: 53.186852,
+      lng: 50.106493,
+    },
+    yandexRating: '4.9',
+    reviewsCount: 91,
+    badge: 'Хорошее место 2026 • Рейтинг 4.9',
+  },
+  services: [
+    {
+      id: 'syndicate-svc-wash',
+      category: 'Мойка и уход',
+      name: 'Трехфазная мойка комплекс',
+      description:
+        '• Деликатная бесконтактная 1-я фаза\n• Ручная мойка пористой губкой с pH-нейтральным шампунем\n• Нано-консервация 3-й фазой для глубокого гидрофоба\n• Очистка колесных дисков и насадок выхлопа\n• Бережная сушка турбосушкой без микроцарапин',
+      durationMinutes: 90,
+      bufferMinutes: 15,
+      priceType: 'from',
+      prices: {
+        class_1_sedan: 3300,
+        class_2_suv: 4000,
+        class_3_xl: 4600,
+      },
+      imageUrl: '/images/services/syndicate-wash.jpg',
+      sortOrder: 1,
+      isPopular: true,
+    },
+    {
+      id: 'syndicate-svc-polish',
+      category: 'Полировка кузова',
+      name: 'Детейлинг полировка лакокрасочного покрытия',
+      description:
+        'Глубокая восстановительная полировка кузова в 3–4 этапа. Удаление до 95% царапин, паутинки, голограмм и притертостей до глубокого зеркального отражения.',
+      durationMinutes: 360,
+      bufferMinutes: 30,
+      priceType: 'fixed',
+      prices: {
+        class_1_sedan: 25000,
+        class_2_suv: 30000,
+        class_3_xl: 35000,
+      },
+      imageUrl: '/images/services/syndicate-polish.jpg',
+      sortOrder: 2,
+      isPopular: true,
+    },
+    {
+      id: 'syndicate-svc-ceramic',
+      category: 'Защитные покрытия',
+      name: 'Керамическое покрытие KRYTEX MEGA8',
+      description:
+        'Нанесение премиальной нанокерамики KRYTEX в 2 слоя. Сверхстойкий гидрофобный щит, защита от химических реагентов и ультрафиолета с карамельным блеском.',
+      durationMinutes: 240,
+      bufferMinutes: 30,
+      priceType: 'from',
+      prices: {
+        class_1_sedan: 15000,
+        class_2_suv: 18000,
+        class_3_xl: 21000,
+      },
+      imageUrl: '/images/services/ceramic.jpg',
+      sortOrder: 3,
+    },
+    {
+      id: 'syndicate-svc-dryclean',
+      category: 'Химчистка и салон',
+      name: 'Комплексная химчистка салона',
+      description:
+        'Глубокая очистка интерьера авто: потолок, сиденья, ковролин, багажник, пластик и воздуховоды с последующей сушкой и обработкой кондиционером кожи.',
+      durationMinutes: 360,
+      bufferMinutes: 30,
+      priceType: 'fixed',
+      prices: {
+        class_1_sedan: 18000,
+        class_2_suv: 21500,
+        class_3_xl: 25000,
+      },
+      imageUrl: '/images/services/himchistka.jpg',
+      sortOrder: 4,
+    },
+    {
+      id: 'syndicate-svc-ppf',
+      category: 'Оклейка и пленки',
+      name: 'Полная оклейка авто в пленку (PPF)',
+      description:
+        'Бронирование кузова полиуретановой антигравийной пленкой премиум-класса с самозатягивающимся верхним слоем Top Coat. Защита от сколов и царапин.',
+      durationMinutes: 2880,
+      bufferMinutes: 60,
+      priceType: 'from',
+      prices: {
+        class_1_sedan: 250000,
+        class_2_suv: 300000,
+        class_3_xl: 350000,
+      },
+      imageUrl: '/images/services/ppf.jpg',
+      sortOrder: 5,
+      isPopular: true,
+    },
+    {
+      id: 'syndicate-svc-inspection',
+      category: 'Консультация',
+      name: 'Осмотр и диагностика ЛКП (консультация)',
+      description:
+        'Бесплатный профессиональный осмотр автомобиля мастером студии с замером толщины ЛКП толщиномером, оценкой повреждений и подбором плана работ.',
+      durationMinutes: 30,
+      bufferMinutes: 0,
+      priceType: 'inspection',
+      prices: {
+        class_1_sedan: 0,
+        class_2_suv: 0,
+        class_3_xl: 0,
+      },
+      imageUrl: '/images/services/cleaning.jpg',
+      sortOrder: 6,
+    },
+  ],
+  upsellOffer: {
+    id: 'syndicate-upsell-antirain',
+    title: 'Нанопокрытие «Антидождь» на лобовое стекло',
+    description: 'Добавьте защиту лобового стекла к вашему заказу со скидкой 40%.',
+    originalPrice: 4000,
+    discountPrice: 2400,
+    durationMinutes: 30,
+    imageUrl: '/images/services/syndicate-polish.jpg',
+  },
+};
