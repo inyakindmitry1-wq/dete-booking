@@ -285,7 +285,7 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({
                     </h4>
                     <div className="flex items-center gap-2 mt-1 text-xs">
                       <span className="font-extrabold text-white">
-                        {formatCurrency(svc.price, tenant.currency)}
+                        {svc.price > 0 ? formatCurrency(svc.price, tenant.currency) : 'Бесплатно (0 ₽)'}
                       </span>
                       <span className="text-zinc-500">•</span>
                       <span className="text-zinc-400 font-medium text-[11px]">
@@ -310,7 +310,7 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({
                   {selectedService.name}
                 </span>
                 <span className="text-base font-semibold text-white">
-                  {formatCurrency(activePrice, tenant.currency)}
+                  {activePrice > 0 ? formatCurrency(activePrice, tenant.currency) : 'Бесплатно (0 ₽)'}
                 </span>
               </div>
 

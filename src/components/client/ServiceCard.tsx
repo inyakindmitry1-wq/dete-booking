@@ -62,12 +62,20 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({
 
         {/* Bottom Row: Price & Action CTA */}
         <div className="mt-2.5 pt-2 border-t border-white/[0.06] flex items-center justify-between gap-1.5">
-          <div className="flex items-baseline gap-1 shrink-0 whitespace-nowrap">
-            <span className="text-[11px] text-zinc-400 font-medium whitespace-nowrap">от</span>
-            <span className="text-sm sm:text-base font-black text-white tracking-tight whitespace-nowrap inline-block">
-              {formatCurrency(service.price, currency)}
-            </span>
-          </div>
+          {service.price > 0 ? (
+            <div className="flex items-baseline gap-1 shrink-0 whitespace-nowrap">
+              <span className="text-[11px] text-zinc-400 font-medium whitespace-nowrap">от</span>
+              <span className="text-sm sm:text-base font-black text-white tracking-tight whitespace-nowrap inline-block">
+                {formatCurrency(service.price, currency)}
+              </span>
+            </div>
+          ) : (
+            <div className="flex items-baseline gap-1.5 shrink-0 whitespace-nowrap">
+              <span className="text-xs sm:text-sm font-extrabold text-emerald-400 tracking-tight whitespace-nowrap bg-emerald-500/10 px-2 py-0.5 rounded-lg border border-emerald-500/20">
+                Бесплатно
+              </span>
+            </div>
+          )}
 
           <Button
             size="sm"

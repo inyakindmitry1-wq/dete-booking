@@ -18,7 +18,6 @@ import { cn } from '@/lib/utils';
 import {
   Wrench,
   Warehouse,
-  Tag,
   ArrowUpRight,
   User,
   AlertCircle,
@@ -123,7 +122,6 @@ export const Home: React.FC = () => {
     );
   }
 
-  const minPrice = services.length > 0 ? Math.min(...services.map((s) => s.price)) : 3500;
   const categories = ['Все', ...Array.from(new Set(services.map((s) => s.category)))];
   const filteredServices =
     selectedCategory === 'Все'
@@ -253,17 +251,6 @@ export const Home: React.FC = () => {
                 </div>
                 <span className="text-xs text-zinc-400 block font-medium">
                   бокса в работе
-                </span>
-              </div>
-
-              {/* Card 3: Starting price */}
-              <div className="col-span-2 rounded-2xl border border-white/[0.07] bg-[#121316] p-3.5 shadow-sm flex items-center justify-between">
-                <div className="flex items-center gap-2 text-white font-black text-base whitespace-nowrap">
-                  <Tag className="h-4 w-4 text-white shrink-0" />
-                  <span className="whitespace-nowrap">от {formatCurrency(minPrice, tenant.currency)}</span>
-                </div>
-                <span className="text-xs text-zinc-400 font-medium whitespace-nowrap">
-                  за услугу
                 </span>
               </div>
             </div>

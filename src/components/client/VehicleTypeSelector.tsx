@@ -154,7 +154,7 @@ export const VehicleTypeSelector: React.FC<VehicleTypeSelectorProps> = ({
                       isSelected ? "text-emerald-400" : "text-zinc-400"
                     )}
                   >
-                    {formatCurrency(tierPrice, currency)}
+                    {tierPrice > 0 ? formatCurrency(tierPrice, currency) : 'Бесплатно'}
                   </span>
                 ) : (
                   <span className="text-[10px] text-zinc-500 block mt-0.5 truncate leading-tight">
@@ -191,7 +191,7 @@ export const VehicleTypeSelector: React.FC<VehicleTypeSelectorProps> = ({
 
           <div className="text-right shrink-0 whitespace-nowrap">
             <span className="text-base sm:text-lg font-black text-white whitespace-nowrap">
-              {formatCurrency(currentPrice, currency)}
+              {currentPrice > 0 ? formatCurrency(currentPrice, currency) : 'Бесплатно (0 ₽)'}
             </span>
           </div>
         </div>
