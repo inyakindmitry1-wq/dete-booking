@@ -74,7 +74,7 @@ export function getAllStudios(): StudioPreset[] {
 }
 
 /**
- * Dynamically updates document title, favicon, and meta tags
+ * Dynamically updates document title, favicon, apple-touch-icon and PWA manifest
  */
 export function applyStudioBranding(studio: StudioPreset): void {
   if (typeof document === 'undefined') return;
@@ -85,16 +85,16 @@ export function applyStudioBranding(studio: StudioPreset): void {
   // 2. Resolve logo or fallback monogram
   const iconUrl = studio.logoUrl || generateSvgLogoDataUri(studio.name, studio.accentColor);
 
-  // 3. Update Favicon & Apple Touch Icon
-  const favicon = document.getElementById('favicon-link') as HTMLLinkElement | null;
-  if (favicon) {
-    favicon.href = iconUrl;
-  }
+  // 3. Update ALL Favicons & Apple Touch Icons
+  const favicons = document.querySelectorAll<HTMLLinkElement>("link[rel*='icon']");
+  favicons.forEach((el) => {
+    el.href = iconUrl;
+  });
 
-  const appleIcon = document.getElementById('apple-touch-icon') as HTMLLinkElement | null;
-  if (appleIcon) {
-    appleIcon.href = iconUrl;
-  }
+  const appleIcons = document.querySelectorAll<HTMLLinkElement>("link[rel*='apple-touch-icon']");
+  appleIcons.forEach((el) => {
+    el.href = iconUrl;
+  });
 
   // 4. Update Meta Theme Color
   let metaTheme = document.querySelector('meta[name="theme-color"]') as HTMLMetaElement | null;
@@ -104,4 +104,49 @@ export function applyStudioBranding(studio: StudioPreset): void {
     document.head.appendChild(metaTheme);
   }
   metaTheme.content = '#09090b';
+
+  // 5. Update Web App Manifest dynamically for home screen desktop icon
+  const manifestLink = document.getElementById('manifest-link') as HTMLLinkElement | null;
+  if (manifestLink) {
+    const dynamicManifest = {
+      name: studio.name,
+      short_name: studio.shortName,
+      description: studio.description || studio.tagline,
+      start_url: `${import.meta.env.BASE_URL}s/${studio.slug}/?studio=${studio.slug}`.replace(/\/+/g, '/'),
+      scope: `${import.meta.env.BASE_URL}`.replace(/\/+/g, '/'),
+      display: 'standalone',
+      background_color: '#09090b',
+      theme_color: '#09090b',
+      icons: [
+        {
+          src: iconUrl,
+          sizes: '192x192',
+          type: 'image/png',
+          purpose: 'any',
+        },
+        {
+          src: iconUrl,
+          sizes: '192x192',
+          type: 'image/png',
+          purpose: 'maskable',
+        },
+        {
+          src: iconUrl,
+          sizes: '512x512',
+          type: 'image/png',
+          purpose: 'any',
+        },
+        {
+          src: iconUrl,
+          sizes: '512x512',
+          type: 'image/png',
+          purpose: 'maskable',
+        },
+      ],
+    };
+    const blob = new Blob([JSON.stringify(dynamicManifest, null, 2)], {
+      type: 'application/manifest+json',
+    });
+    manifestLink.href = URL.createObjectURL(blob);
+  }
 }
