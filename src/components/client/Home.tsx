@@ -194,27 +194,28 @@ export const Home: React.FC = () => {
             {/* 1. Hero Car Spotlight Card */}
             <div className="relative rounded-[28px] border border-white/[0.08] bg-[#0c0f15] overflow-hidden shadow-2xl">
               {/* Subtle Ambient Vignette */}
-              <div className="absolute top-0 inset-x-0 h-24 bg-gradient-to-b from-white/[0.03] to-transparent pointer-events-none" />
+              <div className="absolute top-0 inset-x-0 h-24 bg-gradient-to-b from-white/[0.04] to-transparent pointer-events-none z-10" />
 
-              {/* Sports Car Frontal Render */}
-              <div className="relative h-48 sm:h-52 w-full flex items-center justify-center overflow-hidden">
+              {/* Sports Car Frontal Render - Expanded vertically downward */}
+              <div className="relative h-72 sm:h-80 w-full flex items-center justify-center overflow-hidden">
                 <img
                   src={tenant.cover_url}
                   alt={tenant.name}
-                  className="h-full w-full object-cover object-center scale-105"
+                  className="h-full w-full object-cover object-[center_30%] select-none pointer-events-none"
                   loading="eager"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0c0f15] via-transparent to-black/20" />
+                {/* Smooth Dark Floor Gradient */}
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0c0f15] via-[#0c0f15]/30 to-transparent pointer-events-none" />
 
                 {/* Floating Glass Booking Button inside Car Card */}
-                <div className="absolute bottom-3 inset-x-3">
+                <div className="absolute bottom-4 inset-x-4 z-20">
                   <button
                     type="button"
                     onClick={handleQuickBookHero}
-                    className="w-full h-12 px-5 rounded-full bg-white/[0.08] hover:bg-white/[0.14] active:bg-white/[0.18] backdrop-blur-md border border-white/20 flex items-center justify-between text-white shadow-[0_4px_30px_rgba(0,0,0,0.5)] active:scale-[0.98] transition-all duration-200"
+                    className="w-full h-12 sm:h-13 px-5 rounded-2xl bg-white/[0.09] hover:bg-white/[0.15] active:bg-white/[0.20] backdrop-blur-md border border-white/20 flex items-center justify-between text-white shadow-[0_8px_32px_rgba(0,0,0,0.65)] active:scale-[0.98] transition-all duration-200 group"
                   >
-                    <span className="text-sm font-semibold tracking-tight text-white drop-shadow-sm">Записаться</span>
-                    <ArrowUpRight className="h-4 w-4 text-white/90" />
+                    <span className="text-sm font-bold tracking-tight text-white drop-shadow-sm">Записаться</span>
+                    <ArrowUpRight className="h-4 w-4 text-white/90 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                   </button>
                 </div>
               </div>
