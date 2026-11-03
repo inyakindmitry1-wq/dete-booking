@@ -71,7 +71,7 @@ const CAR_DATABASE: Array<{
     categoryLabel: 'Седан',
   },
   {
-    keywords: ['бмв 3', 'bmw 3', 'тройк', 'бмв 5', 'bmw 5', 'пятерк', 'f30', 'g20', 'g30'],
+    keywords: ['бмв 3', 'bmw 3', 'бмв тройк', 'bmw тройк', 'бмв 5', 'bmw 5', 'бмв пятерк', 'bmw f30', 'bmw g20', 'bmw g30'],
     name: 'BMW 3 / 5 Series (Седан)',
     category: 'sedan',
     carClass: 'class_1_sedan',
@@ -466,6 +466,34 @@ function formatServicePrice(service: ServiceItem, selectedCar: SelectedCar): str
   return `${price.toLocaleString('ru-RU')} ₽`;
 }
 
+export function isGenericCar(name: string): boolean {
+  const lower = name.toLowerCase().trim();
+  return (
+    lower === 'седан' ||
+    lower === 'кроссовер' ||
+    lower === 'внедорожник' ||
+    lower === 'седан / купе' ||
+    lower === 'компактный кроссовер' ||
+    lower === 'полноразмерный внедорожник' ||
+    lower === 'седан (1-й класс)' ||
+    lower === 'внедорожник / минивэн'
+  );
+}
+
+function getCarCostLabel(car: SelectedCar): string {
+  if (isGenericCar(car.name)) {
+    return `(класс: ${car.categoryLabel})`;
+  }
+  return `для ${car.name}`;
+}
+
+function getPromptCarLabel(car: SelectedCar): string {
+  if (isGenericCar(car.name)) {
+    return '';
+  }
+  return ` на ${car.name}`;
+}
+
 /**
  * Autonomous Rule-based Detailing AI Concierge.
  * Complete coverage of all real customer intents, vehicle detection, objection handling, and booking transactions.
@@ -487,7 +515,10 @@ export async function processAiMessage(options: ProcessMessageOptions): Promise<
     if (onUpdateSelectedCar) {
       onUpdateSelectedCar(recognizedCar);
     }
-    carRecognitionPill = `🚗 Переключил класс на: **${recognizedCar.name}** (${recognizedCar.categoryLabel}). Все расчёты ниже рассчитаны под него.\n\n`;
+    const recognizedLabel = isGenericCar(recognizedCar.name)
+      ? `**${recognizedCar.categoryLabel}**`
+      : `**${recognizedCar.name}** (${recognizedCar.categoryLabel})`;
+    carRecognitionPill = `🚗 Определил ваш автомобиль: ${recognizedLabel}. Все расчёты ниже рассчитаны под него.\n\n`;
   }
 
   // -------------------------------------------------------------------------
@@ -526,8 +557,12 @@ export async function processAiMessage(options: ProcessMessageOptions): Promise<
         ? `${appointment.price.toLocaleString('ru-RU')} ₽`
         : 'Бесплатно (0 ₽)';
 
+    const carBookingMention = isGenericCar(activeCar.name)
+      ? ` (класс: **${activeCar.categoryLabel}**)`
+      : ` для вашего автомобиля **${activeCar.name}**`;
+
     return {
-      text: `${carRecognitionPill}Готово! Бокс успешно забронирован для вашего автомобиля **${activeCar.name}**.\n\n🛠 **Услуга:** ${appointment.serviceName}\n📅 **Дата:** ${dateFormatted}\n⏰ **Время:** ${timeFormatted}\n💰 **Стоимость:** ${priceText}\n📍 **Адрес:** ${studio.branch.city}, ${studio.branch.address}\n\nЭлектронный талон сохранён. Вы можете добавить его в календарь или посмотреть статус во вкладке «Мои записи».`,
+      text: `${carRecognitionPill}Готово! Бокс успешно забронирован${carBookingMention}.\n\n🛠 **Услуга:** ${appointment.serviceName}\n📅 **Дата:** ${dateFormatted}\n⏰ **Время:** ${timeFormatted}\n💰 **Стоимость:** ${priceText}\n📍 **Адрес:** ${studio.branch.city}, ${studio.branch.address}\n\nЭлектронный талон сохранён. Вы можете добавить его в календарь или посмотреть статус во вкладке «Мои записи».`,
       bookingCard: {
         bookingId: appointment.bookingId,
         accessToken: appointment.accessToken,
@@ -562,9 +597,9 @@ export async function processAiMessage(options: ProcessMessageOptions): Promise<
     const priceText = formatServicePrice(ceramicService, activeCar);
 
     return {
-      text: `${carRecognitionPill}🛡 **Керамическое покрытие 9H (2 слоя + гидрофобный топкоут):**\n\n• **Что даёт:** мощнейший гидрофобный эффект (грязь и вода не задерживаются), зеркальный мокрый блеск, защиту от птичьего помёта, химических реагентов и УФ-выгорания.\n• **Срок службы:** до 1.5–2 лет при правильном 3-фазном уходе.\n• **Технология:** перед нанесением керамики кузов обязательно проходит мягкую восстановительную полировку и обезжиривание спиртовыми праймерами.\n• **Стоимость для ${activeCar.name}:** **${priceText}**.\n• **Время работы:** ~24 часа (для полной полимеризации первого слоя).\n\nЗаписать ваш автомобиль на керамику?`,
+      text: `${carRecognitionPill}🛡 **Керамическое покрытие 9H (2 слоя + гидрофобный топкоут):**\n\n• **Что даёт:** мощнейший гидрофобный эффект (грязь и вода не задерживаются), зеркальный мокрый блеск, защиту от птичьего помёта, химических реагентов и УФ-выгорания.\n• **Срок службы:** до 1.5–2 лет при правильном 3-фазном уходе.\n• **Технология:** перед нанесением керамики кузов обязательно проходит мягкую восстановительную полировку и обезжиривание спиртовыми праймерами.\n• **Стоимость ${getCarCostLabel(activeCar)}:** **${priceText}**.\n• **Время работы:** ~24 часа (для полной полимеризации первого слоя).\n\nЗаписать ваш автомобиль на керамику?`,
       suggestedPrompts: [
-        `Запиши на керамику на ${activeCar.name}`,
+        `Запиши на керамику${getPromptCarLabel(activeCar)}`,
         'Нужна ли полировка перед керамикой?',
         'Какая гарантия на керамику?',
         'Прайс на все услуги',
@@ -590,9 +625,9 @@ export async function processAiMessage(options: ProcessMessageOptions): Promise<
     const priceText = formatServicePrice(ppfService, activeCar);
 
     return {
-      text: `${carRecognitionPill}🛡 **Антигравийная полиуретановая плёнка (PPF 190–210 мкм):**\n\n• **Только полиуретан премиум-класса** (не путать с дешевым винилом, который мутнеет и трескается).\n• **Топкоут Top Coat:** функция самозатягивания царапин при нагреве солнцем или тёплой водой.\n• **Комплекс «Зоны риска» включает:** передний бампер, капот целиком, передние крылья, фары и ПТФ, зеркала заднего вида, стойки лобового стекла, полосу над лобовым на крыше, зоны под дверными ручками и полосу погрузки багажника.\n• **Срок службы и гарантия:** 5–7 лет без пожелтения и отслаивания.\n• **Стоимость для ${activeCar.name}:** **${priceText}**.\n\nМожем записать вас на оклейку или бесплатный замер ЛКП.`,
+      text: `${carRecognitionPill}🛡 **Антигравийная полиуретановая плёнка (PPF 190–210 мкм):**\n\n• **Только полиуретан премиум-класса** (не путать с дешевым винилом, который мутнеет и трескается).\n• **Топкоут Top Coat:** функция самозатягивания царапин при нагреве солнцем или тёплой водой.\n• **Комплекс «Зоны риска» включает:** передний бампер, капот целиком, передние крылья, фары и ПТФ, зеркала заднего вида, стойки лобового стекла, полосу над лобовым на крыше, зоны под дверными ручками и полосу погрузки багажника.\n• **Срок службы и гарантия:** 5–7 лет без пожелтения и отслаивания.\n• **Стоимость ${getCarCostLabel(activeCar)}:** **${priceText}**.\n\nМожем записать вас на оклейку или бесплатный замер ЛКП.`,
       suggestedPrompts: [
-        `Запиши на оклейку на ${activeCar.name}`,
+        `Запиши на оклейку${getPromptCarLabel(activeCar)}`,
         'Желтеет ли полиуретан со временем?',
         'Сколько длится оклейка?',
         'Осмотр и консультация мастера',
@@ -617,7 +652,7 @@ export async function processAiMessage(options: ProcessMessageOptions): Promise<
     const priceText = formatServicePrice(polishService, activeCar);
 
     return {
-      text: `${carRecognitionPill}✨ **Восстановительная детейлинг-полировка ЛКП:**\n\n• **Безопасность лака:** используем толщиномер до и после работы на каждом элементе. Снимаем всего 2–4 микрона заводского лака (при общем слое лака 35–50 микрон).\n• **Результат:** удаление до 95% мелких царапин, "паутинки" от моек и голограмм. Глубокий зеркальный глянец.\n• **Пасты и круги:** только профессиональные линейки Rupes, Koch Chemie, Menzerna.\n• **Время:** ~6–8 часов.\n• **Стоимость для ${activeCar.name}:** **${priceText}**.\n\nРекомендуем после полировки запечатать лак керамикой или твердым воском. Записать вас?`,
+      text: `${carRecognitionPill}✨ **Восстановительная детейлинг-полировка ЛКП:**\n\n• **Безопасность лака:** используем толщиномер до и после работы на каждом элементе. Снимаем всего 2–4 микрона заводского лака (при общем слое лака 35–50 микрон).\n• **Результат:** удаление до 95% мелких царапин, "паутинки" от моек и голограмм. Глубокий зеркальный глянец.\n• **Пасты и круги:** только профессиональные линейки Rupes, Koch Chemie, Menzerna.\n• **Время:** ~6–8 часов.\n• **Стоимость ${getCarCostLabel(activeCar)}:** **${priceText}**.\n\nРекомендуем после полировки запечатать лак керамикой или твердым воском. Записать вас?`,
       suggestedPrompts: [
         `Запиши на полировку на завтра`,
         'Не сотрете ли лак?',
@@ -645,9 +680,9 @@ export async function processAiMessage(options: ProcessMessageOptions): Promise<
     const priceText = formatServicePrice(dryService, activeCar);
 
     return {
-      text: `${carRecognitionPill}🧼 **Глубокая детейлинг-химчистка интерьера:**\n\n• **Что входит:** экстракторная чистка ковролина и сидений аппаратом Santoemma, кистевая проработка воздуховодов и стыков аппаратом Tornador, чистка и консервация кожи премиальными бальзамами, озонирование салона.\n• **Главное преимущество:** сушим салон профессиональным автофеном — вы забираете **полностью сухой автомобиль** без запаха прелости и риска плесени!\n• **Устранение запахов:** озонатор уничтожает 99.9% бактерий и въевшиеся запахи табака и животных.\n• **Стоимость для ${activeCar.name}:** **${priceText}**.\n• **Длительность:** ~4–6 часов.`,
+      text: `${carRecognitionPill}🧼 **Глубокая детейлинг-химчистка интерьера:**\n\n• **Что входит:** экстракторная чистка ковролина и сидений аппаратом Santoemma, кистевая проработка воздуховодов и стыков аппаратом Tornador, чистка и консервация кожи премиальными бальзамами, озонирование салона.\n• **Главное преимущество:** сушим салон профессиональным автофеном — вы забираете **полностью сухой автомобиль** без запаха прелости и риска плесени!\n• **Устранение запахов:** озонатор уничтожает 99.9% бактерий и въевшиеся запахи табака и животных.\n• **Стоимость ${getCarCostLabel(activeCar)}:** **${priceText}**.\n• **Длительность:** ~4–6 часов.`,
       suggestedPrompts: [
-        `Запиши на химчистку на ${activeCar.name}`,
+        `Запиши на химчистку${getPromptCarLabel(activeCar)}`,
         'Отдадите сухую машину?',
         'Уберет ли запах табака?',
         'Прайс на все услуги',
@@ -672,7 +707,7 @@ export async function processAiMessage(options: ProcessMessageOptions): Promise<
     const priceText = formatServicePrice(washService, activeCar);
 
     return {
-      text: `${carRecognitionPill}🚿 **Детейлинг-мойка кузова и комплексный уход:**\n\n• **1-я фаза:** бережный бесконтактный состав размягчает дорожную статику без повреждения хрома и пластика.\n• **2-я фаза:** ручная мойка пористой крупноячеистой губкой по системе двух вёдер с пескоотделителями (исключает круговые царапины).\n• **3-я фаза:** нанесение жидкого кварца / консерванта для гидрофоба и глубокого блеска.\n• **Сушка:** бесконтактная турбосушка тёплым воздухом кузова, дисков, зеркал и дверных проёмов.\n• **Интерьер:** бережная уборка салона, очистка стёкол и чернение резины.\n• **Стоимость для ${activeCar.name}:** **${priceText}** (~1.5–2 часа).`,
+      text: `${carRecognitionPill}🚿 **Детейлинг-мойка кузова и комплексный уход:**\n\n• **1-я фаза:** бережный бесконтактный состав размягчает дорожную статику без повреждения хрома и пластика.\n• **2-я фаза:** ручная мойка пористой крупноячеистой губкой по системе двух вёдер с пескоотделителями (исключает круговые царапины).\n• **3-я фаза:** нанесение жидкого кварца / консерванта для гидрофоба и глубокого блеска.\n• **Сушка:** бесконтактная турбосушка тёплым воздухом кузова, дисков, зеркал и дверных проёмов.\n• **Интерьер:** бережная уборка салона, очистка стёкол и чернение резины.\n• **Стоимость ${getCarCostLabel(activeCar)}:** **${priceText}** (~1.5–2 часа).`,
       suggestedPrompts: [
         `Запиши на мойку на завтра в 14:00`,
         `Запиши на мойку на сегодня`,
@@ -725,8 +760,12 @@ export async function processAiMessage(options: ProcessMessageOptions): Promise<
       .map((s) => `• **${s.name}:** ${formatServicePrice(s, activeCar)}`)
       .join('\n');
 
+    const carHeading = isGenericCar(activeCar.name)
+      ? `🚘 **Класс авто: ${activeCar.categoryLabel}**`
+      : `🚘 **${activeCar.name}** (Класс: ${activeCar.categoryLabel})`;
+
     return {
-      text: `${carRecognitionPill}📋 **Актуальный прайс-лист студии ${studio.name} для вашего авто:**\n🚘 **${activeCar.name}** (Класс: ${activeCar.categoryLabel})\n\n${list}\n\n💡 Цены фиксируются при бронировании. Чтобы занять удобный слот, просто напишите, например: «Запиши на мойку на завтра в 15:00».`,
+      text: `${carRecognitionPill}📋 **Актуальный прайс-лист студии ${studio.name}:**\n${carHeading}\n\n${list}\n\n💡 Цены фиксируются при бронировании. Чтобы занять удобный слот, просто напишите, например: «Запиши на мойку на завтра в 15:00».`,
       suggestedPrompts: [
         'Запиши на комплекс на завтра',
         'Сколько стоит керамика?',
@@ -898,8 +937,12 @@ export async function processAiMessage(options: ProcessMessageOptions): Promise<
     lower.includes('салют') ||
     lower.includes('хай')
   ) {
+    const carGreetingInfo = isGenericCar(activeCar.name)
+      ? `🚘 Текущий класс: **${activeCar.categoryLabel}**. Вы можете назвать марку своего авто (например: «У меня Camry» или «Tiguan»), и я пересчитаю всё под неё!`
+      : `🚘 Выбранный автомобиль: **${activeCar.name}** (${activeCar.categoryLabel}). Если у вас другая модель, просто напишите её название!`;
+
     return {
-      text: `${carRecognitionPill}Здравствуйте! Я онлайн-консультант премиальной студии **${studio.name}**.\n\n🚘 Текущий выбранный авто: **${activeCar.name}** (${activeCar.categoryLabel}). Если у вас другая модель, просто напишите её название!\n\nЧем могу помочь?\n• Рассчитать точную стоимость под вашу модель\n• Забронировать бокс на удобный день и час\n• Рассказать про мойку, полировку, керамику, оклейку пленкой или химчистку`,
+      text: `${carRecognitionPill}Здравствуйте! Я онлайн-консультант премиальной студии **${studio.name}**.\n\n${carGreetingInfo}\n\nЧем могу помочь?\n• Рассчитать точную стоимость под вашу модель\n• Забронировать бокс на удобный день и час\n• Рассказать про мойку, полировку, керамику, оклейку пленкой или химчистку`,
       suggestedPrompts: [
         'Сколько стоит комплексная мойка?',
         'Прайс на все услуги',
@@ -913,8 +956,12 @@ export async function processAiMessage(options: ProcessMessageOptions): Promise<
   // -------------------------------------------------------------------------
   // DEFAULT FALLBACK: SMART CONCIERGE ASSISTANCE
   // -------------------------------------------------------------------------
+  const carFallbackMention = isGenericCar(activeCar.name)
+    ? `вашего автомобиля (${activeCar.categoryLabel})`
+    : `автомобиля **${activeCar.name}**`;
+
   return {
-    text: `${carRecognitionPill}Я помогу вам с любым вопросом по детейлингу автомобиля **${activeCar.name}**:\n\n• Узнать точную стоимость (мойка, полировка, керамика, оклейка PPF, химчистка)\n• Записаться на свободное время (просто напишите: *«Запиши на комплекс на завтра в 15:00»*)\n• Уточнить технологию работ, используемую химию и гарантию\n• Подсказать адрес (${studio.branch.address}) и график работы\n\nЧто именно вас интересует?`,
+    text: `${carRecognitionPill}Я помогу вам с любым вопросом по детейлингу ${carFallbackMention}:\n\n• Узнать точную стоимость (мойка, полировка, керамика, оклейка PPF, химчистка)\n• Записаться на свободное время (просто напишите: *«Запиши на комплекс на завтра в 15:00»*)\n• Уточнить технологию работ, используемую химию и гарантию\n• Подсказать адрес (${studio.branch.address}) и график работы\n\nЧто именно вас интересует?`,
     suggestedPrompts: [
       'Прайс для моего авто',
       'Запиши на мойку на завтра',

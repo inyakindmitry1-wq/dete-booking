@@ -91,4 +91,25 @@ describe('geminiService offline engine', () => {
     expect(result.bookingCard?.serviceName).toBe('Детейлинг-мойка');
     expect(result.bookingCard?.timeFormatted).toBe('14:00');
   });
+
+  it('does not assume any car brand like BMW when car is generic sedan', async () => {
+    const genericCar: SelectedCar = {
+      name: 'Седан',
+      category: 'sedan',
+      carClass: 'class_1_sedan',
+      categoryLabel: 'Седан',
+    };
+
+    const result = await processAiMessage({
+      userMessage: 'Сколько стоит мойка?',
+      studio: caronePreset,
+      services: caronePreset.services,
+      selectedCar: genericCar,
+      createAppointment: vi.fn(),
+    });
+
+    expect(result.text.toLowerCase()).toContain('мойка');
+    expect(result.text).not.toContain('BMW');
+    expect(result.text).toContain('Седан');
+  });
 });

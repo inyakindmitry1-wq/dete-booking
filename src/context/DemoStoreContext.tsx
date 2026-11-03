@@ -164,7 +164,7 @@ export const DemoStoreProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   );
 
   const [selectedCar, setSelectedCar] = useState<SelectedCar>({
-    name: 'BMW 3 Series (Седан)',
+    name: 'Седан',
     category: 'sedan',
     carClass: 'class_1_sedan',
     categoryLabel: 'Седан',

@@ -46,7 +46,7 @@ const CAR_CLASS_OPTIONS: Array<{
   {
     label: 'Седан',
     car: {
-      name: 'Седан (BMW 3, Camry, Vesta)',
+      name: 'Седан',
       category: 'sedan',
       carClass: 'class_1_sedan',
       categoryLabel: 'Седан',
@@ -55,7 +55,7 @@ const CAR_CLASS_OPTIONS: Array<{
   {
     label: 'Кроссовер',
     car: {
-      name: 'Кроссовер (Tiguan, RAV4, Monjaro)',
+      name: 'Кроссовер',
       category: 'crossover',
       carClass: 'class_2_suv',
       categoryLabel: 'Кроссовер',
@@ -64,7 +64,7 @@ const CAR_CLASS_OPTIONS: Array<{
   {
     label: 'Внедорожник',
     car: {
-      name: 'Внедорожник (LC300, BMW X5, Li L9)',
+      name: 'Внедорожник',
       category: 'suv',
       carClass: 'class_3_xl',
       categoryLabel: 'Внедорожник',
@@ -82,7 +82,7 @@ export const AIChatWidget: React.FC<AIChatWidgetProps> = ({
     {
       id: 'welcome',
       sender: 'assistant',
-      text: `Здравствуйте! Я онлайн-консультант студии ${tenant.name}.\n\nЗнаю точные цены для вашего автомобиля **${selectedCar.name}**, регламенты работ и свободные окна.\n\nЗадайте любой вопрос или напишите, например: «Запиши на мойку на завтра в 14:00».`,
+      text: `Здравствуйте! Я онлайн-консультант студии ${tenant.name}.\n\nПодскажу точные цены на все услуги, свободные окна и технологию работ.\n\nНапишите марку вашего автомобиля (или выберите класс выше) — всё рассчитаю и помогу записаться!`,
       suggestedPrompts: [
         'Сколько стоит мойка?',
         'Запиши на полировку на завтра',
@@ -147,10 +147,11 @@ export const AIChatWidget: React.FC<AIChatWidgetProps> = ({
 
   function handleCarClassChange(option: typeof CAR_CLASS_OPTIONS[0]) {
     setSelectedCar(option.car);
+    const classNum = option.car.carClass === 'class_1_sedan' ? '1-й класс' : (option.car.carClass === 'class_2_suv' ? '2-й класс' : '3-й класс');
     const systemNotice: ChatMessage = {
       id: `sys-${Date.now()}`,
       sender: 'assistant',
-      text: `🚗 Класс автомобиля обновлён: **${option.car.name}** (${option.car.categoryLabel}). Теперь все цены рассчитываются под него.`,
+      text: `🚗 Выбран класс: **${option.car.categoryLabel}** (${classNum}). Все расчёты ниже рассчитаны под него.`,
       suggestedPrompts: [
         'Прайс для моего авто',
         'Сколько стоит мойка?',
