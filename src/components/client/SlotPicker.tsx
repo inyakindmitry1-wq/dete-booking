@@ -16,12 +16,7 @@ import { TimeSlot } from '@/types/database';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import {
-  Calendar as CalendarIcon,
-  Clock,
   AlertCircle,
-  Sunrise,
-  Sun,
-  Moon,
   ChevronLeft,
   ChevronRight,
   CalendarDays,
@@ -39,8 +34,6 @@ interface SlotPickerProps {
 // 2-letter Russian weekday abbreviations capitalized: Пт, Сб, Вс, Пн, Вт, Ср, Чт
 const RU_WEEKDAYS_SHORT = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
 
-type TimePeriodFilter = 'all' | 'morning' | 'afternoon' | 'evening';
-
 export const SlotPicker: React.FC<SlotPickerProps> = ({
   selectedDate,
   onSelectDate,
@@ -49,7 +42,6 @@ export const SlotPicker: React.FC<SlotPickerProps> = ({
   slots = [],
   isLoading,
 }) => {
-  const [activePeriod, setActivePeriod] = useState<TimePeriodFilter>('all');
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [calendarMonth, setCalendarMonth] = useState<Date>(new Date(selectedDate));
   const hiddenDateInputRef = useRef<HTMLInputElement>(null);
@@ -84,33 +76,6 @@ export const SlotPicker: React.FC<SlotPickerProps> = ({
   const availableSlotsOnly = useMemo(() => {
     return slots.filter((s) => s.is_available);
   }, [slots]);
-
-  // Categorize available slots by period of day
-  const { morningSlots, afternoonSlots, eveningSlots } = useMemo(() => {
-    const morning: TimeSlot[] = [];
-    const afternoon: TimeSlot[] = [];
-    const evening: TimeSlot[] = [];
-
-    availableSlotsOnly.forEach((s) => {
-      const hour = parseInt(s.display_time.split(':')[0], 10);
-      if (hour < 12) {
-        morning.push(s);
-      } else if (hour < 17) {
-        afternoon.push(s);
-      } else {
-        evening.push(s);
-      }
-    });
-
-    return { morningSlots: morning, afternoonSlots: afternoon, eveningSlots: evening };
-  }, [availableSlotsOnly]);
-
-  const displayedSlots = useMemo(() => {
-    if (activePeriod === 'morning') return morningSlots;
-    if (activePeriod === 'afternoon') return afternoonSlots;
-    if (activePeriod === 'evening') return eveningSlots;
-    return availableSlotsOnly;
-  }, [activePeriod, morningSlots, afternoonSlots, eveningSlots, availableSlotsOnly]);
 
   // Format full date label like "25 сент. 2026г."
   const formattedFullDate = useMemo(() => {
@@ -295,103 +260,45 @@ export const SlotPicker: React.FC<SlotPickerProps> = ({
       </div>
 
       {/* ==================================================================== */}
-      {/* 2. Time Slots Section (Matching Sleek Reference Style)               */}
+      {/* 2. Time Slots Section (Horizontal Row Matching Date Selector)        */}
       {/* ==================================================================== */}
       <div>
-        {/* Period Filter Tabs (Optional filter if multiple periods exist) */}
-        {availableSlotsOnly.length > 8 && !isLoading && (
-          <div className="grid grid-cols-4 gap-1 p-1 rounded-xl bg-[#131722] border border-white/10 mb-3">
-            <button
-              type="button"
-              onClick={() => setActivePeriod('all')}
-              className={cn(
-                "py-1.5 rounded-lg text-xs font-semibold transition-all text-center select-none",
-                activePeriod === 'all'
-                  ? "bg-[#2563eb] text-white shadow-sm font-bold"
-                  : "text-zinc-400 hover:text-white"
-              )}
-            >
-              Все ({availableSlotsOnly.length})
-            </button>
-            <button
-              type="button"
-              onClick={() => setActivePeriod('morning')}
-              className={cn(
-                "py-1.5 rounded-lg text-xs font-semibold transition-all text-center select-none",
-                activePeriod === 'morning'
-                  ? "bg-[#2563eb] text-white shadow-sm font-bold"
-                  : "text-zinc-400 hover:text-white"
-              )}
-            >
-              Утро ({morningSlots.length})
-            </button>
-            <button
-              type="button"
-              onClick={() => setActivePeriod('afternoon')}
-              className={cn(
-                "py-1.5 rounded-lg text-xs font-semibold transition-all text-center select-none",
-                activePeriod === 'afternoon'
-                  ? "bg-[#2563eb] text-white shadow-sm font-bold"
-                  : "text-zinc-400 hover:text-white"
-              )}
-            >
-              День ({afternoonSlots.length})
-            </button>
-            <button
-              type="button"
-              onClick={() => setActivePeriod('evening')}
-              className={cn(
-                "py-1.5 rounded-lg text-xs font-semibold transition-all text-center select-none",
-                activePeriod === 'evening'
-                  ? "bg-[#2563eb] text-white shadow-sm font-bold"
-                  : "text-zinc-400 hover:text-white"
-              )}
-            >
-              Вечер ({eveningSlots.length})
-            </button>
-          </div>
-        )}
-
-        {/* Slot Grid */}
         {isLoading ? (
-          <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+          <div className="flex gap-2 overflow-hidden py-1">
             {Array.from({ length: 6 }).map((_, i) => (
-              <Skeleton key={i} className="h-11 rounded-xl bg-[#131722]" />
+              <Skeleton key={i} className="h-12 w-20 shrink-0 rounded-2xl bg-[#131722]" />
             ))}
           </div>
         ) : availableSlotsOnly.length === 0 ? (
-          <div className="p-5 rounded-2xl border border-white/10 bg-[#131722]/70 text-center text-xs text-zinc-400 flex flex-col items-center gap-2">
+          <div className="p-4 rounded-2xl border border-white/10 bg-[#131722]/70 text-center text-xs text-zinc-400 flex flex-col items-center gap-1.5">
             <AlertCircle className="h-5 w-5 text-zinc-500" />
             <span className="font-semibold text-zinc-300">На эту дату нет свободных окон</span>
             <span className="text-[11px] text-zinc-500 max-w-xs">
               Все боксы заняты или студия закрыта. Пожалуйста, выберите другую дату.
             </span>
           </div>
-        ) : displayedSlots.length === 0 ? (
-          <div className="p-4 rounded-2xl border border-white/10 bg-[#131722]/70 text-center text-xs text-zinc-400">
-            В выбранном интервале свободных окон нет. Выберите другое время.
-          </div>
         ) : (
-          <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 max-h-56 overflow-y-auto pr-1 scrollbar-none">
-            {displayedSlots.map((slot) => {
-              const isSelected = selectedSlotTime === slot.time;
-              return (
-                <button
-                  key={slot.time}
-                  type="button"
-                  onClick={() => onSelectSlot(slot)}
-                  className={cn(
-                    "h-11 rounded-xl border text-sm font-bold transition-all flex items-center justify-center active:scale-95 select-none",
-                    !isSelected &&
-                      "border-white/10 bg-[#131722] text-zinc-200 hover:border-white/30 hover:bg-[#1c2233] hover:text-white",
-                    isSelected &&
-                      "border-blue-400 bg-[#2563eb] text-white font-extrabold shadow-[0_0_16px_rgba(37,99,235,0.45)] scale-[1.02]"
-                  )}
-                >
-                  {slot.display_time}
-                </button>
-              );
-            })}
+          <div className="relative">
+            <div className="flex items-center gap-2 overflow-x-auto pb-2.5 pt-1 scrollbar-none snap-x touch-pan-x -mx-1 px-1">
+              {availableSlotsOnly.map((slot) => {
+                const isSelected = selectedSlotTime === slot.time;
+                return (
+                  <button
+                    key={slot.time}
+                    type="button"
+                    onClick={() => onSelectSlot(slot)}
+                    className={cn(
+                      "shrink-0 min-w-[80px] h-12 rounded-2xl border text-sm font-bold transition-all flex items-center justify-center select-none active:scale-95 snap-start",
+                      isSelected
+                        ? "bg-[#2563eb] border-blue-400 text-white font-extrabold shadow-[0_4px_16px_rgba(37,99,235,0.45)] ring-1 ring-blue-400/40"
+                        : "bg-[#131722]/80 border-white/10 text-white hover:bg-[#1c2233] hover:border-white/20"
+                    )}
+                  >
+                    <span>{slot.display_time}</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
         )}
       </div>

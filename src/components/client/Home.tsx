@@ -382,7 +382,7 @@ export const Home: React.FC = () => {
         />
 
         {/* Floating AI Assistant Trigger & Sheet */}
-        <AIChatWidget tenant={tenant} />
+        <AIChatWidget tenant={tenant} onNavigateToBookings={() => setActiveTab('ticket')} />
 
         {/* Floating Dock Bottom Navigation */}
         <BottomNav
