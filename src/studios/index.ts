@@ -4,14 +4,17 @@ import { caronePreset } from './presets/carone';
 import { syndicatePreset } from './presets/syndicate';
 import { brooklandsPreset } from './presets/brooklands';
 import { evMotorsPreset } from './presets/ev-motors';
+import { favoritPreset } from './presets/favorit';
 import { assetUrl } from '@/lib/utils';
 
 export * from './types';
-export { apexPreset, caronePreset, syndicatePreset, brooklandsPreset, evMotorsPreset };
+export { apexPreset, caronePreset, syndicatePreset, brooklandsPreset, evMotorsPreset, favoritPreset };
 
 export const studiosRegistry: Record<string, StudioPreset> = {
-  carone: caronePreset,
+  favorit: favoritPreset,
+  favorite: favoritPreset,
   'ev-motors': evMotorsPreset,
+  carone: caronePreset,
   apex: apexPreset,
   syndicate: syndicatePreset,
   brooklands: brooklandsPreset,

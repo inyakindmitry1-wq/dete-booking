@@ -12,6 +12,18 @@ const distDir = path.join(process.cwd(), 'dist');
 fs.writeFileSync(path.join(distDir, '.nojekyll'), '');
 
 const tenantMetadata = {
+  'favorit': {
+    name: 'Фаворит Детейлинг',
+    shortName: 'Фаворит',
+    tagline: 'Детейлинг-студия и защита кузова в Самаре',
+    logoRelPath: 'logos/favorit.png',
+  },
+  'favorite': {
+    name: 'Фаворит Детейлинг',
+    shortName: 'Фаворит',
+    tagline: 'Детейлинг-студия и защита кузова в Самаре',
+    logoRelPath: 'logos/favorit.png',
+  },
   'ev-motors': {
     name: 'EV Motors',
     shortName: 'EV Motors',
@@ -58,6 +70,10 @@ const tenantMetadata = {
 
 // Pre-create directory index.html and dedicated manifest/icons for all known tenant routes
 const staticRoutes = [
+  's/favorit',
+  's/favorit/owner',
+  's/favorite',
+  's/favorite/owner',
   's/sokol',
   's/sokol/owner',
   's/graphite',

@@ -1,0 +1,189 @@
+{
+  "slug": "favorit",
+  "name": "Фаворит Детейлинг",
+  "tagline": "Детейлинг-студия и защита кузова в Самаре",
+  "description": "Детейлинг-студия «Фаворит Детейлинг» в Самаре на Структурной улице, 82. Обладатель награды «Хорошее место 2026» Яндекс Карт с безупречным рейтингом 5.0. Специализируемся на деликатной 3-фазной мойке Koch Chemie, восстановительной полировке, керамических покрытиях, бронировании полиуретаном и профессиональном уходе за автомобилями.",
+  "phone": "+7 (927) 707-31-63",
+  "address": "Структурная улица, 82",
+  "city": "Самара",
+  "currency": "RUB",
+  "timezone": "Europe/Samara",
+  "businessType": "detailing",
+  "isPreview": false,
+  "branding": {
+    "accentColor": "#10b981",
+    "logoUrl": "/logos/favorit.png",
+    "coverUrl": "/images/hero-car.jpg",
+    "theme": "luxury-dark",
+    "favicon": "/logos/favorit.png",
+    "appleTouchIcon": "/logos/favorit.png"
+  },
+  "resources": [
+    {
+      "id": "88888888-8888-4888-8888-888888888801",
+      "name": "Моечный пост 1 (Фаворит Koch Chemie)",
+      "type": "wash_bay",
+      "description": "Пост 3-фазной европейской мойки Koch Chemie с турбосушкой",
+      "is_active": true,
+      "sort_order": 1
+    },
+    {
+      "id": "88888888-8888-4888-8888-888888888802",
+      "name": "Полировочный бокс 2 (Фаворит Lab)",
+      "type": "detailing_bay",
+      "description": "Зона деликатной восстановительной полировки и нанокерамики",
+      "is_active": true,
+      "sort_order": 2
+    },
+    {
+      "id": "88888888-8888-4888-8888-888888888803",
+      "name": "PPF бокс 3 (Фаворит Броня)",
+      "type": "detailing_bay",
+      "description": "Зона оклейки антигравийной полиуретановой пленкой",
+      "is_active": true,
+      "sort_order": 3
+    }
+  ],
+  "services": [
+    {
+      "id": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbb01",
+      "category": "Мойка и уход",
+      "name": "Трёхфазная детейлинг-мойка Koch Chemie",
+      "description": "Бережная 3-фазная детейлинг-мойка оригинальной немецкой химией Koch Chemie по системе двух вёдер, чистка дисков, консервация кварцем и бережная турбосушка.",
+      "duration_minutes": 75,
+      "buffer_minutes": 15,
+      "price": 1200,
+      "is_active": true,
+      "image_url": "/images/services/wash-premium.jpg",
+      "sort_order": 1
+    },
+    {
+      "id": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbb02",
+      "category": "Полировка кузова",
+      "name": "Экспресс-полировка кузова для блеска",
+      "description": "Быстрая полировка в один проход финишной антиголограммной пастой с подготовкой кузова. Возвращает зеркальный глянец и насыщенный цвет.",
+      "duration_minutes": 180,
+      "buffer_minutes": 30,
+      "price": 6500,
+      "is_active": true,
+      "image_url": "/images/services/polishing.jpg",
+      "sort_order": 2
+    },
+    {
+      "id": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbb03",
+      "category": "Полировка кузова",
+      "name": "Глубокая восстановительная полировка ЛКП",
+      "description": "Многоступенчатая абразивная полировка профессиональными пастами Rupes и Menzerna. Удаление до 95% паутинки и глубоких царапин без истончения заводского лака.",
+      "duration_minutes": 360,
+      "buffer_minutes": 30,
+      "price": 14000,
+      "is_active": true,
+      "image_url": "/images/services/syndicate-polish.jpg",
+      "sort_order": 3
+    },
+    {
+      "id": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbb04",
+      "category": "Защитные покрытия",
+      "name": "Нанокерамика 9H (2 слоя + гидрофоб)",
+      "description": "Керамическая защита кузова в 2 слоя с гидрофобным топкоутом. Зеркальный мокрый блеск, защита от дорожных реагентов, выгорания на солнце и мелкого пескоструя.",
+      "duration_minutes": 300,
+      "buffer_minutes": 30,
+      "price": 22000,
+      "is_active": true,
+      "image_url": "/images/services/ceramic.jpg",
+      "sort_order": 4
+    },
+    {
+      "id": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbb05",
+      "category": "Оклейка пленкой",
+      "name": "Бронирование ударной зоны пленкой PPF",
+      "description": "Оклейка зон риска полиуретановой бронепленкой 190–210 мкм с самозатягивающимся слоем (бампер, капот, крылья, фары, зеркала, полоса на крышу).",
+      "duration_minutes": 960,
+      "buffer_minutes": 60,
+      "price": 55000,
+      "is_active": true,
+      "image_url": "/images/services/ppf.jpg",
+      "sort_order": 5
+    },
+    {
+      "id": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbb06",
+      "category": "Химчистка салона",
+      "name": "Глубокая детейлинг-химчистка салона с сушкой",
+      "description": "Полный разбор и экстракторная чистка сидений, ковролина, багажника, потолка аппаратом Tornador и профессиональная сушка автофеном до полного высыхания.",
+      "duration_minutes": 300,
+      "buffer_minutes": 30,
+      "price": 9000,
+      "is_active": true,
+      "image_url": "/images/services/himchistka.jpg",
+      "sort_order": 6
+    },
+    {
+      "id": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbb07",
+      "category": "Оптика",
+      "name": "Восстановление и глубокая полировка фар",
+      "description": "Шлифовка и полировка оптики для восстановления заводской прозрачности фар. Улучшает видимость и безопасность в ночное время.",
+      "duration_minutes": 45,
+      "buffer_minutes": 15,
+      "price": 1000,
+      "is_active": true,
+      "image_url": "/images/services/cleaning.jpg",
+      "sort_order": 7
+    },
+    {
+      "id": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbb08",
+      "category": "Диагностика",
+      "name": "Осмотр кузова и дефектовка ЛКП — слот 30 мин (0 ₽)",
+      "description": "Бесплатный инструментальный замер толщины ЛКП толщиномером, осмотр повреждений и точный подбор комплекса детейлинга мастером.",
+      "duration_minutes": 30,
+      "buffer_minutes": 0,
+      "price": 0,
+      "is_active": true,
+      "image_url": "/images/services/interior.jpg",
+      "sort_order": 8
+    }
+  ],
+  "serviceResources": [
+    {
+      "serviceId": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbb01",
+      "resourceId": "88888888-8888-4888-8888-888888888801"
+    },
+    {
+      "serviceId": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbb02",
+      "resourceId": "88888888-8888-4888-8888-888888888802"
+    },
+    {
+      "serviceId": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbb03",
+      "resourceId": "88888888-8888-4888-8888-888888888802"
+    },
+    {
+      "serviceId": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbb04",
+      "resourceId": "88888888-8888-4888-8888-888888888802"
+    },
+    {
+      "serviceId": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbb05",
+      "resourceId": "88888888-8888-4888-8888-888888888803"
+    },
+    {
+      "serviceId": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbb06",
+      "resourceId": "88888888-8888-4888-8888-888888888802"
+    },
+    {
+      "serviceId": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbb07",
+      "resourceId": "88888888-8888-4888-8888-888888888802"
+    },
+    {
+      "serviceId": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbb08",
+      "resourceId": "88888888-8888-4888-8888-888888888802"
+    }
+  ],
+  "workingHours": [
+    { "day_of_week": 0, "open_time": "10:00:00", "close_time": "19:00:00", "is_closed": false },
+    { "day_of_week": 1, "open_time": "10:00:00", "close_time": "19:00:00", "is_closed": false },
+    { "day_of_week": 2, "open_time": "10:00:00", "close_time": "19:00:00", "is_closed": false },
+    { "day_of_week": 3, "open_time": "10:00:00", "close_time": "19:00:00", "is_closed": false },
+    { "day_of_week": 4, "open_time": "10:00:00", "close_time": "19:00:00", "is_closed": false },
+    { "day_of_week": 5, "open_time": "10:00:00", "close_time": "19:00:00", "is_closed": false },
+    { "day_of_week": 6, "open_time": "10:00:00", "close_time": "19:00:00", "is_closed": false }
+  ],
+  "scheduleExceptions": []
+}
