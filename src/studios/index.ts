@@ -3,12 +3,14 @@ import { apexPreset } from './presets/apex';
 import { caronePreset } from './presets/carone';
 import { syndicatePreset } from './presets/syndicate';
 import { brooklandsPreset } from './presets/brooklands';
+import { evMotorsPreset } from './presets/ev-motors';
 
 export * from './types';
-export { apexPreset, caronePreset, syndicatePreset, brooklandsPreset };
+export { apexPreset, caronePreset, syndicatePreset, brooklandsPreset, evMotorsPreset };
 
 export const studiosRegistry: Record<string, StudioPreset> = {
   carone: caronePreset,
+  'ev-motors': evMotorsPreset,
   apex: apexPreset,
   syndicate: syndicatePreset,
   brooklands: brooklandsPreset,

@@ -23,6 +23,8 @@ const staticRoutes = [
   's/syndicate/owner',
   's/carone',
   's/carone/owner',
+  's/ev-motors',
+  's/ev-motors/owner',
   's/brooklands',
   's/brooklands/owner',
 ];
