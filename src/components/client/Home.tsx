@@ -273,7 +273,7 @@ export const Home: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setActiveTab('catalog')}
-                  className="text-xs font-semibold text-primary hover:underline"
+                  className="text-xs font-semibold text-blue-400 hover:text-blue-300 hover:underline"
                 >
                   Все услуги
                 </button>
@@ -319,7 +319,7 @@ export const Home: React.FC = () => {
                   className={cn(
                     "px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all shrink-0 active:scale-95 select-none",
                     selectedCategory === cat
-                      ? "bg-primary text-primary-foreground shadow-sm shadow-primary/20"
+                      ? "bg-[#2563eb] text-white shadow-sm shadow-blue-500/30"
                       : "bg-zinc-900 text-zinc-400 hover:text-white border border-white/[0.06]"
                   )}
                 >

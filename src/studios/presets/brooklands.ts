@@ -9,7 +9,7 @@ export const brooklandsPreset: StudioPreset = {
     'Детейлинг-ателье BROOKLANDS на Звенигородском шоссе. Топовое европейское оборудование, индивидуальные боксы с климат-контролем и премиальные материалы от лучших мировых брендов.',
   logoUrl: '/icons/apex-logo.png',
   coverUrl: '/images/hero-car.jpg',
-  accentColor: '#10b981',
+  accentColor: '#2563eb',
   branch: {
     address: 'Звенигородское шоссе, 28, стр. 1',
     city: 'Москва',

@@ -23,7 +23,7 @@ import {
   Car,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useDemoStore } from '@/context/DemoStoreContext';
+import { useDemoStore, SelectedCar } from '@/context/DemoStoreContext';
 import { geminiService, BookingCardData } from '@/services/geminiService';
 
 interface AIChatWidgetProps {
@@ -36,27 +36,73 @@ interface ChatMessage {
   sender: 'user' | 'assistant';
   text: string;
   bookingCard?: BookingCardData;
+  suggestedPrompts?: string[];
 }
+
+const CAR_CLASS_OPTIONS: Array<{
+  label: string;
+  car: SelectedCar;
+}> = [
+  {
+    label: 'Седан',
+    car: {
+      name: 'Седан (BMW 3, Camry, Vesta)',
+      category: 'sedan',
+      carClass: 'class_1_sedan',
+      categoryLabel: 'Седан',
+    },
+  },
+  {
+    label: 'Кроссовер',
+    car: {
+      name: 'Кроссовер (Tiguan, RAV4, Monjaro)',
+      category: 'crossover',
+      carClass: 'class_2_suv',
+      categoryLabel: 'Кроссовер',
+    },
+  },
+  {
+    label: 'Внедорожник',
+    car: {
+      name: 'Внедорожник (LC300, BMW X5, Li L9)',
+      category: 'suv',
+      carClass: 'class_3_xl',
+      categoryLabel: 'Внедорожник',
+    },
+  },
+];
 
 export const AIChatWidget: React.FC<AIChatWidgetProps> = ({
   tenant,
   onNavigateToBookings,
 }) => {
-  const { studio, services, selectedCar, createAppointment } = useDemoStore();
+  const { studio, services, selectedCar, setSelectedCar, createAppointment } = useDemoStore();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: 'welcome',
       sender: 'assistant',
-      text: `Здравствуйте! Я официальный онлайн-консультант студии ${tenant.name}.\n\nЗнаю точные цены для вашего ${selectedCar.name}, могу проконсультировать по технологиям или сразу записать в свободный бокс. Чем могу помочь?`,
+      text: `Здравствуйте! Я онлайн-консультант студии ${tenant.name}.\n\nЗнаю точные цены для вашего автомобиля **${selectedCar.name}**, регламенты работ и свободные окна.\n\nЗадайте любой вопрос или напишите, например: «Запиши на мойку на завтра в 14:00».`,
+      suggestedPrompts: [
+        'Сколько стоит мойка?',
+        'Запиши на полировку на завтра',
+        'Прайс на все услуги',
+        'Какие есть скидки?',
+      ],
     },
   ]);
   const [inputText, setInputText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
 
   async function handleSendMessage(textToSend?: string) {
-    const text = textToSend || inputText.trim();
+    const text = (textToSend || inputText).trim();
     if (!text || isTyping) return;
+
+    if (text.toLowerCase() === 'перейти в мои записи' || text.toLowerCase() === 'мои записи') {
+      setIsOpen(false);
+      onNavigateToBookings?.();
+      return;
+    }
 
     const userMsg: ChatMessage = {
       id: `usr-${Date.now()}`,
@@ -74,6 +120,7 @@ export const AIChatWidget: React.FC<AIChatWidgetProps> = ({
         services,
         selectedCar,
         createAppointment,
+        onUpdateSelectedCar: setSelectedCar,
       });
 
       const assistantMsg: ChatMessage = {
@@ -81,6 +128,7 @@ export const AIChatWidget: React.FC<AIChatWidgetProps> = ({
         sender: 'assistant',
         text: result.text,
         bookingCard: result.bookingCard,
+        suggestedPrompts: result.suggestedPrompts,
       };
       setMessages((prev) => [...prev, assistantMsg]);
     } catch {
@@ -89,7 +137,7 @@ export const AIChatWidget: React.FC<AIChatWidgetProps> = ({
         {
           id: `err-${Date.now()}`,
           sender: 'assistant',
-          text: 'Извините, произошла непредвиденная ошибка. Пожалуйста, воспользуйтесь стандартной онлайн-записью в каталоге услуг.',
+          text: 'Извините, произошла заминка. Пожалуйста, воспользуйтесь стандартной онлайн-записью в каталоге услуг или позвоните нам.',
         },
       ]);
     } finally {
@@ -97,12 +145,20 @@ export const AIChatWidget: React.FC<AIChatWidgetProps> = ({
     }
   }
 
-  const quickPrompts = [
-    'Сколько стоит мойка?',
-    'Запиши на комплекс на завтра в 14:00',
-    'Прайс для моего авто',
-    'Где вы находитесь?',
-  ];
+  function handleCarClassChange(option: typeof CAR_CLASS_OPTIONS[0]) {
+    setSelectedCar(option.car);
+    const systemNotice: ChatMessage = {
+      id: `sys-${Date.now()}`,
+      sender: 'assistant',
+      text: `🚗 Класс автомобиля обновлён: **${option.car.name}** (${option.car.categoryLabel}). Теперь все цены рассчитываются под него.`,
+      suggestedPrompts: [
+        'Прайс для моего авто',
+        'Сколько стоит мойка?',
+        'Запиши на полировку',
+      ],
+    };
+    setMessages((prev) => [...prev, systemNotice]);
+  }
 
   return (
     <>
@@ -116,7 +172,7 @@ export const AIChatWidget: React.FC<AIChatWidgetProps> = ({
 
       {/* Chat Drawer */}
       <Drawer open={isOpen} onOpenChange={setIsOpen}>
-        <DrawerContent className="max-w-md mx-auto max-h-[88vh] bg-[#0b0e14] border-t border-white/10 text-white focus:outline-none">
+        <DrawerContent className="max-w-md mx-auto max-h-[90vh] bg-[#0b0e14] border-t border-white/10 text-white focus:outline-none">
           <DrawerHeader className="pb-2 pt-3 border-b border-white/[0.08]">
             <div className="flex items-center justify-between">
               <DrawerTitle className="flex items-center gap-2 text-white text-base font-bold">
@@ -125,23 +181,43 @@ export const AIChatWidget: React.FC<AIChatWidgetProps> = ({
                 </div>
                 <span>AI-Консультант {tenant.name}</span>
               </DrawerTitle>
-              <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-white/[0.06] border border-white/10 text-[10px] text-zinc-300 font-medium">
-                <Car className="h-3 w-3 text-blue-400" />
-                <span className="truncate max-w-[120px]">{selectedCar.categoryLabel}</span>
+            </div>
+
+            {/* Quick Car Class Selector Chips */}
+            <div className="flex items-center justify-between gap-1.5 pt-2">
+              <span className="text-[10px] text-zinc-400 uppercase tracking-wider font-bold shrink-0">
+                Класс авто:
+              </span>
+              <div className="flex items-center gap-1 overflow-x-auto scrollbar-none">
+                {CAR_CLASS_OPTIONS.map((opt) => {
+                  const isCurrent = selectedCar.carClass === opt.car.carClass;
+                  return (
+                    <button
+                      key={opt.label}
+                      type="button"
+                      onClick={() => handleCarClassChange(opt)}
+                      className={cn(
+                        "px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-all active:scale-95 select-none",
+                        isCurrent
+                          ? "bg-[#2563eb] text-white shadow-sm shadow-blue-500/30 font-bold"
+                          : "bg-white/5 text-zinc-400 hover:text-white border border-white/10"
+                      )}
+                    >
+                      {opt.label}
+                    </button>
+                  );
+                })}
               </div>
             </div>
-            <DrawerDescription className="text-xs text-zinc-400 mt-1">
-              Работает локально • Подбирает цены для {selectedCar.name} • Записывает без очередей
-            </DrawerDescription>
           </DrawerHeader>
 
           {/* Messages Area */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-3 min-h-[280px] max-h-[400px] scrollbar-none">
+          <div className="flex-1 overflow-y-auto p-4 space-y-3.5 min-h-[300px] max-h-[420px] scrollbar-none">
             {messages.map((m) => (
               <div
                 key={m.id}
                 className={cn(
-                  "flex gap-2.5 max-w-[90%]",
+                  "flex gap-2.5 max-w-[92%]",
                   m.sender === 'user' ? "ml-auto flex-row-reverse" : "mr-auto"
                 )}
               >
@@ -160,7 +236,7 @@ export const AIChatWidget: React.FC<AIChatWidgetProps> = ({
                       "p-3.5 rounded-2xl text-xs sm:text-sm leading-relaxed whitespace-pre-line shadow-sm",
                       m.sender === 'user'
                         ? "bg-[#2563eb] text-white rounded-tr-none font-medium"
-                        : "bg-[#131722]/90 border border-white/10 text-zinc-200 rounded-tl-none"
+                        : "bg-[#131722]/95 border border-white/10 text-zinc-200 rounded-tl-none"
                     )}
                   >
                     {m.text}
@@ -168,7 +244,7 @@ export const AIChatWidget: React.FC<AIChatWidgetProps> = ({
 
                   {/* Booking Confirmation Card */}
                   {m.bookingCard && (
-                    <div className="p-3.5 rounded-2xl bg-[#0e1422] border border-emerald-500/40 text-white space-y-3 shadow-[0_4px_20px_rgba(16,185,129,0.15)] animate-in fade-in zoom-in-95 duration-200">
+                    <div className="p-3.5 rounded-2xl bg-[#0e1422] border border-emerald-500/40 text-white space-y-3 shadow-[0_4px_20px_rgba(16,185,129,0.18)] animate-in fade-in zoom-in-95 duration-200">
                       <div className="flex items-center justify-between pb-2 border-b border-white/10">
                         <div className="flex items-center gap-1.5 text-emerald-400 font-bold text-xs">
                           <CheckCircle2 className="h-4 w-4 shrink-0" />
@@ -219,6 +295,22 @@ export const AIChatWidget: React.FC<AIChatWidgetProps> = ({
                       </button>
                     </div>
                   )}
+
+                  {/* Interactive Suggested Chips under Message */}
+                  {m.suggestedPrompts && m.suggestedPrompts.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 pt-1">
+                      {m.suggestedPrompts.map((prompt) => (
+                        <button
+                          key={prompt}
+                          type="button"
+                          onClick={() => handleSendMessage(prompt)}
+                          className="px-2.5 py-1 rounded-xl text-[11px] font-medium bg-[#161a26] border border-blue-500/25 text-blue-300 hover:bg-blue-600 hover:text-white hover:border-blue-500 transition-all active:scale-95 text-left"
+                        >
+                          {prompt}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
@@ -234,20 +326,6 @@ export const AIChatWidget: React.FC<AIChatWidgetProps> = ({
                 </div>
               </div>
             )}
-          </div>
-
-          {/* Quick Prompts Strip */}
-          <div className="px-4 py-2 flex gap-1.5 overflow-x-auto scrollbar-none border-t border-white/[0.06]">
-            {quickPrompts.map((q) => (
-              <button
-                key={q}
-                type="button"
-                onClick={() => handleSendMessage(q)}
-                className="px-3 py-1.5 rounded-xl text-[11px] font-medium bg-[#131722] border border-white/10 text-zinc-300 hover:text-white hover:border-white/20 whitespace-nowrap active:scale-95 transition-all select-none"
-              >
-                {q}
-              </button>
-            ))}
           </div>
 
           {/* Input Area */}
@@ -269,7 +347,7 @@ export const AIChatWidget: React.FC<AIChatWidgetProps> = ({
                 type="submit"
                 size="icon"
                 disabled={!inputText.trim() || isTyping}
-                className="rounded-xl shrink-0 h-11 w-11 bg-blue-600 hover:bg-blue-500 text-white disabled:bg-zinc-800 disabled:text-zinc-500"
+                className="rounded-xl shrink-0 h-11 w-11 bg-[#2563eb] hover:bg-blue-500 text-white disabled:bg-zinc-800 disabled:text-zinc-500"
               >
                 <Send className="h-4 w-4" />
               </Button>

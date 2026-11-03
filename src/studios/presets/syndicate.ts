@@ -9,7 +9,7 @@ export const syndicatePreset: StudioPreset = {
     'Детейлинг-студия Syndicate в Самаре. Обладатель официальной награды «Хорошее место 2026» Яндекс Карт с рейтингом 4.9. Комплексная трехфазная мойка, восстановительная полировка ЛКП, антигравийная пленка (PPF), керамика KRYTEX и профессиональный уход за интерьером.',
   logoUrl: '/icons/syndicate-logo.png',
   coverUrl: '/images/hero-car.jpg',
-  accentColor: '#fbbf24',
+  accentColor: '#2563eb',
   branch: {
     address: 'ул. Льва Толстого, 97А, корп. 1',
     city: 'Самара',

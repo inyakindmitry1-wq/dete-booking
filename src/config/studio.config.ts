@@ -54,7 +54,7 @@ export const studioConfig: StudioConfig = {
     close: '21:00',
   },
   branding: {
-    accentColor: '#fbbf24',
+    accentColor: '#2563eb',
     logoUrl: '/icons/syndicate-logo.png',
     coverUrl: '/images/hero-car.jpg',
     badgeText: 'Хорошее место 2026 • Рейтинг 4.9',

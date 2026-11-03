@@ -11,7 +11,7 @@
   "businessType": "detailing",
   "isPreview": false,
   "branding": {
-    "accentColor": "#FBBF24",
+    "accentColor": "#2563eb",
     "logoUrl": "/icons/syndicate-logo.png",
     "coverUrl": "/images/hero-car.jpg",
     "theme": "luxury-dark",

@@ -15,6 +15,8 @@ export interface BookingCardData {
 export interface AiProcessResult {
   text: string;
   bookingCard?: BookingCardData;
+  suggestedPrompts?: string[];
+  detectedCar?: SelectedCar;
 }
 
 export interface ProcessMessageOptions {
@@ -32,6 +34,7 @@ export interface ProcessMessageOptions {
     customerName?: string;
     customerPhone?: string;
   }) => Promise<CreatedAppointment>;
+  onUpdateSelectedCar?: (car: SelectedCar) => void;
 }
 
 const RU_MONTHS = [
@@ -48,6 +51,206 @@ const RU_MONTHS = [
   'ноября',
   'декабря',
 ];
+
+/**
+ * Intelligent Car Database for auto-recognition from Russian user input
+ */
+const CAR_DATABASE: Array<{
+  keywords: string[];
+  name: string;
+  category: 'sedan' | 'crossover' | 'suv';
+  carClass: 'class_1_sedan' | 'class_2_suv' | 'class_3_xl';
+  categoryLabel: string;
+}> = [
+  // Sedans
+  {
+    keywords: ['камри', 'camry', 'corolla', 'королл'],
+    name: 'Toyota Camry (Седан)',
+    category: 'sedan',
+    carClass: 'class_1_sedan',
+    categoryLabel: 'Седан',
+  },
+  {
+    keywords: ['бмв 3', 'bmw 3', 'тройк', 'бмв 5', 'bmw 5', 'пятерк', 'f30', 'g20', 'g30'],
+    name: 'BMW 3 / 5 Series (Седан)',
+    category: 'sedan',
+    carClass: 'class_1_sedan',
+    categoryLabel: 'Седан',
+  },
+  {
+    keywords: ['солярис', 'solaris', 'рио', 'rio', 'поло', 'polo', 'рапид', 'rapid'],
+    name: 'Hyundai Solaris / Kia Rio (Седан)',
+    category: 'sedan',
+    carClass: 'class_1_sedan',
+    categoryLabel: 'Седан',
+  },
+  {
+    keywords: ['веста', 'vesta', 'гранта', 'granta', 'приора', 'priora', 'лада', 'lada'],
+    name: 'Lada Vesta (Седан)',
+    category: 'sedan',
+    carClass: 'class_1_sedan',
+    categoryLabel: 'Седан',
+  },
+  {
+    keywords: ['мерседес с', 'мерс с', 'c-class', 'e-class', 'w205', 'w213', 'мерседес е', 'мерс е'],
+    name: 'Mercedes-Benz C/E-Class (Седан)',
+    category: 'sedan',
+    carClass: 'class_1_sedan',
+    categoryLabel: 'Седан',
+  },
+  {
+    keywords: ['ауди а4', 'ауди а6', 'audi a4', 'audi a6', 'пассат', 'passat', 'октавия', 'octavia'],
+    name: 'Audi A4 / Skoda Octavia (Седан)',
+    category: 'sedan',
+    carClass: 'class_1_sedan',
+    categoryLabel: 'Седан',
+  },
+
+  // Crossovers
+  {
+    keywords: ['тигуан', 'tiguan', 'рав4', 'rav4', 'рав 4', 'rav 4', 'сх-5', 'cx-5', 'cx5', 'мазда сх'],
+    name: 'VW Tiguan / Toyota RAV4',
+    category: 'crossover',
+    carClass: 'class_2_suv',
+    categoryLabel: 'Кроссовер',
+  },
+  {
+    keywords: ['монжаро', 'monjaro', 'джили', 'geely', 'тугелла', 'tugella', 'атлас', 'atlas', 'кулрей', 'coolray'],
+    name: 'Geely Monjaro',
+    category: 'crossover',
+    carClass: 'class_2_suv',
+    categoryLabel: 'Кроссовер',
+  },
+  {
+    keywords: ['чери', 'chery', 'тигго', 'tiggo', 'омода', 'omoda', 'хавал', 'haval', 'джолион', 'jolion', 'f7', 'дарго', 'dargo'],
+    name: 'Haval / Chery Tiggo',
+    category: 'crossover',
+    carClass: 'class_2_suv',
+    categoryLabel: 'Кроссовер',
+  },
+  {
+    keywords: ['эксид', 'exeed', 'vx', 'txl', 'rx', 'чанган', 'changan', 'cs55', 'uni-k', 'юник'],
+    name: 'Exeed / Changan UNI-K',
+    category: 'crossover',
+    carClass: 'class_2_suv',
+    categoryLabel: 'Кроссовер',
+  },
+  {
+    keywords: ['бмв х3', 'bmw x3', 'bmw x4', 'х3', 'х4', 'audi q5', 'ауди ку5', 'glc', 'мерс глц', 'макан', 'macan'],
+    name: 'BMW X3 / Audi Q5',
+    category: 'crossover',
+    carClass: 'class_2_suv',
+    categoryLabel: 'Кроссовер',
+  },
+  {
+    keywords: ['спортейдж', 'sportage', 'туссан', 'tucson', 'кашкай', 'qashqai', 'х-трейл', 'x-trail', 'крета', 'creta'],
+    name: 'Kia Sportage / Hyundai Tucson',
+    category: 'crossover',
+    carClass: 'class_2_suv',
+    categoryLabel: 'Кроссовер',
+  },
+
+  // Full-size SUVs & XL
+  {
+    keywords: ['крузак', 'land cruiser', 'ленд крузер', 'prado', 'прадо', 'крузер 200', 'крузер 300', 'lc200', 'lc300'],
+    name: 'Toyota Land Cruiser 300',
+    category: 'suv',
+    carClass: 'class_3_xl',
+    categoryLabel: 'Внедорожник',
+  },
+  {
+    keywords: ['бмв х5', 'bmw x5', 'бмв х6', 'bmw x6', 'бмв х7', 'bmw x7', 'х5', 'х6', 'х7', 'g05', 'g07'],
+    name: 'BMW X5 / X7',
+    category: 'suv',
+    carClass: 'class_3_xl',
+    categoryLabel: 'Внедорожник',
+  },
+  {
+    keywords: ['гелик', 'гелендваген', 'g-class', 'w463', 'gle', 'gls', 'мерс гле', 'мерс глс'],
+    name: 'Mercedes-Benz G/GLS-Class',
+    category: 'suv',
+    carClass: 'class_3_xl',
+    categoryLabel: 'Внедорожник',
+  },
+  {
+    keywords: ['лисян', 'lixiang', 'li l7', 'li l9', 'li auto', 'л7', 'л9', 'зикра', 'зикер', 'zeekr', 'zeekr 001', '001', 'зикр'],
+    name: 'Li L9 / Zeekr 001',
+    category: 'suv',
+    carClass: 'class_3_xl',
+    categoryLabel: 'Внедорожник',
+  },
+  {
+    keywords: ['танк', 'tank 300', 'tank 500', 'танк 300', 'танк 500', 'воя', 'voyah', 'voyah free'],
+    name: 'Tank 500 / Voyah Free',
+    category: 'suv',
+    carClass: 'class_3_xl',
+    categoryLabel: 'Внедорожник',
+  },
+  {
+    keywords: ['туарег', 'touareg', 'каен', 'кайен', 'cayenne', 'q7', 'q8', 'ауди ку7', 'ауди ку8', 'эскалейд', 'escalade'],
+    name: 'Porsche Cayenne / Audi Q7',
+    category: 'suv',
+    carClass: 'class_3_xl',
+    categoryLabel: 'Внедорожник',
+  },
+  {
+    keywords: ['минивэн', 'в-класс', 'v-class', 'мультивен', 'multivan', 'alphard', 'альфард', 'staria', 'стария'],
+    name: 'Mercedes V-Class / Multivan',
+    category: 'suv',
+    carClass: 'class_3_xl',
+    categoryLabel: 'Внедорожник / Минивэн',
+  },
+];
+
+/**
+ * Detects if user message contains specific car brand or model
+ */
+function detectCarFromText(text: string): SelectedCar | null {
+  const lower = text.toLowerCase();
+
+  for (const car of CAR_DATABASE) {
+    for (const kw of car.keywords) {
+      if (lower.includes(kw)) {
+        return {
+          name: car.name,
+          category: car.category,
+          carClass: car.carClass,
+          categoryLabel: car.categoryLabel,
+        };
+      }
+    }
+  }
+
+  // Explicit class mention
+  if (lower.includes('седан') || lower.includes('хэтчбек') || lower.includes('купе')) {
+    return {
+      name: 'Седан / Купе',
+      category: 'sedan',
+      carClass: 'class_1_sedan',
+      categoryLabel: 'Седан',
+    };
+  }
+
+  if (lower.includes('кроссовер') || lower.includes('паркетник')) {
+    return {
+      name: 'Компактный кроссовер',
+      category: 'crossover',
+      carClass: 'class_2_suv',
+      categoryLabel: 'Кроссовер',
+    };
+  }
+
+  if (lower.includes('внедорожник') || lower.includes('джип') || lower.includes('минивэн') || lower.includes('пикап')) {
+    return {
+      name: 'Полноразмерный внедорожник',
+      category: 'suv',
+      carClass: 'class_3_xl',
+      categoryLabel: 'Внедорожник',
+    };
+  }
+
+  return null;
+}
 
 /**
  * Extracts date from Russian user query
@@ -93,7 +296,22 @@ function parseRequestedDate(text: string): { dateStr: string; dateFormatted: str
     };
   }
 
-  // 4. Weekdays: в понедельник, во вторник, в среду, в четверг, в пятницу, в субботу, в воскресенье
+  // 4. "на выходных", "в эти выходные"
+  if (lower.includes('выходн')) {
+    const day = now.getDay();
+    const diffToSat = (6 - day + 7) % 7 || 7;
+    const target = new Date();
+    target.setDate(target.getDate() + diffToSat);
+    const yyyy = target.getFullYear();
+    const mm = String(target.getMonth() + 1).padStart(2, '0');
+    const dd = String(target.getDate()).padStart(2, '0');
+    return {
+      dateStr: `${yyyy}-${mm}-${dd}`,
+      dateFormatted: `В субботу, ${target.getDate()} ${RU_MONTHS[target.getMonth()]}`,
+    };
+  }
+
+  // 5. Weekdays
   const weekdays: Record<string, number> = {
     воскресень: 0,
     понедельник: 1,
@@ -108,7 +326,7 @@ function parseRequestedDate(text: string): { dateStr: string; dateFormatted: str
     if (lower.includes(key)) {
       const currentDay = now.getDay();
       let diff = targetDay - currentDay;
-      if (diff <= 0) diff += 7; // next occurrence
+      if (diff <= 0) diff += 7;
       const target = new Date();
       target.setDate(target.getDate() + diff);
       const yyyy = target.getFullYear();
@@ -121,7 +339,7 @@ function parseRequestedDate(text: string): { dateStr: string; dateFormatted: str
     }
   }
 
-  // 5. Specific numeric day + month name or "числа"
+  // 6. Specific numeric day + month name or "числа"
   const dayMatch = lower.match(/(\d{1,2})\s*(?:-?го)?\s*(числа|янв|фев|мар|апр|ма[йя]|июн|июл|авг|сен|окт|ноя|дек)?/);
   if (dayMatch && dayMatch[1]) {
     const dayNum = parseInt(dayMatch[1], 10);
@@ -129,7 +347,6 @@ function parseRequestedDate(text: string): { dateStr: string; dateFormatted: str
       const target = new Date();
       target.setDate(dayNum);
       if (target.getTime() < now.getTime() - 86400000) {
-        // If past day in current month, roll to next month
         target.setMonth(target.getMonth() + 1);
       }
       const yyyy = target.getFullYear();
@@ -181,13 +398,13 @@ function parseRequestedTime(text: string): { timeStr: string; timeFormatted: str
   }
 
   // 3. Time of day
-  if (lower.includes('утром') || lower.includes('с утра')) {
+  if (lower.includes('утром') || lower.includes('с утра') || lower.includes('пораньше')) {
     return { timeStr: '10:00', timeFormatted: '10:00' };
   }
   if (lower.includes('днем') || lower.includes('в обед')) {
     return { timeStr: '14:00', timeFormatted: '14:00' };
   }
-  if (lower.includes('вечером')) {
+  if (lower.includes('вечером') || lower.includes('после работы') || lower.includes('попозже')) {
     return { timeStr: '18:00', timeFormatted: '18:00' };
   }
 
@@ -216,7 +433,7 @@ function resolveMatchedService(text: string, services: ServiceItem[]): ServiceIt
     if (found) return found;
   }
 
-  if (lower.includes('химчистк') || lower.includes('салон') || lower.includes('кожа') || lower.includes('пятна')) {
+  if (lower.includes('химчистк') || lower.includes('салон') || lower.includes('кожа') || lower.includes('пятна') || lower.includes('ткань')) {
     const found = services.find((s) => s.category.toLowerCase().includes('химчист') || s.name.toLowerCase().includes('химчист'));
     if (found) return found;
   }
@@ -250,18 +467,32 @@ function formatServicePrice(service: ServiceItem, selectedCar: SelectedCar): str
 }
 
 /**
- * Autonomous Rule-based Mock AI Engine running 100% locally in browser without API keys.
+ * Autonomous Rule-based Detailing AI Concierge.
+ * Complete coverage of all real customer intents, vehicle detection, objection handling, and booking transactions.
  */
 export async function processAiMessage(options: ProcessMessageOptions): Promise<AiProcessResult> {
-  const { userMessage, studio, services, selectedCar, createAppointment } = options;
+  const { userMessage, studio, services, createAppointment, onUpdateSelectedCar } = options;
+  let activeCar = options.selectedCar;
   const lower = userMessage.toLowerCase().trim();
 
-  // 1. Simulate realistic response delay (700 - 1000 ms) with typing effect
-  const delayMs = Math.floor(700 + Math.random() * 300);
+  // 1. Simulate realistic response delay (650 - 950 ms)
+  const delayMs = Math.floor(650 + Math.random() * 300);
   await new Promise((resolve) => setTimeout(resolve, delayMs));
 
+  // 2. Intelligent Auto-Detection of Vehicle Brand & Class
+  const recognizedCar = detectCarFromText(lower);
+  let carRecognitionPill = '';
+  if (recognizedCar && recognizedCar.name !== activeCar.name) {
+    activeCar = recognizedCar;
+    if (onUpdateSelectedCar) {
+      onUpdateSelectedCar(recognizedCar);
+    }
+    carRecognitionPill = `🚗 Переключил класс на: **${recognizedCar.name}** (${recognizedCar.categoryLabel}). Все расчёты ниже рассчитаны под него.\n\n`;
+  }
+
   // -------------------------------------------------------------------------
-  // INTENT 1: BOOKING ("запиши", "записать", "бронь", "забронировать", "запишите")
+  // SCENARIO 1: BOOKING & RESERVATION
+  // ("запиши", "записать", "бронь", "забронировать", "запишите", "хочу приехать")
   // -------------------------------------------------------------------------
   const isBookingIntent =
     lower.includes('запиш') ||
@@ -270,6 +501,7 @@ export async function processAiMessage(options: ProcessMessageOptions): Promise<
     lower.includes('забронир') ||
     lower.includes('забронируй') ||
     lower.includes('хочу записаться') ||
+    lower.includes('хочу приехать') ||
     lower.includes('назначь');
 
   if (isBookingIntent) {
@@ -277,14 +509,14 @@ export async function processAiMessage(options: ProcessMessageOptions): Promise<
     const { dateStr, dateFormatted } = parseRequestedDate(lower);
     const { timeStr, timeFormatted } = parseRequestedTime(lower);
 
-    // Call createAppointment in DemoStoreContext
+    // Call atomic createAppointment in context
     const appointment = await createAppointment({
       serviceId: targetService.id,
       serviceName: targetService.name,
       dateStr,
       timeStr,
-      price: targetService.prices[selectedCar.carClass],
-      carModel: selectedCar.name,
+      price: targetService.prices[activeCar.carClass],
+      carModel: activeCar.name,
       customerName: 'Клиент (AI-запись)',
       customerPhone: studio.branch.phone || '+7 (999) 000-00-00',
     });
@@ -295,7 +527,7 @@ export async function processAiMessage(options: ProcessMessageOptions): Promise<
         : 'Бесплатно (0 ₽)';
 
     return {
-      text: `Отлично! Я успешно забронировал бокс для вашего автомобиля ${selectedCar.name} на услугу «${appointment.serviceName}».\n\n📅 Дата: ${dateFormatted}\n⏰ Время: ${timeFormatted}\n💰 Стоимость для ${selectedCar.categoryLabel}: ${priceText}\n📍 Адрес студии: ${studio.branch.city}, ${studio.branch.address}.\n\nЭлектронный талон сохранён в разделе «Мои записи».`,
+      text: `${carRecognitionPill}Готово! Бокс успешно забронирован для вашего автомобиля **${activeCar.name}**.\n\n🛠 **Услуга:** ${appointment.serviceName}\n📅 **Дата:** ${dateFormatted}\n⏰ **Время:** ${timeFormatted}\n💰 **Стоимость:** ${priceText}\n📍 **Адрес:** ${studio.branch.city}, ${studio.branch.address}\n\nЭлектронный талон сохранён. Вы можете добавить его в календарь или посмотреть статус во вкладке «Мои записи».`,
       bookingCard: {
         bookingId: appointment.bookingId,
         accessToken: appointment.accessToken,
@@ -303,14 +535,181 @@ export async function processAiMessage(options: ProcessMessageOptions): Promise<
         dateFormatted,
         timeFormatted,
         price: appointment.price,
-        carModel: selectedCar.name,
+        carModel: activeCar.name,
         currency: 'RUB',
       },
+      suggestedPrompts: [
+        'Перейти в мои записи',
+        'Что входит в эту услугу?',
+        'Как к вам проехать?',
+        'Есть ли клиентская зона?',
+      ],
+      detectedCar: recognizedCar || undefined,
     };
   }
 
   // -------------------------------------------------------------------------
-  // INTENT 2: PRICE INQUIRY ("цена", "прайс", "сколько", "стоимость", "почем")
+  // SCENARIO 2: CERAMIC COATING & QUARTZ
+  // ("керамика", "жидкое стекло", "9h", "кварц", "защита кузова")
+  // -------------------------------------------------------------------------
+  if (
+    lower.includes('керамик') ||
+    lower.includes('жидкое стекло') ||
+    lower.includes('9h') ||
+    lower.includes('кварц')
+  ) {
+    const ceramicService = services.find((s) => s.category.toLowerCase().includes('керамик') || s.name.toLowerCase().includes('керамик')) || services[0];
+    const priceText = formatServicePrice(ceramicService, activeCar);
+
+    return {
+      text: `${carRecognitionPill}🛡 **Керамическое покрытие 9H (2 слоя + гидрофобный топкоут):**\n\n• **Что даёт:** мощнейший гидрофобный эффект (грязь и вода не задерживаются), зеркальный мокрый блеск, защиту от птичьего помёта, химических реагентов и УФ-выгорания.\n• **Срок службы:** до 1.5–2 лет при правильном 3-фазном уходе.\n• **Технология:** перед нанесением керамики кузов обязательно проходит мягкую восстановительную полировку и обезжиривание спиртовыми праймерами.\n• **Стоимость для ${activeCar.name}:** **${priceText}**.\n• **Время работы:** ~24 часа (для полной полимеризации первого слоя).\n\nЗаписать ваш автомобиль на керамику?`,
+      suggestedPrompts: [
+        `Запиши на керамику на ${activeCar.name}`,
+        'Нужна ли полировка перед керамикой?',
+        'Какая гарантия на керамику?',
+        'Прайс на все услуги',
+      ],
+      detectedCar: recognizedCar || undefined,
+    };
+  }
+
+  // -------------------------------------------------------------------------
+  // SCENARIO 3: PPF POLYURETHANE FILM
+  // ("пленка", "оклейка", "броня", "бронепленка", "ppf", "полиуретан", "зоны риска")
+  // -------------------------------------------------------------------------
+  if (
+    lower.includes('пленк') ||
+    lower.includes('оклейк') ||
+    lower.includes('броня') ||
+    lower.includes('бронир') ||
+    lower.includes('ppf') ||
+    lower.includes('полиуретан') ||
+    lower.includes('зоны риска')
+  ) {
+    const ppfService = services.find((s) => s.category.toLowerCase().includes('пленк') || s.name.toLowerCase().includes('оклейк') || s.name.toLowerCase().includes('пленк')) || services[0];
+    const priceText = formatServicePrice(ppfService, activeCar);
+
+    return {
+      text: `${carRecognitionPill}🛡 **Антигравийная полиуретановая плёнка (PPF 190–210 мкм):**\n\n• **Только полиуретан премиум-класса** (не путать с дешевым винилом, который мутнеет и трескается).\n• **Топкоут Top Coat:** функция самозатягивания царапин при нагреве солнцем или тёплой водой.\n• **Комплекс «Зоны риска» включает:** передний бампер, капот целиком, передние крылья, фары и ПТФ, зеркала заднего вида, стойки лобового стекла, полосу над лобовым на крыше, зоны под дверными ручками и полосу погрузки багажника.\n• **Срок службы и гарантия:** 5–7 лет без пожелтения и отслаивания.\n• **Стоимость для ${activeCar.name}:** **${priceText}**.\n\nМожем записать вас на оклейку или бесплатный замер ЛКП.`,
+      suggestedPrompts: [
+        `Запиши на оклейку на ${activeCar.name}`,
+        'Желтеет ли полиуретан со временем?',
+        'Сколько длится оклейка?',
+        'Осмотр и консультация мастера',
+      ],
+      detectedCar: recognizedCar || undefined,
+    };
+  }
+
+  // -------------------------------------------------------------------------
+  // SCENARIO 4: POLISHING & SCRATCH REMOVAL
+  // ("полировка", "царапины", "паутинка", "блеск", "лак", "голограммы")
+  // -------------------------------------------------------------------------
+  if (
+    lower.includes('полировк') ||
+    lower.includes('царапин') ||
+    lower.includes('паутинк') ||
+    lower.includes('голограмм') ||
+    lower.includes('блеск') ||
+    lower.includes('помутнел')
+  ) {
+    const polishService = services.find((s) => s.category.toLowerCase().includes('полировк') || s.name.toLowerCase().includes('полировк')) || services[0];
+    const priceText = formatServicePrice(polishService, activeCar);
+
+    return {
+      text: `${carRecognitionPill}✨ **Восстановительная детейлинг-полировка ЛКП:**\n\n• **Безопасность лака:** используем толщиномер до и после работы на каждом элементе. Снимаем всего 2–4 микрона заводского лака (при общем слое лака 35–50 микрон).\n• **Результат:** удаление до 95% мелких царапин, "паутинки" от моек и голограмм. Глубокий зеркальный глянец.\n• **Пасты и круги:** только профессиональные линейки Rupes, Koch Chemie, Menzerna.\n• **Время:** ~6–8 часов.\n• **Стоимость для ${activeCar.name}:** **${priceText}**.\n\nРекомендуем после полировки запечатать лак керамикой или твердым воском. Записать вас?`,
+      suggestedPrompts: [
+        `Запиши на полировку на завтра`,
+        'Не сотрете ли лак?',
+        'Сколько держится полировка?',
+        'Комплексная детейлинг-мойка',
+      ],
+      detectedCar: recognizedCar || undefined,
+    };
+  }
+
+  // -------------------------------------------------------------------------
+  // SCENARIO 5: DRY CLEANING & INTERIOR DETAILING
+  // ("химчистка", "салон", "кожа", "пятна", "сиденья", "запах", "потолок")
+  // -------------------------------------------------------------------------
+  if (
+    lower.includes('химчистк') ||
+    lower.includes('салон') ||
+    lower.includes('кожа') ||
+    lower.includes('пятн') ||
+    lower.includes('запах') ||
+    lower.includes('сидень') ||
+    lower.includes('потолок')
+  ) {
+    const dryService = services.find((s) => s.category.toLowerCase().includes('химчист') || s.name.toLowerCase().includes('химчист')) || services[0];
+    const priceText = formatServicePrice(dryService, activeCar);
+
+    return {
+      text: `${carRecognitionPill}🧼 **Глубокая детейлинг-химчистка интерьера:**\n\n• **Что входит:** экстракторная чистка ковролина и сидений аппаратом Santoemma, кистевая проработка воздуховодов и стыков аппаратом Tornador, чистка и консервация кожи премиальными бальзамами, озонирование салона.\n• **Главное преимущество:** сушим салон профессиональным автофеном — вы забираете **полностью сухой автомобиль** без запаха прелости и риска плесени!\n• **Устранение запахов:** озонатор уничтожает 99.9% бактерий и въевшиеся запахи табака и животных.\n• **Стоимость для ${activeCar.name}:** **${priceText}**.\n• **Длительность:** ~4–6 часов.`,
+      suggestedPrompts: [
+        `Запиши на химчистку на ${activeCar.name}`,
+        'Отдадите сухую машину?',
+        'Уберет ли запах табака?',
+        'Прайс на все услуги',
+      ],
+      detectedCar: recognizedCar || undefined,
+    };
+  }
+
+  // -------------------------------------------------------------------------
+  // SCENARIO 6: DETAILING WASH & 3-PHASE WASH
+  // ("мойка", "помыть", "комплекс", "3 фазы", "трехфазная", "грязная")
+  // -------------------------------------------------------------------------
+  if (
+    lower.includes('мойк') ||
+    lower.includes('помыть') ||
+    lower.includes('комплекс') ||
+    lower.includes('фазн') ||
+    lower.includes('грязн') ||
+    lower.includes('помыть кузов')
+  ) {
+    const washService = services.find((s) => s.category.toLowerCase().includes('мойк') || s.name.toLowerCase().includes('мойк')) || services[0];
+    const priceText = formatServicePrice(washService, activeCar);
+
+    return {
+      text: `${carRecognitionPill}🚿 **Детейлинг-мойка кузова и комплексный уход:**\n\n• **1-я фаза:** бережный бесконтактный состав размягчает дорожную статику без повреждения хрома и пластика.\n• **2-я фаза:** ручная мойка пористой крупноячеистой губкой по системе двух вёдер с пескоотделителями (исключает круговые царапины).\n• **3-я фаза:** нанесение жидкого кварца / консерванта для гидрофоба и глубокого блеска.\n• **Сушка:** бесконтактная турбосушка тёплым воздухом кузова, дисков, зеркал и дверных проёмов.\n• **Интерьер:** бережная уборка салона, очистка стёкол и чернение резины.\n• **Стоимость для ${activeCar.name}:** **${priceText}** (~1.5–2 часа).`,
+      suggestedPrompts: [
+        `Запиши на мойку на завтра в 14:00`,
+        `Запиши на мойку на сегодня`,
+        'Сколько стоит полировка?',
+        'Есть ли свободные окна?',
+      ],
+      detectedCar: recognizedCar || undefined,
+    };
+  }
+
+  // -------------------------------------------------------------------------
+  // SCENARIO 7: INSPECTION & MASTER CONSULTATION
+  // ("осмотр", "консультация", "диагностика", "посмотреть", "оценить")
+  // -------------------------------------------------------------------------
+  if (
+    lower.includes('осмотр') ||
+    lower.includes('консультац') ||
+    lower.includes('диагностик') ||
+    lower.includes('посмотреть') ||
+    lower.includes('дефектовк') ||
+    lower.includes('оценить')
+  ) {
+    return {
+      text: `${carRecognitionPill}🔍 **Осмотр и консультация мастера-технолога:**\n\n• **Стоимость: 0 ₽ (абсолютно бесплатно)**.\n• **Длительность:** 20–30 минут.\n• **Что делаем:** замеряем толщину заводского лака толщиномером на всех деталях, определяем перекрашенные элементы, оцениваем глубину царапин и состояние салона, подбираем оптимальный комплекс и составляем точную смету без навязывания лишних работ.\n\nЗаписать вас на осмотр на удобное время?`,
+      suggestedPrompts: [
+        'Запиши на осмотр на завтра',
+        'Запиши на осмотр на сегодня',
+        'Где вы находитесь?',
+        'Сколько стоит полировка?',
+      ],
+      detectedCar: recognizedCar || undefined,
+    };
+  }
+
+  // -------------------------------------------------------------------------
+  // SCENARIO 8: PRICING & PRICE LIST
+  // ("цена", "прайс", "сколько", "стоимость", "почем", "тариф")
   // -------------------------------------------------------------------------
   const isPriceIntent =
     lower.includes('цен') ||
@@ -321,62 +720,153 @@ export async function processAiMessage(options: ProcessMessageOptions): Promise<
     lower.includes('тариф');
 
   if (isPriceIntent) {
-    const isSpecific =
-      lower.includes('мойк') ||
-      lower.includes('полировк') ||
-      lower.includes('керамик') ||
-      lower.includes('пленк') ||
-      lower.includes('оклейк') ||
-      lower.includes('химчист') ||
-      lower.includes('осмотр');
-
-    if (isSpecific) {
-      const svc = resolveMatchedService(lower, services);
-      const priceText = formatServicePrice(svc, selectedCar);
-      return {
-        text: `Стоимость услуги «${svc.name}» для вашего автомобиля (${selectedCar.name}):\n👉 ${priceText}.\n\nДлительность: ${svc.durationMinutes ? `${Math.round(svc.durationMinutes / 60)} ч.` : 'от 2 часов'}.\n${svc.description}\n\nХотите записаться? Просто напишите, например: «Запиши на ${svc.name.toLowerCase()} на завтра в 14:00»!`,
-      };
-    }
-
-    // Full Price List for Current Car
     const list = services
       .slice(0, 6)
-      .map((s) => `• ${s.name}: ${formatServicePrice(s, selectedCar)}`)
+      .map((s) => `• **${s.name}:** ${formatServicePrice(s, activeCar)}`)
       .join('\n');
 
     return {
-      text: `Актуальный прайс-лист студии ${studio.name} для вашего автомобиля (${selectedCar.name}, класс ${selectedCar.categoryLabel}):\n\n${list}\n\nЦены зафиксированы. Чтобы забронировать свободный бокс, напишите: «Запиши на полировку на завтра в 15:00».`,
+      text: `${carRecognitionPill}📋 **Актуальный прайс-лист студии ${studio.name} для вашего авто:**\n🚘 **${activeCar.name}** (Класс: ${activeCar.categoryLabel})\n\n${list}\n\n💡 Цены фиксируются при бронировании. Чтобы занять удобный слот, просто напишите, например: «Запиши на мойку на завтра в 15:00».`,
+      suggestedPrompts: [
+        'Запиши на комплекс на завтра',
+        'Сколько стоит керамика?',
+        'Сколько стоит полировка?',
+        'Есть ли скидки?',
+      ],
+      detectedCar: recognizedCar || undefined,
     };
   }
 
   // -------------------------------------------------------------------------
-  // INTENT 3: SERVICE INQUIRY ("мойка", "полировка", "керамика", "комплекс", "осмотр")
+  // SCENARIO 9: DISCOUNTS, PROMOTIONS & GIFTS
+  // ("скидки", "акции", "скидка", "подарок", "первый визит", "бонус")
   // -------------------------------------------------------------------------
   if (
-    lower.includes('мойк') ||
-    lower.includes('комплекс') ||
-    lower.includes('полировк') ||
-    lower.includes('керамик') ||
-    lower.includes('пленк') ||
-    lower.includes('оклейк') ||
-    lower.includes('химчист') ||
-    lower.includes('осмотр')
+    lower.includes('скидк') ||
+    lower.includes('акци') ||
+    lower.includes('подарок') ||
+    lower.includes('бонус') ||
+    lower.includes('первый визит') ||
+    lower.includes('дешевле')
   ) {
-    const svc = resolveMatchedService(lower, services);
-    const priceText = formatServicePrice(svc, selectedCar);
     return {
-      text: `Услуга «${svc.name}»:\n• Стоимость для ${selectedCar.name}: ${priceText}\n• Длительность: ${svc.durationMinutes ? `${Math.round(svc.durationMinutes / 60)} ч.` : 'от 2 ч.'}\n• Описание: ${svc.description}\n\nЗаписать вас на удобный день? Напишите, например: «Запиши на завтра в 12:00».`,
+      text: `${carRecognitionPill}🎁 **Специальные условия для вас:**\n\n1. **Скидка 10% на первый визит** при бронировании любого комплекса через наше онлайн-приложение.\n2. **Подарок:** бесплатная обработка лобового стекла и боковых зеркал гидрофобным составом «Антидождь» при заказе полировки кузова или химчистки.\n3. **Бесплатная диагностика:** замер толщины ЛКП толщиномером на каждом элементе — всегда 0 ₽.\n\nХотите воспользоваться спецпредложением прямо сейчас?`,
+      suggestedPrompts: [
+        `Запиши со скидкой 10% на завтра`,
+        'Сколько стоит полировка со скидкой?',
+        'Сколько стоит мойка со скидкой?',
+        'Осмотр и консультация мастера',
+      ],
+      detectedCar: recognizedCar || undefined,
     };
   }
 
   // -------------------------------------------------------------------------
-  // INTENT 4: LOCATION & CONTACTS ("где", "адрес", "телефон", "график", "часы")
+  // SCENARIO 10: PAYMENT METHODS & DOCUMENTS
+  // ("оплата", "как платить", "картой", "безнал", "счет", "рассрочка", "предоплата")
+  // -------------------------------------------------------------------------
+  if (
+    lower.includes('оплат') ||
+    lower.includes('платить') ||
+    lower.includes('карт') ||
+    lower.includes('безнал') ||
+    lower.includes('счет') ||
+    lower.includes('юрлиц') ||
+    lower.includes('предоплат') ||
+    lower.includes('терминал') ||
+    lower.includes('сбп')
+  ) {
+    return {
+      text: `💳 **Способы оплаты в студии ${studio.name}:**\n\n• **Никакой предоплаты:** расчёт производится строго по факту выполненных работ после вашей личной проверки и приёмки автомобиля.\n• **Банковские карты:** Visa, MasterCard, МИР через терминал.\n• **СБП (Система быстрых платежей):** моментальная оплата по QR-коду.\n• **Наличный расчёт.**\n• **Безналичный расчёт для юрлиц:** выставляем счёт, предоставляем полный комплект закрывающих документов (акт, УПД, договор).\n\nГотовы забронировать удобный слот?`,
+      suggestedPrompts: [
+        'Запиши на мойку на завтра',
+        'Прайс для моего авто',
+        'Где вы находитесь?',
+      ],
+      detectedCar: recognizedCar || undefined,
+    };
+  }
+
+  // -------------------------------------------------------------------------
+  // SCENARIO 11: WAITING LOUNGE & AMENITIES
+  // ("где подождать", "лаунж", "кофе", "диван", "вайфай", "wi-fi", "комната отдыха")
+  // -------------------------------------------------------------------------
+  if (
+    lower.includes('подождать') ||
+    lower.includes('лаунж') ||
+    lower.includes('кофе') ||
+    lower.includes('диван') ||
+    lower.includes('wi-fi') ||
+    lower.includes('вайфай') ||
+    lower.includes('комната отдыха') ||
+    lower.includes('зона ожидания')
+  ) {
+    return {
+      text: `☕ **Комфортная клиентская зона в студии ${studio.name}:**\n\nПока ваш автомобиль находится в заботливых руках наших мастеров, вы можете с комфортом отдохнуть в лаунже:\n• Зерновой итальянский кофе, чай и прохладительные напитки.\n• Удобные мягкие кожаные диваны и кондиционирование.\n• Высокоскоростной бесплатный Wi-Fi и рабочие розетки.\n• Игровая приставка PlayStation 5.\n• Мониторы видеонаблюдения с прямой трансляцией из боксов — вы всегда видите процесс работы над своим авто.\n\nЛибо вы можете оставить автомобиль и вернуться к назначенному времени готовности.`,
+      suggestedPrompts: [
+        'Запиши на завтра в 14:00',
+        'Сколько длится детейлинг-мойка?',
+        'Где вы находитесь?',
+      ],
+      detectedCar: recognizedCar || undefined,
+    };
+  }
+
+  // -------------------------------------------------------------------------
+  // SCENARIO 12: MANAGE BOOKINGS / RESCHEDULE / CANCEL
+  // ("отменить", "перенести", "мои записи", "где запись", "талон", "опоздаю")
+  // -------------------------------------------------------------------------
+  if (
+    lower.includes('отмен') ||
+    lower.includes('перенес') ||
+    lower.includes('мои запис') ||
+    lower.includes('мой талон') ||
+    lower.includes('опозда')
+  ) {
+    return {
+      text: `📲 **Управление вашими записями:**\n\nВсе ваши активные талоны хранятся в разделе **«Мои записи»** (иконка календаря в нижнем меню приложения).\n\nТам вы можете:\n• Посмотреть номер брони, дату и точный адрес студии.\n• Скачать запись в Apple / Google Calendar (файл .ics).\n• Перенести время или отменить визит в 1 клик без необходимости звонить.\n• Показать электронный талон мастеру при сдаче авто.\n\nНажмите кнопку ниже, чтобы открыть ваши записи прямо сейчас:`,
+      suggestedPrompts: [
+        'Перейти в мои записи',
+        'Записаться на другую услугу',
+        'Позвонить в студию',
+      ],
+      detectedCar: recognizedCar || undefined,
+    };
+  }
+
+  // -------------------------------------------------------------------------
+  // SCENARIO 13: OBJECTIONS & WHY QUALITY MATTERS
+  // ("дорого", "почему так дорого", "гарантия", "сотрете лак", "боюсь")
+  // -------------------------------------------------------------------------
+  if (
+    lower.includes('дорог') ||
+    lower.includes('почему так') ||
+    lower.includes('гаранти') ||
+    lower.includes('сотрете лак') ||
+    lower.includes('протрете') ||
+    lower.includes('боюсь')
+  ) {
+    return {
+      text: `💎 **Почему клиенты доверяют именно нам:**\n\n1. **Опыт и сертификация:** наши мастера имеют опыт от 5 лет и проходят регулярную сертификацию.\n2. **Премиум-химия:** работаем только проверенными составами (Koch Chemie, Rupes, Menzerna, SunTek, Gyeon). Никаких агрессивных щелочных пен, убивающих хром.\n3. **Инструментальный контроль:** перед полировкой замеряем лак толщиномером. Снимаем микроны, сохраняя заводской слой.\n4. **Ответственность:** несём полную материальную ответственность за сохранность авто на всё время пребывания в студии.\n5. **Гарантия:** предоставляем официальную гарантию на плёнку (5–7 лет) и керамику (до 2 лет).\n\nПриезжайте на бесплатный осмотр — мастер всё покажет и объяснит до начала работ!`,
+      suggestedPrompts: [
+        'Запиши на бесплатный осмотр',
+        'Сколько стоит полировка?',
+        'Где вы находитесь?',
+      ],
+      detectedCar: recognizedCar || undefined,
+    };
+  }
+
+  // -------------------------------------------------------------------------
+  // SCENARIO 14: LOCATION & CONTACTS
+  // ("где", "адрес", "телефон", "график", "как доехать", "навигатор")
   // -------------------------------------------------------------------------
   if (
     lower.includes('где') ||
     lower.includes('адрес') ||
     lower.includes('находит') ||
-    lower.includes('как доехать') ||
+    lower.includes('доехать') ||
+    lower.includes('проехать') ||
     lower.includes('телефон') ||
     lower.includes('номер') ||
     lower.includes('контакт') ||
@@ -385,12 +875,19 @@ export async function processAiMessage(options: ProcessMessageOptions): Promise<
     lower.includes('работаете')
   ) {
     return {
-      text: `Студия ${studio.name}:\n📍 Адрес: ${studio.branch.city}, ${studio.branch.address}\n📞 Телефон: ${studio.branch.phone}\n⏰ График работы: ${studio.branch.workingHoursText}\n⭐ Рейтинг: ${studio.branch.yandexRating || '5.0'} (${studio.branch.badge || 'Хорошее место'})\n\nМогу подсказать свободные окна или записать вас прямо сейчас.`,
+      text: `📍 **Контакты и адрес студии ${studio.name}:**\n\n• **Адрес:** ${studio.branch.city}, ${studio.branch.address}\n• **Телефон:** ${studio.branch.phone}\n• **Режим работы:** ${studio.branch.workingHoursText}\n• **Рейтинг на Яндекс Картах:** ⭐ ${studio.branch.yandexRating || '5.0'} (${studio.branch.badge || 'Хорошее место'})\n\nВ шапке приложения есть кнопка «Карта» для мгновенного построения маршрута в Яндекс Навигаторе.`,
+      suggestedPrompts: [
+        'Запиши на завтра в 14:00',
+        'Прайс для моего авто',
+        'Какие услуги есть?',
+      ],
+      detectedCar: recognizedCar || undefined,
     };
   }
 
   // -------------------------------------------------------------------------
-  // INTENT 5: GREETING ("привет", "здравствуй", "добрый день", "салют")
+  // SCENARIO 15: GREETINGS & SMALL TALK
+  // ("привет", "здравствуй", "добрый день", "салют", "хай")
   // -------------------------------------------------------------------------
   if (
     lower.includes('привет') ||
@@ -402,15 +899,29 @@ export async function processAiMessage(options: ProcessMessageOptions): Promise<
     lower.includes('хай')
   ) {
     return {
-      text: `Здравствуйте! Я официальный онлайн-консультант студии ${studio.name}.\n\nВаш выбранный автомобиль: ${selectedCar.name} (${selectedCar.categoryLabel}).\n\nЯ знаю точные цены для вашего класса, регламенты работ по мойке, полировке, керамике и химчистке, а также могу мгновенно забронировать свободный бокс без очередей.\n\nКакая услуга или вопрос вас интересует?`,
+      text: `${carRecognitionPill}Здравствуйте! Я онлайн-консультант премиальной студии **${studio.name}**.\n\n🚘 Текущий выбранный авто: **${activeCar.name}** (${activeCar.categoryLabel}). Если у вас другая модель, просто напишите её название!\n\nЧем могу помочь?\n• Рассчитать точную стоимость под вашу модель\n• Забронировать бокс на удобный день и час\n• Рассказать про мойку, полировку, керамику, оклейку пленкой или химчистку`,
+      suggestedPrompts: [
+        'Сколько стоит комплексная мойка?',
+        'Прайс на все услуги',
+        'Запиши на завтра в 14:00',
+        'Есть ли скидка на первый визит?',
+      ],
+      detectedCar: recognizedCar || undefined,
     };
   }
 
   // -------------------------------------------------------------------------
-  // DEFAULT FALLBACK
+  // DEFAULT FALLBACK: SMART CONCIERGE ASSISTANCE
   // -------------------------------------------------------------------------
   return {
-    text: `Я могу подсказать точные цены для вашего ${selectedCar.name}, рассказать о технологии детейлинга (мойка, полировка, керамика, оклейка пленкой, химчистка) или сразу забронировать бокс.\n\nНапишите, что вас интересует, или просто: «Запиши на комплексную мойку на завтра в 14:00».`,
+    text: `${carRecognitionPill}Я помогу вам с любым вопросом по детейлингу автомобиля **${activeCar.name}**:\n\n• Узнать точную стоимость (мойка, полировка, керамика, оклейка PPF, химчистка)\n• Записаться на свободное время (просто напишите: *«Запиши на комплекс на завтра в 15:00»*)\n• Уточнить технологию работ, используемую химию и гарантию\n• Подсказать адрес (${studio.branch.address}) и график работы\n\nЧто именно вас интересует?`,
+    suggestedPrompts: [
+      'Прайс для моего авто',
+      'Запиши на мойку на завтра',
+      'Сколько стоит полировка?',
+      'Бесплатный осмотр мастера',
+    ],
+    detectedCar: recognizedCar || undefined,
   };
 }
 

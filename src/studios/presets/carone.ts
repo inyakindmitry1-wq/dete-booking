@@ -9,7 +9,7 @@ export const caronePreset: StudioPreset = {
     'Детейлинг-студия Carone в Самаре на ул. Энтузиастов. Обладатель награды «Хорошее место 2026» Яндекс Карт с безупречным рейтингом 5.0. Деликатная мойка кузова, восстановительная полировка, оклейка полиуретаном и химчистка салона.',
   logoUrl: '/logos/carone.png',
   coverUrl: '/images/hero-car.jpg',
-  accentColor: '#38bdf8',
+  accentColor: '#2563eb',
   branch: {
     address: 'ул. Энтузиастов, 11',
     city: 'Самара',

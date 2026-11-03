@@ -9,7 +9,7 @@ export const apexPreset: StudioPreset = {
     'Премиальный детейлинг-центр APEX на Кутузовском проспекте. Закрытые стерильные боксы, спецосвещение, сертифицированные мастера и топовые защитные составы.',
   logoUrl: '/icons/apex-logo.png',
   coverUrl: '/images/hero-car.jpg',
-  accentColor: '#fbbf24',
+  accentColor: '#2563eb',
   branch: {
     address: 'Кутузовский проспект, 36, стр. 2',
     city: 'Москва',

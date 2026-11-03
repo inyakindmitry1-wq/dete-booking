@@ -19,7 +19,7 @@ export const DEFAULT_STUDIO_SLUG = 'carone';
 /**
  * Generates stylish SVG monogram Data URI for studios without dedicated image
  */
-export function generateSvgLogoDataUri(name: string, accentColor = '#fbbf24'): string {
+export function generateSvgLogoDataUri(name: string, accentColor = '#2563eb'): string {
   const words = name.trim().split(/\s+/);
   const initials = words.length > 1
     ? (words[0][0] + words[1][0]).toUpperCase()

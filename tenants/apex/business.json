@@ -11,7 +11,7 @@
   "businessType": "service",
   "isPreview": false,
   "branding": {
-    "accentColor": "#DC2626",
+    "accentColor": "#2563eb",
     "logoUrl": "https://images.unsplash.com/photo-1486006920555-c77dce18193b?auto=format&fit=crop&w=400&q=80",
     "coverUrl": "/images/hero-car.jpg",
     "theme": "industrial-dark",
