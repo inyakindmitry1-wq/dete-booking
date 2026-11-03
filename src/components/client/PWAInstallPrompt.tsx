@@ -229,7 +229,7 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1.5">
-                        <span className="text-xs font-bold text-white truncate">Sokol Team</span>
+                        <span className="text-xs font-bold text-white truncate">{tenant.name}</span>
                         <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400 shrink-0" />
                       </div>
                       <span className="text-[10px] text-zinc-400 block truncate">
@@ -275,7 +275,7 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({
 
                   <div className="rounded-xl bg-[#090a0d] border border-white/[0.08] p-2 px-3 flex items-center justify-between text-zinc-400">
                     <span className="text-[11px] font-mono text-zinc-500 truncate max-w-[200px]">
-                      sokol-detailing...
+                      {tenant.slug}-booking...
                     </span>
                     <div className="h-6 w-6 rounded-md bg-white/10 flex items-center justify-center text-white">
                       <MoreVertical className="h-3.5 w-3.5" />

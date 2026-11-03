@@ -15,7 +15,7 @@ export const OwnerHeader: React.FC<OwnerHeaderProps> = ({
   onLogout,
 }) => {
   const navigate = useNavigate();
-  const studioShortName = tenant.slug === 'graphite' ? 'SGX' : (tenant.name.split(' ')[0] || tenant.name);
+  const studioShortName = tenant.name.split(' ')[0] || tenant.name;
 
   return (
     <header className="sticky top-0 z-30 bg-[#090b10]/95 backdrop-blur-md border-b border-white/10 px-4 py-3.5">

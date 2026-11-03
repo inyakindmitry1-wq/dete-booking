@@ -7,7 +7,7 @@ export type PushSupportStatus =
   | 'granted'
   | 'denied';
 
-export function useWebPush() {
+export function useWebPush(tenant?: { name?: string; logo_url?: string }) {
   const [status, setStatus] = useState<PushSupportStatus>('unsupported');
   const [isSubscribing, setIsSubscribing] = useState(false);
 
@@ -51,6 +51,9 @@ export function useWebPush() {
     if (!('Notification' in window)) return false;
 
     setIsSubscribing(true);
+    const studioName = tenant?.name || 'Детейлинг-студия';
+    const studioIcon = tenant?.logo_url || '/icons/carone-logo.png';
+
     try {
       const permission = await Notification.requestPermission();
       if (permission === 'granted') {
@@ -61,17 +64,17 @@ export function useWebPush() {
           if ('serviceWorker' in navigator) {
             const reg = await navigator.serviceWorker.ready;
             if (reg && reg.showNotification) {
-              await reg.showNotification('Sokol Team Detailing', {
+              await reg.showNotification(studioName, {
                 body: 'Уведомления подключены! Мы напомним вам о визите и сообщим о готовности авто.',
-                icon: '/icons/sokol-logo.png',
-                badge: '/icons/sokol-logo.png',
+                icon: studioIcon,
+                badge: studioIcon,
               });
               return true;
             }
           }
-          new Notification('Sokol Team Detailing', {
+          new Notification(studioName, {
             body: 'Уведомления подключены! Мы напомним вам о визите и сообщим о готовности авто.',
-            icon: '/icons/sokol-logo.png',
+            icon: studioIcon,
           });
         } catch {
           // Fallback if browser requires specific trigger

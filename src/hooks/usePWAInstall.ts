@@ -9,7 +9,7 @@ export interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;
 }
 
-export function usePWAInstall(tenantSlug: string = 'sokol') {
+export function usePWAInstall(tenantSlug: string = 'carone') {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isStandalone, setIsStandalone] = useState(false);
   const [isIOS, setIsIOS] = useState(false);

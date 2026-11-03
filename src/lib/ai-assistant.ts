@@ -20,7 +20,7 @@ function getAssistantApiKey(): string {
 }
 
 /**
- * Intelligent domain-specialized AI concierge for Sokol Team Detailing
+ * Intelligent domain-specialized AI concierge for detailing studio
  * Formulates concise, strict, fact-only answers without fluff.
  */
 export async function askStudioAssistant(
@@ -154,11 +154,14 @@ export async function askStudioAssistant(
   }
 
   if (query.includes('цен') || query.includes('прайс') || query.includes('скольк')) {
-    return `Прайс-лист Sokol Team Detailing:
-• Стандарт мойка: от 3 900 ₽
-• Премиум мойка: от 5 900 ₽
+    if (services && services.length > 0) {
+      const topServices = services.slice(0, 6).map(s => `• ${s.name}: от ${(s.price || 0).toLocaleString('ru-RU')} ₽`).join('\n');
+      return `Прайс-лист ${tenant.name}:\n${topServices}\n\nЦены зависят от класса авто. Выберите услугу в каталоге, чтобы увидеть точную сумму под вашу модель.`;
+    }
+    return `Прайс-лист ${tenant.name}:
+• Комплексная мойка: от 3 500 ₽
 • Полировка кузова: от 18 000 ₽
-• Керамика 9H (2 слоя): от 32 000 ₽
+• Керамика 9H: от 30 000 ₽
 • Оклейка PPF: от 75 000 ₽
 • Химчистка салона: от 14 000 ₽
 Цены зависят от класса авто. Выберите услугу в каталоге, чтобы увидеть точную сумму под вашу модель.`;

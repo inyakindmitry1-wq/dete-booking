@@ -30,7 +30,7 @@ export const BookingReceipt: React.FC<BookingReceiptProps> = ({
   onManageBooking,
 }) => {
   const [copied, setCopied] = useState(false);
-  const { status: pushStatus, isSubscribing, requestPushPermission } = useWebPush();
+  const { status: pushStatus, isSubscribing, requestPushPermission } = useWebPush(tenant);
 
   const shareableUrl = `${window.location.origin}/s/${tenant.slug}/booking/${booking.booking_id}?token=${booking.access_token}`;
 
@@ -39,7 +39,7 @@ export const BookingReceipt: React.FC<BookingReceiptProps> = ({
   const finishDate = new Date(booking.end_time);
   const formattedFinish = format(finishDate, "d MMMM 'в' HH:mm", { locale: ru });
 
-  const studioShortName = tenant.slug === 'graphite' ? 'SGX' : (tenant.name.split(' ')[0] || 'SGX');
+  const studioShortName = tenant.name.split(' ')[0] || tenant.name;
   const studioAddress = `${tenant.city}, ${tenant.address}`;
 
   async function handleShareOrCopy() {

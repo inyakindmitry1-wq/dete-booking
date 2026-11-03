@@ -125,7 +125,7 @@ export const MyBookingsView: React.FC<MyBookingsViewProps> = ({ tenant, onBookNe
   const priceValue = activeBooking?.price_snapshot || currentStored?.price || 3500;
   const carModelValue = activeBooking?.car_model || currentStored?.car_model || activeBooking?.customer?.name || '';
   const studioAddress = `${tenant.city}, ${tenant.address}`;
-  const studioShortName = tenant.slug === 'graphite' ? 'SGX' : (tenant.name.split(' ')[0] || 'SGX');
+  const studioShortName = tenant.name.split(' ')[0] || tenant.name;
 
   const shareableUrl = currentStored
     ? `${window.location.origin}/s/${tenant.slug}/booking/${currentStored.booking_id}?token=${currentStored.access_token}`

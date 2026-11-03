@@ -94,7 +94,7 @@ export const ClientBookingStatusPage: React.FC = () => {
       ? 'Выполнен'
       : 'Отменена';
 
-  const studioShortName = tenant.slug === 'graphite' ? 'SGX' : (tenant.name.split(' ')[0] || 'SGX');
+  const studioShortName = tenant.name.split(' ')[0] || tenant.name;
   const studioAddress = `${tenant.city}, ${tenant.address}`;
 
   function handleDownloadCalendar() {
