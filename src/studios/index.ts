@@ -4,6 +4,7 @@ import { caronePreset } from './presets/carone';
 import { syndicatePreset } from './presets/syndicate';
 import { brooklandsPreset } from './presets/brooklands';
 import { evMotorsPreset } from './presets/ev-motors';
+import { assetUrl } from '@/lib/utils';
 
 export * from './types';
 export { apexPreset, caronePreset, syndicatePreset, brooklandsPreset, evMotorsPreset };
@@ -84,8 +85,17 @@ export function applyStudioBranding(studio: StudioPreset): void {
   // 1. Update Title
   document.title = `${studio.name} — Онлайн-запись в студию`;
 
-  // 2. Resolve logo or fallback monogram
-  const iconUrl = studio.logoUrl || generateSvgLogoDataUri(studio.name, studio.accentColor);
+  // 1.1 Update Apple Mobile Web App Title (CRITICAL for iOS Add to Home Screen)
+  let appleTitleMeta = document.querySelector('meta[name="apple-mobile-web-app-title"]') as HTMLMetaElement | null;
+  if (!appleTitleMeta) {
+    appleTitleMeta = document.createElement('meta');
+    appleTitleMeta.name = 'apple-mobile-web-app-title';
+    document.head.appendChild(appleTitleMeta);
+  }
+  appleTitleMeta.content = studio.shortName || studio.name;
+
+  // 2. Resolve logo or fallback monogram using assetUrl to guarantee correct GitHub Pages base path
+  const iconUrl = studio.logoUrl ? assetUrl(studio.logoUrl) : generateSvgLogoDataUri(studio.name, studio.accentColor);
 
   // 3. Update ALL Favicons & Apple Touch Icons
   const favicons = document.querySelectorAll<HTMLLinkElement>("link[rel*='icon']");
@@ -112,7 +122,7 @@ export function applyStudioBranding(studio: StudioPreset): void {
   if (manifestLink) {
     const dynamicManifest = {
       name: studio.name,
-      short_name: studio.shortName,
+      short_name: studio.shortName || studio.name,
       description: studio.description || studio.tagline,
       start_url: `${import.meta.env.BASE_URL}s/${studio.slug}/?studio=${studio.slug}`.replace(/\/+/g, '/'),
       scope: `${import.meta.env.BASE_URL}`.replace(/\/+/g, '/'),

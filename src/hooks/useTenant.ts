@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '@/lib/api';
 import { DbTenant } from '@/types/database';
+import { assetUrl } from '@/lib/utils';
 
 function hexToHsl(hex: string): string {
   let c = hex.replace('#', '');
@@ -82,15 +83,32 @@ export function useTenant() {
       console.warn('Could not set accent color:', e);
     }
 
+    // Update document title and apple-mobile-web-app-title
+    document.title = `${tenant.name} — Онлайн-запись в студию`;
+
+    let appleTitleMeta = document.querySelector('meta[name="apple-mobile-web-app-title"]') as HTMLMetaElement | null;
+    if (!appleTitleMeta) {
+      appleTitleMeta = document.createElement('meta');
+      appleTitleMeta.name = 'apple-mobile-web-app-title';
+      document.head.appendChild(appleTitleMeta);
+    }
+    appleTitleMeta.content = tenant.name;
+
     // Update favicon and apple-touch-icon links
+    const resolvedLogo = assetUrl(tenant.logo_url);
     const faviconLink = document.getElementById('favicon-link') as HTMLLinkElement | null;
-    if (faviconLink && tenant.logo_url) {
-      faviconLink.href = tenant.logo_url;
+    if (faviconLink && resolvedLogo) {
+      faviconLink.href = resolvedLogo;
     }
     const appleTouchIcon = document.getElementById('apple-touch-icon') as HTMLLinkElement | null;
-    if (appleTouchIcon && tenant.logo_url) {
-      appleTouchIcon.href = tenant.logo_url;
+    if (appleTouchIcon && resolvedLogo) {
+      appleTouchIcon.href = resolvedLogo;
     }
+
+    const allAppleIcons = document.querySelectorAll<HTMLLinkElement>("link[rel*='apple-touch-icon']");
+    allAppleIcons.forEach((el) => {
+      if (resolvedLogo) el.href = resolvedLogo;
+    });
 
     // Update Web App Manifest link dynamically
     const manifestLink = document.getElementById('manifest-link') as HTMLLinkElement | null;
@@ -106,25 +124,25 @@ export function useTenant() {
         theme_color: tenant.accent_color,
         icons: [
           {
-            src: tenant.logo_url,
+            src: resolvedLogo,
             sizes: '192x192',
             type: 'image/png',
             purpose: 'any',
           },
           {
-            src: tenant.logo_url,
+            src: resolvedLogo,
             sizes: '192x192',
             type: 'image/png',
             purpose: 'maskable',
           },
           {
-            src: tenant.logo_url,
+            src: resolvedLogo,
             sizes: '512x512',
             type: 'image/png',
             purpose: 'any',
           },
           {
-            src: tenant.logo_url,
+            src: resolvedLogo,
             sizes: '512x512',
             type: 'image/png',
             purpose: 'maskable',

@@ -5,15 +5,56 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" id="apple-mobile-web-app-title" content="Онлайн-запись" />
     <meta name="format-detection" content="telephone=no" />
-    <title>Carone Detailing — Онлайн-запись в студию</title>
-    <!-- Dynamic tenant meta tags will be updated at runtime -->
+    <title id="app-title">Онлайн-запись в студию детейлинга</title>
+    <!-- Dynamic tenant meta tags updated synchronously and at runtime -->
     <link rel="icon" id="favicon-link" type="image/png" href="%BASE_URL%favicon.png" />
     <link rel="apple-touch-icon" id="apple-touch-icon" href="%BASE_URL%apple-touch-icon.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="%BASE_URL%apple-touch-icon.png" />
     <link rel="apple-touch-icon" sizes="192x192" href="%BASE_URL%pwa-192x192.png" />
     <link rel="apple-touch-icon" sizes="512x512" href="%BASE_URL%pwa-512x512.png" />
     <link rel="manifest" id="manifest-link" href="%BASE_URL%manifest.webmanifest" />
+
+    <!-- Synchronous early tenant branding before React mount -->
+    <script type="text/javascript">
+      (function() {
+        try {
+          var base = '%BASE_URL%';
+          var loc = window.location;
+          var p = loc.pathname;
+          var s = new URLSearchParams(loc.search);
+          var match = p.match(/\/s\/([a-zA-Z0-9_-]+)/);
+          var slug = match ? match[1] : (s.get('studio') || '');
+          
+          var studios = {
+            'ev-motors': { name: 'EV Motors', short: 'EV Motors', logo: 'logos/ev-motors.png' },
+            'carone': { name: 'Carone Detailing', short: 'Carone', logo: 'logos/carone.png' },
+            'apex': { name: 'Apex Detailing', short: 'Apex', logo: 'icons/apex-logo.png' },
+            'syndicate': { name: 'Syndicate Detailing', short: 'Syndicate', logo: 'icons/syndicate-logo.png' },
+            'brooklands': { name: 'Brooklands Detailing', short: 'Brooklands', logo: 'icons/apex-logo.png' },
+            'sokol': { name: 'Автомоечный комплекс Сокол', short: 'Сокол', logo: 'icons/sokol-logo.png' },
+            'graphite': { name: 'Graphite Auto Lab', short: 'Graphite', logo: 'icons/sokol-logo.png' }
+          };
+          var current = studios[slug];
+          if (current) {
+            document.title = current.name + ' — Онлайн-запись в студию';
+            var appleTitle = document.getElementById('apple-mobile-web-app-title');
+            if (appleTitle) appleTitle.setAttribute('content', current.short || current.name);
+            var logoHref = base + current.logo;
+            var fav = document.getElementById('favicon-link');
+            if (fav) fav.href = logoHref;
+            var appleIcons = document.querySelectorAll("link[rel*='apple-touch-icon']");
+            for (var i = 0; i < appleIcons.length; i++) {
+              appleIcons[i].href = logoHref;
+            }
+            var man = document.getElementById('manifest-link');
+            if (man) man.href = base + 's/' + slug + '/manifest.webmanifest';
+          }
+        } catch (e) {}
+      })();
+    </script>
+
     <!-- Start Single Page Apps for GitHub Pages -->
     <script type="text/javascript">
       (function(l) {
