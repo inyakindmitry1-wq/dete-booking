@@ -12,6 +12,18 @@ const distDir = path.join(process.cwd(), 'dist');
 fs.writeFileSync(path.join(distDir, '.nojekyll'), '');
 
 const tenantMetadata = {
+  'helios': {
+    name: 'Хелиос Тюнинг',
+    shortName: 'Хелиос',
+    tagline: 'Премиальный автосвет, детейлинг и стайлинг в Самаре',
+    logoRelPath: 'logos/helios.png',
+  },
+  'khelios': {
+    name: 'Хелиос Тюнинг',
+    shortName: 'Хелиос',
+    tagline: 'Премиальный автосвет, детейлинг и стайлинг в Самаре',
+    logoRelPath: 'logos/helios.png',
+  },
   'favorit': {
     name: 'Фаворит Детейлинг',
     shortName: 'Фаворит',
@@ -70,6 +82,10 @@ const tenantMetadata = {
 
 // Pre-create directory index.html and dedicated manifest/icons for all known tenant routes
 const staticRoutes = [
+  's/helios',
+  's/helios/owner',
+  's/khelios',
+  's/khelios/owner',
   's/favorit',
   's/favorit/owner',
   's/favorite',
@@ -190,7 +206,14 @@ try {
   execSync('git add -A', { cwd: distDir });
   execSync('git commit -m "deploy: update GitHub Pages build with dynamic PWA branding"', { cwd: distDir });
   execSync('git branch -M gh-pages', { cwd: distDir });
-  execSync('git push -f https://github.com/inyakindmitry1-wq/dete-booking.git gh-pages', { cwd: distDir, stdio: 'inherit' });
+  let token = '';
+  try {
+    token = execSync('gh auth token').toString().trim();
+  } catch {}
+  const remoteUrl = token
+    ? `https://x-access-token:${token}@github.com/inyakindmitry1-wq/dete-booking.git`
+    : 'https://github.com/inyakindmitry1-wq/dete-booking.git';
+  execSync(`git push -f ${remoteUrl} gh-pages`, { cwd: distDir, stdio: 'inherit' });
   console.log('✅ gh-pages branch updated on GitHub!');
 } catch (err) {
   console.error('Error during git push:', err);

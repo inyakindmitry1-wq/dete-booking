@@ -8,6 +8,7 @@ import syndicateJson from '../../tenants/syndicate/business.json';
 import caroneJson from '../../tenants/carone/business.json';
 import evMotorsJson from '../../tenants/ev-motors/business.json';
 import favoritJson from '../../tenants/favorit/business.json';
+import heliosJson from '../../tenants/helios/business.json';
 
 interface DatabaseState {
   tenants: DbTenant[];
@@ -38,7 +39,7 @@ function loadInitialState(): DatabaseState {
   const tenant_members: DbTenantMember[] = [];
   const notification_jobs: DbNotificationJob[] = [];
 
-  const rawConfigs = [sokolJson, graphiteJson, apexJson, syndicateJson, caroneJson, evMotorsJson, favoritJson];
+  const rawConfigs = [sokolJson, graphiteJson, apexJson, syndicateJson, caroneJson, evMotorsJson, favoritJson, heliosJson];
 
   for (const cfg of rawConfigs) {
     const tenantId = `tenant-${cfg.slug}`;

@@ -1,0 +1,189 @@
+{
+  "slug": "helios",
+  "name": "Хелиос Тюнинг",
+  "tagline": "Премиальный автосвет, детейлинг и стайлинг в Самаре",
+  "description": "Центр детейлинга, автосвета и стайлинга «Хелиос Тюнинг» в Самаре на улице Стара-Загора, 42. Обладатель награды «Хорошее место 2026» Яндекс Карт с рейтингом 5.0. Специализируемся на установке Bi-LED линз, устранении запотевания фар, восстановительной полировке, бронировании полиуретаном PPF и профессиональном дооснащении автомобилей.",
+  "phone": "+7 (846) 231-40-50",
+  "address": "улица Стара-Загора, 42",
+  "city": "Самара",
+  "currency": "RUB",
+  "timezone": "Europe/Samara",
+  "businessType": "detailing",
+  "isPreview": false,
+  "branding": {
+    "accentColor": "#dc2626",
+    "logoUrl": "/logos/helios.png",
+    "coverUrl": "/images/hero-car.jpg",
+    "theme": "luxury-dark",
+    "favicon": "/logos/helios.png",
+    "appleTouchIcon": "/logos/helios.png"
+  },
+  "resources": [
+    {
+      "id": "77777777-7777-4777-8777-777777777701",
+      "name": "Бокс автосвета 1 (Bi-LED Lab)",
+      "type": "detailing_bay",
+      "description": "Оптический пост регулировки по ГОСТу и установки Bi-LED модулей",
+      "is_active": true,
+      "sort_order": 1
+    },
+    {
+      "id": "77777777-7777-4777-8777-777777777702",
+      "name": "Полировочный бокс 2 (Хелиос Lab)",
+      "type": "detailing_bay",
+      "description": "Зона восстановительной полировки кузова и керамических составов",
+      "is_active": true,
+      "sort_order": 2
+    },
+    {
+      "id": "77777777-7777-4777-8777-777777777703",
+      "name": "PPF бокс 3 (Броня и Стайлинг)",
+      "type": "detailing_bay",
+      "description": "Обеспыленная зона оклейки полиуретаном и антихрома",
+      "is_active": true,
+      "sort_order": 3
+    }
+  ],
+  "services": [
+    {
+      "id": "cccccccc-cccc-4ccc-8ccc-cccccccccc01",
+      "category": "Полировка кузова",
+      "name": "Абразивная восстановительная полировка кузова",
+      "description": "Глубокая многоступенчатая полировка ЛКП пастами премиум-класса. Удаление до 95% царапин, паутинки от моек и голограмм до зеркального блеска.",
+      "duration_minutes": 360,
+      "buffer_minutes": 30,
+      "price": 2200,
+      "is_active": true,
+      "image_url": "/images/services/polishing.jpg",
+      "sort_order": 1
+    },
+    {
+      "id": "cccccccc-cccc-4ccc-8ccc-cccccccccc02",
+      "category": "Полировка кузова",
+      "name": "Блесковая финишная полировка кузова",
+      "description": "Мягкая полировка в один проход финишной антиголограммной пастой с предварительной очисткой кузова. Возвращает заводской глянец и глубину цвета.",
+      "duration_minutes": 180,
+      "buffer_minutes": 30,
+      "price": 13000,
+      "is_active": true,
+      "image_url": "/images/services/syndicate-polish.jpg",
+      "sort_order": 2
+    },
+    {
+      "id": "cccccccc-cccc-4ccc-8ccc-cccccccccc03",
+      "category": "Автосвет",
+      "name": "Установка Bi-LED линз в фары (+60% яркости)",
+      "description": "Установка мощных двухчиповых светодиодных Bi-LED модулей. Увеличение освещенности на 60%, четкая светотеневая граница и настройка по ГОСТу.",
+      "duration_minutes": 480,
+      "buffer_minutes": 60,
+      "price": 25000,
+      "is_active": true,
+      "image_url": "/images/services/wash-premium.jpg",
+      "sort_order": 3
+    },
+    {
+      "id": "cccccccc-cccc-4ccc-8ccc-cccccccccc04",
+      "category": "Автосвет",
+      "name": "Устранение запотевания и герметизация фар",
+      "description": "Полная разборка фары, выявление трещин, очистка заводского канта, замена термогерметика на профессиональный бутил и опрессовка на герметичность с гарантией.",
+      "duration_minutes": 240,
+      "buffer_minutes": 30,
+      "price": 6000,
+      "is_active": true,
+      "image_url": "/images/services/cleaning.jpg",
+      "sort_order": 4
+    },
+    {
+      "id": "cccccccc-cccc-4ccc-8ccc-cccccccccc05",
+      "category": "Оклейка пленкой",
+      "name": "Бронирование фар полиуретановой пленкой PPF",
+      "description": "Оклейка стекол фар кристально прозрачным полиуретаном 200 мкм с самозатягивающимся слоем Top Coat. Надежная защита от сколов, гравия и помутнения.",
+      "duration_minutes": 60,
+      "buffer_minutes": 15,
+      "price": 5000,
+      "is_active": true,
+      "image_url": "/images/services/ppf.jpg",
+      "sort_order": 5
+    },
+    {
+      "id": "cccccccc-cccc-4ccc-8ccc-cccccccccc06",
+      "category": "Автосвет",
+      "name": "Глубокая восстановительная полировка фар",
+      "description": "Многоступенчатая шлифовка и полировка поликарбоната фар. Полностью устраняет желтизну, микротрещины и восстанавливает 100% прозрачность.",
+      "duration_minutes": 45,
+      "buffer_minutes": 15,
+      "price": 1000,
+      "is_active": true,
+      "image_url": "/images/services/interior.jpg",
+      "sort_order": 6
+    },
+    {
+      "id": "cccccccc-cccc-4ccc-8ccc-cccccccccc07",
+      "category": "Стайлинг",
+      "name": "Комплексный антихром кузова (Shadow Line)",
+      "description": "Замена хромированных элементов (решетка радиатора, молдинги окон, шильдики) на стильный черный глянец или сатин премиальной пленкой.",
+      "duration_minutes": 360,
+      "buffer_minutes": 30,
+      "price": 12000,
+      "is_active": true,
+      "image_url": "/images/carone/hero.jpg",
+      "sort_order": 7
+    },
+    {
+      "id": "cccccccc-cccc-4ccc-8ccc-cccccccccc08",
+      "category": "Диагностика",
+      "name": "Диагностика автосвета и дефектовка фар — слот 30 мин (0 ₽)",
+      "description": "Бесплатная инструментальная проверка света фар на оптическом стенде по ГОСТу, замер силы света люксметром и экспертная консультация мастера.",
+      "duration_minutes": 30,
+      "buffer_minutes": 0,
+      "price": 0,
+      "is_active": true,
+      "image_url": "/images/services/himchistka.jpg",
+      "sort_order": 8
+    }
+  ],
+  "serviceResources": [
+    {
+      "serviceId": "cccccccc-cccc-4ccc-8ccc-cccccccccc01",
+      "resourceId": "77777777-7777-4777-8777-777777777702"
+    },
+    {
+      "serviceId": "cccccccc-cccc-4ccc-8ccc-cccccccccc02",
+      "resourceId": "77777777-7777-4777-8777-777777777702"
+    },
+    {
+      "serviceId": "cccccccc-cccc-4ccc-8ccc-cccccccccc03",
+      "resourceId": "77777777-7777-4777-8777-777777777701"
+    },
+    {
+      "serviceId": "cccccccc-cccc-4ccc-8ccc-cccccccccc04",
+      "resourceId": "77777777-7777-4777-8777-777777777701"
+    },
+    {
+      "serviceId": "cccccccc-cccc-4ccc-8ccc-cccccccccc05",
+      "resourceId": "77777777-7777-4777-8777-777777777703"
+    },
+    {
+      "serviceId": "cccccccc-cccc-4ccc-8ccc-cccccccccc06",
+      "resourceId": "77777777-7777-4777-8777-777777777701"
+    },
+    {
+      "serviceId": "cccccccc-cccc-4ccc-8ccc-cccccccccc07",
+      "resourceId": "77777777-7777-4777-8777-777777777703"
+    },
+    {
+      "serviceId": "cccccccc-cccc-4ccc-8ccc-cccccccccc08",
+      "resourceId": "77777777-7777-4777-8777-777777777701"
+    }
+  ],
+  "workingHours": [
+    { "day_of_week": 0, "open_time": "10:00:00", "close_time": "20:00:00", "is_closed": true },
+    { "day_of_week": 1, "open_time": "10:00:00", "close_time": "20:00:00", "is_closed": false },
+    { "day_of_week": 2, "open_time": "10:00:00", "close_time": "20:00:00", "is_closed": false },
+    { "day_of_week": 3, "open_time": "10:00:00", "close_time": "20:00:00", "is_closed": false },
+    { "day_of_week": 4, "open_time": "10:00:00", "close_time": "20:00:00", "is_closed": false },
+    { "day_of_week": 5, "open_time": "10:00:00", "close_time": "20:00:00", "is_closed": false },
+    { "day_of_week": 6, "open_time": "10:00:00", "close_time": "20:00:00", "is_closed": false }
+  ],
+  "scheduleExceptions": []
+}

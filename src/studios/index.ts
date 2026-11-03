@@ -5,12 +5,16 @@ import { syndicatePreset } from './presets/syndicate';
 import { brooklandsPreset } from './presets/brooklands';
 import { evMotorsPreset } from './presets/ev-motors';
 import { favoritPreset } from './presets/favorit';
+import { heliosPreset } from './presets/helios';
 import { assetUrl } from '@/lib/utils';
 
 export * from './types';
-export { apexPreset, caronePreset, syndicatePreset, brooklandsPreset, evMotorsPreset, favoritPreset };
+export { apexPreset, caronePreset, syndicatePreset, brooklandsPreset, evMotorsPreset, favoritPreset, heliosPreset };
 
 export const studiosRegistry: Record<string, StudioPreset> = {
+  helios: heliosPreset,
+  khelios: heliosPreset,
+  'khelios-tyuning': heliosPreset,
   favorit: favoritPreset,
   favorite: favoritPreset,
   'ev-motors': evMotorsPreset,
