@@ -503,8 +503,8 @@ export async function processAiMessage(options: ProcessMessageOptions): Promise<
   let activeCar = options.selectedCar;
   const lower = userMessage.toLowerCase().trim();
 
-  // 1. Simulate realistic response delay (650 - 950 ms)
-  const delayMs = Math.floor(650 + Math.random() * 300);
+  // 1. Fast local NLU response (<0.1s)
+  const delayMs = 50;
   await new Promise((resolve) => setTimeout(resolve, delayMs));
 
   // 2. Intelligent Auto-Detection of Vehicle Brand & Class
