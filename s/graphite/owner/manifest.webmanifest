@@ -1,0 +1,36 @@
+{
+  "name": "Graphite Auto Lab",
+  "short_name": "Graphite",
+  "description": "Студия профессионального автодетейлинга в Санкт-Петербурге",
+  "start_url": "/dete-booking/s/graphite/",
+  "scope": "/dete-booking/s/graphite/",
+  "display": "standalone",
+  "background_color": "#09090b",
+  "theme_color": "#09090b",
+  "icons": [
+    {
+      "src": "/dete-booking/icons/sokol-logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/dete-booking/icons/sokol-logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/dete-booking/icons/sokol-logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/dete-booking/icons/sokol-logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "name": "Apex Detailing",
+  "short_name": "Apex",
+  "description": "Премиальный детейлинг и защита кузова в Москве",
+  "start_url": "/dete-booking/s/apex/",
+  "scope": "/dete-booking/s/apex/",
+  "display": "standalone",
+  "background_color": "#09090b",
+  "theme_color": "#09090b",
+  "icons": [
+    {
+      "src": "/dete-booking/icons/apex-logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/dete-booking/icons/apex-logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/dete-booking/icons/apex-logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/dete-booking/icons/apex-logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

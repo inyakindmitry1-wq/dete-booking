@@ -1,0 +1,36 @@
+{
+  "name": "Carone Detailing",
+  "short_name": "Carone",
+  "description": "Профессиональный детейлинг, бронирование кузова и автомойка в Самаре",
+  "start_url": "/dete-booking/s/carone/",
+  "scope": "/dete-booking/s/carone/",
+  "display": "standalone",
+  "background_color": "#09090b",
+  "theme_color": "#09090b",
+  "icons": [
+    {
+      "src": "/dete-booking/logos/carone.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/dete-booking/logos/carone.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/dete-booking/logos/carone.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/dete-booking/logos/carone.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

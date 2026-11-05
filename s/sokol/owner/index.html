@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ru" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" id="apple-mobile-web-app-title" content="Сокол" />
+    <meta name="format-detection" content="telephone=no" />
+    <title id="app-title">Автомоечный комплекс Сокол • Панель владельца</title>
+    <!-- Dynamic tenant meta tags updated synchronously and at runtime -->
+    <link rel="icon" id="favicon-link" type="image/png" href="/dete-booking/icons/sokol-logo.png" />
+    <link rel="apple-touch-icon" id="apple-touch-icon" href="/dete-booking/icons/sokol-logo.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/dete-booking/icons/sokol-logo.png" />
+    <link rel="apple-touch-icon" sizes="192x192" href="/dete-booking/icons/sokol-logo.png" />
+    <link rel="apple-touch-icon" sizes="512x512" href="/dete-booking/icons/sokol-logo.png" />
+    <link rel="manifest" id="manifest-link" href="/dete-booking/s/sokol/manifest.webmanifest" />
+
+    <!-- Synchronous early tenant branding before React mount -->
+    <script type="text/javascript">
+      (function() {
+        try {
+          var base = '/dete-booking/';
+          var loc = window.location;
+          var p = loc.pathname;
+          var s = new URLSearchParams(loc.search);
+          var match = p.match(/\/s\/([a-zA-Z0-9_-]+)/);
+          var slug = match ? match[1] : (s.get('studio') || '');
+          
+          var studios = {
+            'helios': { name: 'Хелиос Тюнинг', short: 'Хелиос', logo: 'logos/helios.png' },
+            'khelios': { name: 'Хелиос Тюнинг', short: 'Хелиос', logo: 'logos/helios.png' },
+            'khelios-tyuning': { name: 'Хелиос Тюнинг', short: 'Хелиос', logo: 'logos/helios.png' },
+            'favorit': { name: 'Фаворит Детейлинг', short: 'Фаворит', logo: 'logos/favorit.png' },
+            'favorite': { name: 'Фаворит Детейлинг', short: 'Фаворит', logo: 'logos/favorit.png' },
+            'ev-motors': { name: 'EV Motors', short: 'EV Motors', logo: 'logos/ev-motors.png' },
+            'carone': { name: 'Carone Detailing', short: 'Carone', logo: 'logos/carone.png' },
+            'apex': { name: 'Apex Detailing', short: 'Apex', logo: 'icons/apex-logo.png' },
+            'syndicate': { name: 'Syndicate Detailing', short: 'Syndicate', logo: 'icons/syndicate-logo.png' },
+            'brooklands': { name: 'Brooklands Detailing', short: 'Brooklands', logo: 'icons/apex-logo.png' },
+            'sokol': { name: 'Автомоечный комплекс Сокол', short: 'Сокол', logo: 'icons/sokol-logo.png' },
+            'graphite': { name: 'Graphite Auto Lab', short: 'Graphite', logo: 'icons/sokol-logo.png' }
+          };
+          var current = studios[slug];
+          if (current) {
+            document.title = current.name + ' — Онлайн-запись в студию';
+            var appleTitle = document.getElementById('apple-mobile-web-app-title');
+            if (appleTitle) appleTitle.setAttribute('content', current.short || current.name);
+            var logoHref = base + current.logo;
+            var fav = document.getElementById('favicon-link');
+            if (fav) fav.href = logoHref;
+            var appleIcons = document.querySelectorAll("link[rel*='apple-touch-icon']");
+            for (var i = 0; i < appleIcons.length; i++) {
+              appleIcons[i].href = logoHref;
+            }
+            var man = document.getElementById('manifest-link');
+            if (man) man.href = base + 's/' + slug + '/manifest.webmanifest';
+          }
+        } catch (e) {}
+      })();
+    </script>
+
+    <!-- Start Single Page Apps for GitHub Pages -->
+    <script type="text/javascript">
+      (function(l) {
+        if (l.search[1] === '/' ) {
+          var decoded = l.search.slice(1).split('&').map(function(s) { 
+            return s.replace(/~and~/g, '&')
+          }).join('?');
+          window.history.replaceState(null, null,
+              l.pathname.slice(0, -1) + decoded + l.hash
+          );
+        }
+      }(window.location))
+    </script>
+    <!-- End Single Page Apps for GitHub Pages -->
+    <script type="module" crossorigin src="/dete-booking/assets/index-fenAgLjz.js"></script>
+    <link rel="stylesheet" crossorigin href="/dete-booking/assets/index-B7erB7po.css">
+  <script id="vite-plugin-pwa:register-sw" src="/dete-booking/registerSW.js"></script></head>
+  <body class="bg-background text-foreground antialiased selection:bg-primary/20 selection:text-primary">
+    <div id="root"></div>
+  </body>
+</html>
